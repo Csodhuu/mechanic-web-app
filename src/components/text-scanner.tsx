@@ -11,9 +11,27 @@ type CropRegion = {
   x: number;
   y: number;
 };
+type Rectangle = {
+  height: number;
+  width: number;
+  x: number;
+  y: number;
+};
+type PageSegMode = NonNullable<
+  Parameters<TesseractWorker["setParameters"]>[0]["tessedit_pageseg_mode"]
+>;
+type RecognitionTarget = {
+  blobs: Blob[];
+  characterBlobs: Blob[];
+  previewUrl: string;
+};
 
 const OCR_WHITELIST =
   "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZАБВГДЕЁЖЗИЙКЛМНОӨПРСТУҮФХЦЧШЩЪЫЬЭЮЯ";
+const DIGIT_WHITELIST = "0123456789";
+const LETTER_WHITELIST = "АБВГДЕЁЖЗИЙКЛМНОӨПРСТУҮФХЦЧШЩЪЫЬЭЮЯ";
+const PSM_SINGLE_LINE = 7 as unknown as PageSegMode;
+const PSM_SINGLE_CHAR = 10 as unknown as PageSegMode;
 
 const CYRILLIC_LOOKALIKES: Record<string, string> = {
   A: "А",
@@ -112,24 +130,64 @@ function extractPlateText(rawText: string) {
   return normalizePlateCandidate(rawText);
 }
 
+function normalizeSingleCharacter(value: string, kind: "digit" | "letter") {
+  const cleaned = value.toUpperCase().replace(/[^0-9A-ZА-ЯӨҮЁ]/gu, "");
+  if (!cleaned) {
+    return "";
+  }
+
+  const char = cleaned[0];
+
+  if (kind === "digit") {
+    if (/\d/.test(char)) {
+      return char;
+    }
+
+    return DIGIT_LOOKALIKES[char] ?? "";
+  }
+
+  if (/[А-ЯӨҮЁ]/u.test(char)) {
+    return char;
+  }
+
+  return CYRILLIC_LOOKALIKES[char] ?? "";
+}
+
 function getCropRegions(width: number, height: number): CropRegion[] {
   const isPortrait = height / width > 1.2;
 
   if (isPortrait) {
     return [
-      { x: 0, y: 0, width: 1, height: 1 },
       { x: 0.08, y: 0.2, width: 0.84, height: 0.48 },
       { x: 0.1, y: 0.3, width: 0.8, height: 0.28 },
       { x: 0.16, y: 0.34, width: 0.68, height: 0.18 },
+      { x: 0, y: 0, width: 1, height: 1 },
     ];
   }
 
   return [
-    { x: 0, y: 0, width: 1, height: 1 },
     { x: 0.08, y: 0.18, width: 0.84, height: 0.64 },
     { x: 0.14, y: 0.32, width: 0.72, height: 0.3 },
     { x: 0.22, y: 0.38, width: 0.56, height: 0.2 },
+    { x: 0, y: 0, width: 1, height: 1 },
   ];
+}
+
+function clamp(value: number, min: number, max: number) {
+  return Math.min(max, Math.max(min, value));
+}
+
+function createCanvas(width: number, height: number) {
+  const canvas = document.createElement("canvas");
+  canvas.width = Math.max(1, Math.round(width));
+  canvas.height = Math.max(1, Math.round(height));
+  return canvas;
+}
+
+async function canvasToBlob(canvas: HTMLCanvasElement, type = "image/png") {
+  return new Promise<Blob | null>((resolve) => {
+    canvas.toBlob(resolve, type);
+  });
 }
 
 function blobToDataUrl(blob: Blob) {
@@ -168,28 +226,254 @@ async function loadSourceImage(source: Blob | File) {
   });
 }
 
+function findBrightPlateBounds(
+  context: CanvasRenderingContext2D,
+  width: number,
+  height: number,
+) {
+  const imageData = context.getImageData(0, 0, width, height);
+  const { data } = imageData;
+  const rowScores = new Array<number>(height).fill(0);
+  const colScores = new Array<number>(width).fill(0);
+
+  for (let y = 0; y < height; y += 1) {
+    for (let x = 0; x < width; x += 1) {
+      const offset = (y * width + x) * 4;
+      const grayscale =
+        data[offset] * 0.299 + data[offset + 1] * 0.587 + data[offset + 2] * 0.114;
+
+      if (grayscale > 150) {
+        rowScores[y] += 1;
+        colScores[x] += 1;
+      }
+    }
+  }
+
+  const activeRows = rowScores
+    .map((count, y) => ({
+      ratio: count / width,
+      y,
+    }))
+    .filter((row) => row.ratio > 0.38);
+  const activeCols = colScores
+    .map((count, x) => ({
+      ratio: count / height,
+      x,
+    }))
+    .filter((col) => col.ratio > 0.18);
+
+  if (!activeRows.length || !activeCols.length) {
+    return {
+      x: 0,
+      y: 0,
+      width,
+      height,
+    };
+  }
+
+  const top = Math.max(0, activeRows[0].y - Math.round(height * 0.04));
+  const bottom = Math.min(
+    height,
+    activeRows[activeRows.length - 1].y + Math.round(height * 0.04),
+  );
+  const left = Math.max(0, activeCols[0].x - Math.round(width * 0.03));
+  const right = Math.min(
+    width,
+    activeCols[activeCols.length - 1].x + Math.round(width * 0.03),
+  );
+
+  return {
+    x: left,
+    y: top,
+    width: Math.max(1, right - left),
+    height: Math.max(1, bottom - top),
+  };
+}
+
+function createProcessedCanvas(source: HTMLCanvasElement) {
+  const canvas = createCanvas(source.width, source.height);
+  const context = canvas.getContext("2d", { willReadFrequently: true });
+
+  if (!context) {
+    return canvas;
+  }
+
+  context.drawImage(source, 0, 0);
+  const imageData = context.getImageData(0, 0, canvas.width, canvas.height);
+  const { data } = imageData;
+
+  for (let index = 0; index < data.length; index += 4) {
+    const grayscale =
+      data[index] * 0.299 + data[index + 1] * 0.587 + data[index + 2] * 0.114;
+    const boosted = clamp((grayscale - 105) * 1.9 + 128, 0, 255);
+    const value = boosted > 138 ? 255 : 0;
+    data[index] = value;
+    data[index + 1] = value;
+    data[index + 2] = value;
+  }
+
+  context.putImageData(imageData, 0, 0);
+  return canvas;
+}
+
+function findCharacterBoxes(canvas: HTMLCanvasElement) {
+  const context = canvas.getContext("2d", { willReadFrequently: true });
+  if (!context) {
+    return [];
+  }
+
+  const { width, height } = canvas;
+  const imageData = context.getImageData(0, 0, width, height);
+  const { data } = imageData;
+  const visited = new Uint8Array(width * height);
+  const boxes: Rectangle[] = [];
+
+  function isForeground(x: number, y: number) {
+    const offset = (y * width + x) * 4;
+    return data[offset] < 80;
+  }
+
+  for (let y = 0; y < height; y += 1) {
+    for (let x = 0; x < width; x += 1) {
+      const index = y * width + x;
+
+      if (visited[index] || !isForeground(x, y)) {
+        continue;
+      }
+
+      let minX = x;
+      let maxX = x;
+      let minY = y;
+      let maxY = y;
+      let area = 0;
+      const queue = [[x, y]];
+      visited[index] = 1;
+
+      while (queue.length) {
+        const [currentX, currentY] = queue.pop()!;
+        area += 1;
+        minX = Math.min(minX, currentX);
+        maxX = Math.max(maxX, currentX);
+        minY = Math.min(minY, currentY);
+        maxY = Math.max(maxY, currentY);
+
+        const neighbors = [
+          [currentX - 1, currentY],
+          [currentX + 1, currentY],
+          [currentX, currentY - 1],
+          [currentX, currentY + 1],
+        ];
+
+        for (const [nextX, nextY] of neighbors) {
+          if (nextX < 0 || nextY < 0 || nextX >= width || nextY >= height) {
+            continue;
+          }
+
+          const nextIndex = nextY * width + nextX;
+          if (visited[nextIndex] || !isForeground(nextX, nextY)) {
+            continue;
+          }
+
+          visited[nextIndex] = 1;
+          queue.push([nextX, nextY]);
+        }
+      }
+
+      const boxWidth = maxX - minX + 1;
+      const boxHeight = maxY - minY + 1;
+
+      if (
+        area < width * height * 0.002 ||
+        boxHeight < height * 0.28 ||
+        boxWidth < width * 0.02
+      ) {
+        continue;
+      }
+
+      boxes.push({
+        x: minX,
+        y: minY,
+        width: boxWidth,
+        height: boxHeight,
+      });
+    }
+  }
+
+  return boxes.sort((left, right) => left.x - right.x);
+}
+
+async function buildCharacterBlobs(canvas: HTMLCanvasElement) {
+  const boxes = findCharacterBoxes(canvas);
+
+  if (boxes.length < 6) {
+    return [];
+  }
+
+  const slicedBoxes = boxes.slice(0, 7);
+  const blobs: Blob[] = [];
+
+  for (const box of slicedBoxes) {
+    const paddingX = Math.max(6, Math.round(box.width * 0.3));
+    const paddingY = Math.max(6, Math.round(box.height * 0.25));
+    const cropX = Math.max(0, box.x - paddingX);
+    const cropY = Math.max(0, box.y - paddingY);
+    const cropWidth = Math.min(canvas.width - cropX, box.width + paddingX * 2);
+    const cropHeight = Math.min(
+      canvas.height - cropY,
+      box.height + paddingY * 2,
+    );
+    const charCanvas = createCanvas(cropWidth * 3, cropHeight * 3);
+    const charContext = charCanvas.getContext("2d");
+
+    if (!charContext) {
+      continue;
+    }
+
+    charContext.fillStyle = "#ffffff";
+    charContext.fillRect(0, 0, charCanvas.width, charCanvas.height);
+    charContext.drawImage(
+      canvas,
+      cropX,
+      cropY,
+      cropWidth,
+      cropHeight,
+      0,
+      0,
+      charCanvas.width,
+      charCanvas.height,
+    );
+
+    const blob = await canvasToBlob(charCanvas);
+    if (blob) {
+      blobs.push(blob);
+    }
+  }
+
+  return blobs;
+}
+
 async function buildRecognitionTargets(source: Blob | File) {
   const image = await loadSourceImage(source);
   const width = "naturalWidth" in image ? image.naturalWidth : image.width;
   const height = "naturalHeight" in image ? image.naturalHeight : image.height;
-  const targets: Array<{ blob: Blob; previewUrl: string }> = [];
+  const targets: RecognitionTarget[] = [];
 
   for (const region of getCropRegions(width, height)) {
     const sourceX = Math.floor(width * region.x);
     const sourceY = Math.floor(height * region.y);
     const cropWidth = Math.max(1, Math.floor(width * region.width));
     const cropHeight = Math.max(1, Math.floor(height * region.height));
-    const scale = Math.max(2, Math.ceil(1400 / cropWidth));
-    const canvas = document.createElement("canvas");
-    canvas.width = cropWidth * scale;
-    canvas.height = cropHeight * scale;
+    const scale = Math.max(2, Math.ceil(1600 / cropWidth));
+    const regionCanvas = createCanvas(cropWidth * scale, cropHeight * scale);
+    const regionContext = regionCanvas.getContext("2d", {
+      willReadFrequently: true,
+    });
 
-    const context = canvas.getContext("2d", { willReadFrequently: true });
-    if (!context) {
+    if (!regionContext) {
       continue;
     }
 
-    context.drawImage(
+    regionContext.drawImage(
       image,
       sourceX,
       sourceY,
@@ -197,47 +481,46 @@ async function buildRecognitionTargets(source: Blob | File) {
       cropHeight,
       0,
       0,
-      canvas.width,
-      canvas.height,
+      regionCanvas.width,
+      regionCanvas.height,
     );
 
-    const rawBlob = await new Promise<Blob | null>((resolve) => {
-      canvas.toBlob(resolve, "image/png");
-    });
+    const plateBounds = findBrightPlateBounds(
+      regionContext,
+      regionCanvas.width,
+      regionCanvas.height,
+    );
+    const plateCanvas = createCanvas(plateBounds.width, plateBounds.height);
+    const plateContext = plateCanvas.getContext("2d");
 
+    if (!plateContext) {
+      continue;
+    }
+
+    plateContext.drawImage(
+      regionCanvas,
+      plateBounds.x,
+      plateBounds.y,
+      plateBounds.width,
+      plateBounds.height,
+      0,
+      0,
+      plateCanvas.width,
+      plateCanvas.height,
+    );
+
+    const rawBlob = await canvasToBlob(plateCanvas);
     if (!rawBlob) {
       continue;
     }
 
-    targets.push({
-      blob: rawBlob,
-      previewUrl: await blobToDataUrl(rawBlob),
-    });
-
-    const imageData = context.getImageData(0, 0, canvas.width, canvas.height);
-    const { data } = imageData;
-
-    for (let index = 0; index < data.length; index += 4) {
-      const grayscale =
-        data[index] * 0.299 + data[index + 1] * 0.587 + data[index + 2] * 0.114;
-      const normalized = Math.max(0, Math.min(255, (grayscale - 118) * 1.7 + 128));
-      data[index] = normalized;
-      data[index + 1] = normalized;
-      data[index + 2] = normalized;
-    }
-
-    context.putImageData(imageData, 0, 0);
-
-    const enhancedBlob = await new Promise<Blob | null>((resolve) => {
-      canvas.toBlob(resolve, "image/png");
-    });
-
-    if (!enhancedBlob) {
-      continue;
-    }
+    const processedCanvas = createProcessedCanvas(plateCanvas);
+    const processedBlob = await canvasToBlob(processedCanvas);
+    const characterBlobs = await buildCharacterBlobs(processedCanvas);
 
     targets.push({
-      blob: enhancedBlob,
+      blobs: processedBlob ? [rawBlob, processedBlob] : [rawBlob],
+      characterBlobs,
       previewUrl: await blobToDataUrl(rawBlob),
     });
   }
@@ -247,6 +530,56 @@ async function buildRecognitionTargets(source: Blob | File) {
   }
 
   return targets;
+}
+
+async function setLineMode(worker: TesseractWorker, psm: PageSegMode) {
+  await worker.setParameters({
+    preserve_interword_spaces: "0",
+    tessedit_char_whitelist: OCR_WHITELIST,
+    tessedit_pageseg_mode: psm,
+  });
+}
+
+async function setSingleCharMode(
+  worker: TesseractWorker,
+  whitelist: string,
+  psm: PageSegMode,
+) {
+  await worker.setParameters({
+    preserve_interword_spaces: "0",
+    tessedit_char_whitelist: whitelist,
+    tessedit_pageseg_mode: psm,
+  });
+}
+
+async function recognizeCharacterSequence(worker: TesseractWorker, blobs: Blob[]) {
+  if (blobs.length < 7) {
+    return null;
+  }
+
+  const chars: string[] = [];
+
+  for (const [index, blob] of blobs.slice(0, 7).entries()) {
+    const isDigit = index < 4;
+    await setSingleCharMode(
+      worker,
+      isDigit ? DIGIT_WHITELIST : LETTER_WHITELIST,
+      PSM_SINGLE_CHAR,
+    );
+    const {
+      data: { text },
+    } = await worker.recognize(blob);
+    const char = normalizeSingleCharacter(text, isDigit ? "digit" : "letter");
+
+    if (!char) {
+      return null;
+    }
+
+    chars.push(char);
+  }
+
+  const joined = chars.join("");
+  return /^\d{4}[А-ЯӨҮЁ]{3}$/u.test(joined) ? joined : null;
 }
 
 export function TextScanner() {
@@ -291,8 +624,8 @@ export function TextScanner() {
 
     if (!workerPromiseRef.current) {
       workerPromiseRef.current = import("tesseract.js").then(
-        async ({ createWorker, PSM }) => {
-          const worker = await createWorker("eng+rus", 1, {
+        async ({ createWorker }) => {
+          const worker = await createWorker("eng+mon", 1, {
             logger: (message) => {
               const percent = Math.round(message.progress * 100);
               setProgressLabel(`${message.status} ${percent}%`);
@@ -300,12 +633,6 @@ export function TextScanner() {
             errorHandler: (workerError) => {
               console.error(workerError);
             },
-          });
-
-          await worker.setParameters({
-            preserve_interword_spaces: "0",
-            tessedit_char_whitelist: OCR_WHITELIST,
-            tessedit_pageseg_mode: PSM.SINGLE_LINE,
           });
 
           workerRef.current = worker;
@@ -412,20 +739,32 @@ export function TextScanner() {
       for (const [index, target] of targets.entries()) {
         setProgressLabel(`OCR оролдлого ${index + 1}/${targets.length}`);
 
-        const {
-          data: { text },
-        } = await worker.recognize(target.blob);
+        for (const blob of target.blobs) {
+          await setLineMode(worker, PSM_SINGLE_LINE);
+          const {
+            data: { text },
+          } = await worker.recognize(blob);
 
-        const plateText = extractPlateText(text);
-        if (plateText) {
-          bestText = plateText;
-          bestPreview = target.previewUrl;
+          const plateText = extractPlateText(text);
+          if (plateText) {
+            bestText = plateText;
+            bestPreview = target.previewUrl;
+            break;
+          }
+        }
+
+        if (bestText) {
           break;
         }
 
-        if (!bestText) {
-          bestText = text.trim();
+        const segmentedText = await recognizeCharacterSequence(
+          worker,
+          target.characterBlobs,
+        );
+        if (segmentedText) {
+          bestText = segmentedText;
           bestPreview = target.previewUrl;
+          break;
         }
       }
 
@@ -435,14 +774,14 @@ export function TextScanner() {
         setCapturedImage(bestPreview || previewSource);
         setStatus(
           normalized
-            ? "Текст амжилттай уншигдлаа."
-            : "Текст илрээгүй байна. Илүү тод зураг ашиглаад дахин оролдоно уу.",
+            ? "Дугаар амжилттай уншигдлаа."
+            : "Дугаар илрээгүй байна. Дугаарыг ойртуулж, хүрээний төвд байлгаад дахин оролдоно уу.",
         );
       });
     } catch (scanError) {
       console.error(scanError);
       setError("OCR ажиллах үед алдаа гарлаа. Сүлжээ болон зурагны чанараа шалгана уу.");
-      setStatus("Текст уншиж чадсангүй.");
+      setStatus("Дугаар уншиж чадсангүй.");
     } finally {
       setProgressLabel("");
       setIsScanning(false);
@@ -570,7 +909,7 @@ export function TextScanner() {
               Эсвэл зураг сонгож OCR ажиллуулах
             </span>
             <span className="mt-1">
-              Галерей дахь зурагнаас дугаар унших боломжтой.
+              Галерей дахь зурагнаас Монгол улсын машины дугаар уншина.
             </span>
             <input
               type="file"
@@ -616,7 +955,7 @@ export function TextScanner() {
               </div>
             ) : (
               <div className="flex h-52 items-center justify-center px-4 text-center text-sm text-slate-500">
-                OCR ажиллуулах үед энд авсан зураг харагдана.
+                OCR ажиллуулах үед энд дугаарын crop зураг харагдана.
               </div>
             )}
           </div>
