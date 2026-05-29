@@ -5,6 +5,41 @@ import { startTransition, useEffect, useRef, useState } from "react";
 
 type TesseractModule = typeof import("tesseract.js");
 type TesseractWorker = Awaited<ReturnType<TesseractModule["createWorker"]>>;
+type CropRegion = {
+  height: number;
+  width: number;
+  x: number;
+  y: number;
+};
+
+const OCR_WHITELIST =
+  "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZАБВГДЕЁЖЗИЙКЛМНОӨПРСТУҮФХЦЧШЩЪЫЬЭЮЯ";
+
+const CYRILLIC_LOOKALIKES: Record<string, string> = {
+  A: "А",
+  B: "В",
+  C: "С",
+  E: "Е",
+  H: "Н",
+  K: "К",
+  M: "М",
+  O: "О",
+  P: "Р",
+  T: "Т",
+  X: "Х",
+  Y: "У",
+};
+
+const DIGIT_LOOKALIKES: Record<string, string> = {
+  B: "8",
+  D: "0",
+  I: "1",
+  L: "1",
+  O: "0",
+  Q: "0",
+  S: "5",
+  Z: "2",
+};
 
 function getCameraErrorMessage(error: unknown) {
   if (!(error instanceof DOMException)) {
@@ -27,6 +62,180 @@ function getCameraErrorMessage(error: unknown) {
   }
 }
 
+function normalizePlateCandidate(candidate: string) {
+  const compact = candidate
+    .toUpperCase()
+    .replace(/[^0-9A-ZА-ЯӨҮЁ]/gu, "");
+
+  if (compact.length < 7) {
+    return null;
+  }
+
+  for (let index = 0; index <= compact.length - 7; index += 1) {
+    const slice = compact.slice(index, index + 7).split("");
+    const digits = slice.slice(0, 4).map((char) => {
+      if (/\d/.test(char)) {
+        return char;
+      }
+
+      return DIGIT_LOOKALIKES[char] ?? char;
+    });
+    const letters = slice.slice(4).map((char) => {
+      if (/[А-ЯӨҮЁ]/u.test(char)) {
+        return char;
+      }
+
+      return CYRILLIC_LOOKALIKES[char] ?? char;
+    });
+    const normalized = `${digits.join("")}${letters.join("")}`;
+
+    if (/^\d{4}[А-ЯӨҮЁ]{3}$/u.test(normalized)) {
+      return normalized;
+    }
+  }
+
+  return null;
+}
+
+function extractPlateText(rawText: string) {
+  const directMatch = rawText
+    .toUpperCase()
+    .replace(/[\r\n]+/g, " ")
+    .replace(/\s+/g, " ")
+    .trim()
+    .match(/\d{4}\s*[А-ЯӨҮЁ]{3}/u)?.[0];
+
+  if (directMatch) {
+    return directMatch.replace(/\s+/g, "");
+  }
+
+  return normalizePlateCandidate(rawText);
+}
+
+function getCropRegions(width: number, height: number): CropRegion[] {
+  const isPortrait = height / width > 1.2;
+
+  if (isPortrait) {
+    return [
+      { x: 0, y: 0, width: 1, height: 1 },
+      { x: 0.08, y: 0.2, width: 0.84, height: 0.48 },
+      { x: 0.1, y: 0.3, width: 0.8, height: 0.28 },
+      { x: 0.16, y: 0.34, width: 0.68, height: 0.18 },
+    ];
+  }
+
+  return [
+    { x: 0, y: 0, width: 1, height: 1 },
+    { x: 0.08, y: 0.18, width: 0.84, height: 0.64 },
+    { x: 0.14, y: 0.32, width: 0.72, height: 0.3 },
+    { x: 0.22, y: 0.38, width: 0.56, height: 0.2 },
+  ];
+}
+
+function blobToDataUrl(blob: Blob) {
+  return new Promise<string>((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = () => {
+      if (typeof reader.result === "string") {
+        resolve(reader.result);
+        return;
+      }
+
+      reject(new Error("Could not convert blob to data URL."));
+    };
+    reader.onerror = () => reject(reader.error);
+    reader.readAsDataURL(blob);
+  });
+}
+
+async function loadSourceImage(source: Blob | File) {
+  if ("createImageBitmap" in window) {
+    return createImageBitmap(source);
+  }
+
+  return new Promise<HTMLImageElement>((resolve, reject) => {
+    const image = new window.Image();
+    const imageUrl = URL.createObjectURL(source);
+    image.onload = () => {
+      URL.revokeObjectURL(imageUrl);
+      resolve(image);
+    };
+    image.onerror = () => {
+      URL.revokeObjectURL(imageUrl);
+      reject(new Error("Image could not be loaded."));
+    };
+    image.src = imageUrl;
+  });
+}
+
+async function buildRecognitionTargets(source: Blob | File) {
+  const image = await loadSourceImage(source);
+  const width = "naturalWidth" in image ? image.naturalWidth : image.width;
+  const height = "naturalHeight" in image ? image.naturalHeight : image.height;
+  const targets: Array<{ blob: Blob; previewUrl: string }> = [];
+
+  for (const region of getCropRegions(width, height)) {
+    const sourceX = Math.floor(width * region.x);
+    const sourceY = Math.floor(height * region.y);
+    const cropWidth = Math.max(1, Math.floor(width * region.width));
+    const cropHeight = Math.max(1, Math.floor(height * region.height));
+    const scale = Math.max(2, Math.ceil(1400 / cropWidth));
+    const canvas = document.createElement("canvas");
+    canvas.width = cropWidth * scale;
+    canvas.height = cropHeight * scale;
+
+    const context = canvas.getContext("2d", { willReadFrequently: true });
+    if (!context) {
+      continue;
+    }
+
+    context.drawImage(
+      image,
+      sourceX,
+      sourceY,
+      cropWidth,
+      cropHeight,
+      0,
+      0,
+      canvas.width,
+      canvas.height,
+    );
+
+    const imageData = context.getImageData(0, 0, canvas.width, canvas.height);
+    const { data } = imageData;
+
+    for (let index = 0; index < data.length; index += 4) {
+      const grayscale =
+        data[index] * 0.299 + data[index + 1] * 0.587 + data[index + 2] * 0.114;
+      const value = grayscale > 150 ? 255 : 0;
+      data[index] = value;
+      data[index + 1] = value;
+      data[index + 2] = value;
+    }
+
+    context.putImageData(imageData, 0, 0);
+
+    const blob = await new Promise<Blob | null>((resolve) => {
+      canvas.toBlob(resolve, "image/png");
+    });
+
+    if (!blob) {
+      continue;
+    }
+
+    targets.push({
+      blob,
+      previewUrl: await blobToDataUrl(blob),
+    });
+  }
+
+  if ("close" in image) {
+    image.close();
+  }
+
+  return targets;
+}
+
 export function TextScanner() {
   const videoRef = useRef<HTMLVideoElement | null>(null);
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
@@ -37,7 +246,7 @@ export function TextScanner() {
   const [cameraActive, setCameraActive] = useState(false);
   const [recognizedText, setRecognizedText] = useState("");
   const [capturedImage, setCapturedImage] = useState("");
-  const [status, setStatus] = useState("Камераа асаагаад текстээ уншуулна уу.");
+  const [status, setStatus] = useState("Камераа асаагаад дугаар руу чиглүүлнэ үү.");
   const [progressLabel, setProgressLabel] = useState("");
   const [isStartingCamera, setIsStartingCamera] = useState(false);
   const [isScanning, setIsScanning] = useState(false);
@@ -69,8 +278,8 @@ export function TextScanner() {
 
     if (!workerPromiseRef.current) {
       workerPromiseRef.current = import("tesseract.js").then(
-        async ({ createWorker }) => {
-          const worker = await createWorker("eng", 1, {
+        async ({ createWorker, PSM }) => {
+          const worker = await createWorker("eng+rus", 1, {
             logger: (message) => {
               const percent = Math.round(message.progress * 100);
               setProgressLabel(`${message.status} ${percent}%`);
@@ -81,7 +290,9 @@ export function TextScanner() {
           });
 
           await worker.setParameters({
-            preserve_interword_spaces: "1",
+            preserve_interword_spaces: "0",
+            tessedit_char_whitelist: OCR_WHITELIST,
+            tessedit_pageseg_mode: PSM.SINGLE_LINE,
           });
 
           workerRef.current = worker;
@@ -112,9 +323,7 @@ export function TextScanner() {
     }
 
     setCameraActive(true);
-    setStatus(
-      'Камер бэлэн. Текстээ кадрт оруулаад "Текст унших" товчийг дарна уу.',
-    );
+    setStatus('Камер бэлэн. Дугаарыг хүрээнд тааруулаад "Текст унших" товч дарна уу.');
   }
 
   async function startCamera() {
@@ -155,7 +364,7 @@ export function TextScanner() {
 
         if (preferredError instanceof DOMException) {
           setStatus(
-            `Арын камер шууд сонгогдоогүй тул боломжит камераар нээлээ. (${preferredError.name})`,
+            `Арын камер шууд сонгогдсонгүй тул боломжит камераар нээлээ. (${preferredError.name})`,
           );
         }
       }
@@ -182,13 +391,35 @@ export function TextScanner() {
       setProgressLabel("OCR бэлдэж байна...");
 
       const worker = await getWorker();
-      const {
-        data: { text },
-      } = await worker.recognize(image);
+      const targets = await buildRecognitionTargets(image);
+
+      let bestText = "";
+      let bestPreview = previewSource;
+
+      for (const [index, target] of targets.entries()) {
+        setProgressLabel(`OCR оролдлого ${index + 1}/${targets.length}`);
+
+        const {
+          data: { text },
+        } = await worker.recognize(target.blob);
+
+        const plateText = extractPlateText(text);
+        if (plateText) {
+          bestText = plateText;
+          bestPreview = target.previewUrl;
+          break;
+        }
+
+        if (!bestText) {
+          bestText = text.trim();
+          bestPreview = target.previewUrl;
+        }
+      }
 
       startTransition(() => {
-        const normalized = text.trim();
+        const normalized = bestText.trim();
         setRecognizedText(normalized);
+        setCapturedImage(bestPreview);
         setStatus(
           normalized
             ? "Текст амжилттай уншигдлаа."
@@ -197,9 +428,7 @@ export function TextScanner() {
       });
     } catch (scanError) {
       console.error(scanError);
-      setError(
-        "OCR ажиллах үед алдаа гарлаа. Сүлжээ болон зурагны чанараа шалгана уу.",
-      );
+      setError("OCR ажиллах үед алдаа гарлаа. Сүлжээ болон зурагны чанараа шалгана уу.");
       setStatus("Текст уншиж чадсангүй.");
     } finally {
       setProgressLabel("");
@@ -220,9 +449,7 @@ export function TextScanner() {
       video.readyState < HTMLMediaElement.HAVE_CURRENT_DATA ||
       !video.videoWidth
     ) {
-      setError(
-        "Камерын дүрс бүрэн ачаалагдаагүй байна. 1-2 секунд хүлээгээд дахин оролдоно уу.",
-      );
+      setError("Камерын дүрс бүрэн ачаалагдаагүй байна. 1-2 секунд хүлээгээд дахин оролдоно уу.");
       return;
     }
 
@@ -270,7 +497,7 @@ export function TextScanner() {
       <div className="overflow-hidden rounded-[2rem] border border-white/55 bg-white/75 shadow-[0_20px_70px_rgba(15,23,42,0.12)] backdrop-blur">
         <div className="border-b border-slate-200/80 px-5 py-4 sm:px-6">
           <p className="text-sm font-semibold text-slate-900">
-            Камер ашиглан текст унших
+            Камер ашиглан дугаар унших
           </p>
           <p className="mt-1 text-sm text-slate-600">{status}</p>
           {progressLabel ? (
@@ -330,7 +557,7 @@ export function TextScanner() {
               Эсвэл зураг сонгож OCR ажиллуулах
             </span>
             <span className="mt-1">
-              Галерей дахь зурганаас текст унших боломжтой.
+              Галерей дахь зурагнаас дугаар унших боломжтой.
             </span>
             <input
               type="file"
@@ -390,8 +617,7 @@ export function TextScanner() {
         </div>
 
         <p className="mt-4 text-sm text-slate-500">
-          Зөвлөмж: бичиг тод, гэрэл сайн, камер тогтвортой байвал OCR илүү сайн
-          ажиллана.
+          Зөвлөмж: дугаарыг хүрээний төвд, тод гэрэлтэй, хөдөлгөөнгүй баривал OCR илүү зөв ажиллана.
         </p>
       </div>
     </section>
