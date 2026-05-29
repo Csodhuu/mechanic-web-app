@@ -201,31 +201,44 @@ async function buildRecognitionTargets(source: Blob | File) {
       canvas.height,
     );
 
+    const rawBlob = await new Promise<Blob | null>((resolve) => {
+      canvas.toBlob(resolve, "image/png");
+    });
+
+    if (!rawBlob) {
+      continue;
+    }
+
+    targets.push({
+      blob: rawBlob,
+      previewUrl: await blobToDataUrl(rawBlob),
+    });
+
     const imageData = context.getImageData(0, 0, canvas.width, canvas.height);
     const { data } = imageData;
 
     for (let index = 0; index < data.length; index += 4) {
       const grayscale =
         data[index] * 0.299 + data[index + 1] * 0.587 + data[index + 2] * 0.114;
-      const value = grayscale > 150 ? 255 : 0;
-      data[index] = value;
-      data[index + 1] = value;
-      data[index + 2] = value;
+      const normalized = Math.max(0, Math.min(255, (grayscale - 118) * 1.7 + 128));
+      data[index] = normalized;
+      data[index + 1] = normalized;
+      data[index + 2] = normalized;
     }
 
     context.putImageData(imageData, 0, 0);
 
-    const blob = await new Promise<Blob | null>((resolve) => {
+    const enhancedBlob = await new Promise<Blob | null>((resolve) => {
       canvas.toBlob(resolve, "image/png");
     });
 
-    if (!blob) {
+    if (!enhancedBlob) {
       continue;
     }
 
     targets.push({
-      blob,
-      previewUrl: await blobToDataUrl(blob),
+      blob: enhancedBlob,
+      previewUrl: await blobToDataUrl(rawBlob),
     });
   }
 
@@ -419,7 +432,7 @@ export function TextScanner() {
       startTransition(() => {
         const normalized = bestText.trim();
         setRecognizedText(normalized);
-        setCapturedImage(bestPreview);
+        setCapturedImage(bestPreview || previewSource);
         setStatus(
           normalized
             ? "Текст амжилттай уншигдлаа."
