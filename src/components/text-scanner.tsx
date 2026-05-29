@@ -20,9 +20,14 @@ type Rectangle = {
 type PageSegMode = NonNullable<
   Parameters<TesseractWorker["setParameters"]>[0]["tessedit_pageseg_mode"]
 >;
+type CharacterBlobResult = {
+  blobs: Blob[];
+  isComplete: boolean;
+};
 type RecognitionTarget = {
   blobs: Blob[];
   characterBlobs: Blob[];
+  isComplete: boolean;
   previewUrl: string;
 };
 
@@ -402,11 +407,17 @@ function findCharacterBoxes(canvas: HTMLCanvasElement) {
   return boxes.sort((left, right) => left.x - right.x);
 }
 
-async function buildCharacterBlobs(canvas: HTMLCanvasElement) {
+async function buildCharacterBlobs(
+  canvas: HTMLCanvasElement,
+): Promise<CharacterBlobResult> {
   const boxes = findCharacterBoxes(canvas);
+  const edgeMargin = Math.max(8, Math.round(canvas.width * 0.02));
 
   if (boxes.length < 6) {
-    return [];
+    return {
+      blobs: [],
+      isComplete: false,
+    };
   }
 
   const slicedBoxes = boxes.slice(0, 7);
@@ -449,7 +460,20 @@ async function buildCharacterBlobs(canvas: HTMLCanvasElement) {
     }
   }
 
-  return blobs;
+  const firstBox = slicedBoxes[0];
+  const lastBox = slicedBoxes[slicedBoxes.length - 1];
+  const touchesLeftEdge = firstBox.x <= edgeMargin;
+  const touchesRightEdge =
+    lastBox.x + lastBox.width >= canvas.width - edgeMargin;
+
+  return {
+    blobs,
+    isComplete:
+      boxes.length === 7 &&
+      blobs.length === 7 &&
+      !touchesLeftEdge &&
+      !touchesRightEdge,
+  };
 }
 
 async function buildRecognitionTargets(source: Blob | File) {
@@ -516,11 +540,19 @@ async function buildRecognitionTargets(source: Blob | File) {
 
     const processedCanvas = createProcessedCanvas(plateCanvas);
     const processedBlob = await canvasToBlob(processedCanvas);
-    const characterBlobs = await buildCharacterBlobs(processedCanvas);
+    const characterResult = await buildCharacterBlobs(processedCanvas);
+    const regionEdgeMargin = Math.max(12, Math.round(regionCanvas.width * 0.015));
+    const plateTouchesRegionEdge =
+      plateBounds.x <= regionEdgeMargin ||
+      plateBounds.y <= regionEdgeMargin ||
+      plateBounds.x + plateBounds.width >= regionCanvas.width - regionEdgeMargin ||
+      plateBounds.y + plateBounds.height >=
+        regionCanvas.height - regionEdgeMargin;
 
     targets.push({
       blobs: processedBlob ? [rawBlob, processedBlob] : [rawBlob],
-      characterBlobs,
+      characterBlobs: characterResult.blobs,
+      isComplete: characterResult.isComplete && !plateTouchesRegionEdge,
       previewUrl: await blobToDataUrl(rawBlob),
     });
   }
@@ -746,7 +778,7 @@ export function TextScanner() {
           } = await worker.recognize(blob);
 
           const plateText = extractPlateText(text);
-          if (plateText) {
+          if (plateText && target.isComplete) {
             bestText = plateText;
             bestPreview = target.previewUrl;
             break;
@@ -761,7 +793,7 @@ export function TextScanner() {
           worker,
           target.characterBlobs,
         );
-        if (segmentedText) {
+        if (segmentedText && target.isComplete) {
           bestText = segmentedText;
           bestPreview = target.previewUrl;
           break;
