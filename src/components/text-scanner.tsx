@@ -3,40 +3,48 @@
 import Image from "next/image";
 import { startTransition, useEffect, useRef, useState } from "react";
 
-type TesseractModule = typeof import("tesseract.js");
-type TesseractWorker = Awaited<ReturnType<TesseractModule["createWorker"]>>;
 type CropRegion = {
   height: number;
   width: number;
   x: number;
   y: number;
 };
-type Rectangle = {
-  height: number;
-  width: number;
-  x: number;
-  y: number;
-};
-type PageSegMode = NonNullable<
-  Parameters<TesseractWorker["setParameters"]>[0]["tessedit_pageseg_mode"]
->;
-type CharacterBlobResult = {
-  blobs: Blob[];
-  isComplete: boolean;
-};
-type RecognitionTarget = {
-  blobs: Blob[];
-  characterBlobs: Blob[];
-  isComplete: boolean;
-  previewUrl: string;
+
+type PaddleOcrResultItem = {
+  score?: number;
+  text?: string;
 };
 
-const OCR_WHITELIST =
-  "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZАБВГДЕЁЖЗИЙКЛМНОӨПРСТУҮФХЦЧШЩЪЫЬЭЮЯ";
-const DIGIT_WHITELIST = "0123456789";
-const LETTER_WHITELIST = "АБВГДЕЁЖЗИЙКЛМНОӨПРСТУҮФХЦЧШЩЪЫЬЭЮЯ";
-const PSM_SINGLE_LINE = 7 as unknown as PageSegMode;
-const PSM_SINGLE_CHAR = 10 as unknown as PageSegMode;
+type PaddleOcrResult = {
+  items?: PaddleOcrResultItem[];
+};
+
+type PaddleOcrInstance = {
+  dispose?: () => Promise<void> | void;
+  predict: (
+    input: Blob | HTMLCanvasElement,
+    params?: Record<string, unknown>,
+  ) => Promise<PaddleOcrResult[]>;
+};
+
+type RecognitionTarget = {
+  blob: Blob;
+  previewUrl: string;
+  weight: number;
+};
+
+type CandidateScore = {
+  previewUrl: string;
+  score: number;
+};
+const importRemoteModule = new Function(
+  "specifier",
+  "return import(specifier)",
+) as (specifier: string) => Promise<{
+  PaddleOCR: {
+    create: (options: Record<string, unknown>) => Promise<PaddleOcrInstance>;
+  };
+}>;
 
 const CYRILLIC_LOOKALIKES: Record<string, string> = {
   A: "А",
@@ -56,6 +64,7 @@ const CYRILLIC_LOOKALIKES: Record<string, string> = {
 const DIGIT_LOOKALIKES: Record<string, string> = {
   B: "8",
   D: "0",
+  G: "6",
   I: "1",
   L: "1",
   O: "0",
@@ -120,66 +129,34 @@ function normalizePlateCandidate(candidate: string) {
   return null;
 }
 
-function extractPlateText(rawText: string) {
-  const directMatch = rawText
+function extractPlateCandidates(input: string) {
+  const normalized = input
     .toUpperCase()
     .replace(/[\r\n]+/g, " ")
     .replace(/\s+/g, " ")
-    .trim()
-    .match(/\d{4}\s*[А-ЯӨҮЁ]{3}/u)?.[0];
+    .trim();
 
-  if (directMatch) {
-    return directMatch.replace(/\s+/g, "");
+  if (!normalized) {
+    return [];
   }
 
-  return normalizePlateCandidate(rawText);
-}
+  const candidates = new Set<string>();
+  const directMatches = normalized.match(/\d{4}\s*[A-ZА-ЯӨҮЁ]{3}/gu) ?? [];
 
-function normalizeSingleCharacter(value: string, kind: "digit" | "letter") {
-  const cleaned = value.toUpperCase().replace(/[^0-9A-ZА-ЯӨҮЁ]/gu, "");
-  if (!cleaned) {
-    return "";
-  }
-
-  const char = cleaned[0];
-
-  if (kind === "digit") {
-    if (/\d/.test(char)) {
-      return char;
+  for (const match of directMatches) {
+    const candidate = normalizePlateCandidate(match);
+    if (candidate) {
+      candidates.add(candidate);
     }
-
-    return DIGIT_LOOKALIKES[char] ?? "";
   }
 
-  if (/[А-ЯӨҮЁ]/u.test(char)) {
-    return char;
+  const compact = normalized.replace(/\s+/g, "");
+  const compactCandidate = normalizePlateCandidate(compact);
+  if (compactCandidate) {
+    candidates.add(compactCandidate);
   }
 
-  return CYRILLIC_LOOKALIKES[char] ?? "";
-}
-
-function getCropRegions(width: number, height: number): CropRegion[] {
-  const isPortrait = height / width > 1.2;
-
-  if (isPortrait) {
-    return [
-      { x: 0.08, y: 0.2, width: 0.84, height: 0.48 },
-      { x: 0.1, y: 0.3, width: 0.8, height: 0.28 },
-      { x: 0.16, y: 0.34, width: 0.68, height: 0.18 },
-      { x: 0, y: 0, width: 1, height: 1 },
-    ];
-  }
-
-  return [
-    { x: 0.08, y: 0.18, width: 0.84, height: 0.64 },
-    { x: 0.14, y: 0.32, width: 0.72, height: 0.3 },
-    { x: 0.22, y: 0.38, width: 0.56, height: 0.2 },
-    { x: 0, y: 0, width: 1, height: 1 },
-  ];
-}
-
-function clamp(value: number, min: number, max: number) {
-  return Math.min(max, Math.max(min, value));
+  return [...candidates];
 }
 
 function createCanvas(width: number, height: number) {
@@ -231,71 +208,32 @@ async function loadSourceImage(source: Blob | File) {
   });
 }
 
-function findBrightPlateBounds(
-  context: CanvasRenderingContext2D,
-  width: number,
-  height: number,
-) {
-  const imageData = context.getImageData(0, 0, width, height);
-  const { data } = imageData;
-  const rowScores = new Array<number>(height).fill(0);
-  const colScores = new Array<number>(width).fill(0);
+function getCropRegions(width: number, height: number): CropRegion[] {
+  const isPortrait = height / width > 1.2;
 
-  for (let y = 0; y < height; y += 1) {
-    for (let x = 0; x < width; x += 1) {
-      const offset = (y * width + x) * 4;
-      const grayscale =
-        data[offset] * 0.299 + data[offset + 1] * 0.587 + data[offset + 2] * 0.114;
-
-      if (grayscale > 150) {
-        rowScores[y] += 1;
-        colScores[x] += 1;
-      }
-    }
+  if (isPortrait) {
+    return [
+      { x: 0.08, y: 0.2, width: 0.84, height: 0.48 },
+      { x: 0.1, y: 0.28, width: 0.8, height: 0.34 },
+      { x: 0.12, y: 0.33, width: 0.76, height: 0.24 },
+      { x: 0.14, y: 0.37, width: 0.72, height: 0.18 },
+      { x: 0, y: 0, width: 1, height: 1 },
+    ];
   }
 
-  const activeRows = rowScores
-    .map((count, y) => ({
-      ratio: count / width,
-      y,
-    }))
-    .filter((row) => row.ratio > 0.38);
-  const activeCols = colScores
-    .map((count, x) => ({
-      ratio: count / height,
-      x,
-    }))
-    .filter((col) => col.ratio > 0.18);
-
-  if (!activeRows.length || !activeCols.length) {
-    return {
-      x: 0,
-      y: 0,
-      width,
-      height,
-    };
-  }
-
-  const top = Math.max(0, activeRows[0].y - Math.round(height * 0.04));
-  const bottom = Math.min(
-    height,
-    activeRows[activeRows.length - 1].y + Math.round(height * 0.04),
-  );
-  const left = Math.max(0, activeCols[0].x - Math.round(width * 0.03));
-  const right = Math.min(
-    width,
-    activeCols[activeCols.length - 1].x + Math.round(width * 0.03),
-  );
-
-  return {
-    x: left,
-    y: top,
-    width: Math.max(1, right - left),
-    height: Math.max(1, bottom - top),
-  };
+  return [
+    { x: 0.08, y: 0.2, width: 0.84, height: 0.42 },
+    { x: 0.1, y: 0.26, width: 0.8, height: 0.28 },
+    { x: 0.12, y: 0.31, width: 0.76, height: 0.2 },
+    { x: 0.14, y: 0.34, width: 0.72, height: 0.16 },
+    { x: 0, y: 0, width: 1, height: 1 },
+  ];
 }
 
-function createProcessedCanvas(source: HTMLCanvasElement) {
+function applyContrastVariant(
+  source: HTMLCanvasElement,
+  mode: "raw" | "grayscale" | "binary",
+) {
   const canvas = createCanvas(source.width, source.height);
   const context = canvas.getContext("2d", { willReadFrequently: true });
 
@@ -304,176 +242,34 @@ function createProcessedCanvas(source: HTMLCanvasElement) {
   }
 
   context.drawImage(source, 0, 0);
+
+  if (mode === "raw") {
+    return canvas;
+  }
+
   const imageData = context.getImageData(0, 0, canvas.width, canvas.height);
   const { data } = imageData;
 
   for (let index = 0; index < data.length; index += 4) {
     const grayscale =
       data[index] * 0.299 + data[index + 1] * 0.587 + data[index + 2] * 0.114;
-    const boosted = clamp((grayscale - 105) * 1.9 + 128, 0, 255);
-    const value = boosted > 138 ? 255 : 0;
-    data[index] = value;
-    data[index + 1] = value;
-    data[index + 2] = value;
+
+    if (mode === "grayscale") {
+      const boosted = Math.max(0, Math.min(255, (grayscale - 110) * 1.65 + 128));
+      data[index] = boosted;
+      data[index + 1] = boosted;
+      data[index + 2] = boosted;
+      continue;
+    }
+
+    const binary = grayscale > 150 ? 255 : 0;
+    data[index] = binary;
+    data[index + 1] = binary;
+    data[index + 2] = binary;
   }
 
   context.putImageData(imageData, 0, 0);
   return canvas;
-}
-
-function findCharacterBoxes(canvas: HTMLCanvasElement) {
-  const context = canvas.getContext("2d", { willReadFrequently: true });
-  if (!context) {
-    return [];
-  }
-
-  const { width, height } = canvas;
-  const imageData = context.getImageData(0, 0, width, height);
-  const { data } = imageData;
-  const visited = new Uint8Array(width * height);
-  const boxes: Rectangle[] = [];
-
-  function isForeground(x: number, y: number) {
-    const offset = (y * width + x) * 4;
-    return data[offset] < 80;
-  }
-
-  for (let y = 0; y < height; y += 1) {
-    for (let x = 0; x < width; x += 1) {
-      const index = y * width + x;
-
-      if (visited[index] || !isForeground(x, y)) {
-        continue;
-      }
-
-      let minX = x;
-      let maxX = x;
-      let minY = y;
-      let maxY = y;
-      let area = 0;
-      const queue = [[x, y]];
-      visited[index] = 1;
-
-      while (queue.length) {
-        const [currentX, currentY] = queue.pop()!;
-        area += 1;
-        minX = Math.min(minX, currentX);
-        maxX = Math.max(maxX, currentX);
-        minY = Math.min(minY, currentY);
-        maxY = Math.max(maxY, currentY);
-
-        const neighbors = [
-          [currentX - 1, currentY],
-          [currentX + 1, currentY],
-          [currentX, currentY - 1],
-          [currentX, currentY + 1],
-        ];
-
-        for (const [nextX, nextY] of neighbors) {
-          if (nextX < 0 || nextY < 0 || nextX >= width || nextY >= height) {
-            continue;
-          }
-
-          const nextIndex = nextY * width + nextX;
-          if (visited[nextIndex] || !isForeground(nextX, nextY)) {
-            continue;
-          }
-
-          visited[nextIndex] = 1;
-          queue.push([nextX, nextY]);
-        }
-      }
-
-      const boxWidth = maxX - minX + 1;
-      const boxHeight = maxY - minY + 1;
-
-      if (
-        area < width * height * 0.002 ||
-        boxHeight < height * 0.28 ||
-        boxWidth < width * 0.02
-      ) {
-        continue;
-      }
-
-      boxes.push({
-        x: minX,
-        y: minY,
-        width: boxWidth,
-        height: boxHeight,
-      });
-    }
-  }
-
-  return boxes.sort((left, right) => left.x - right.x);
-}
-
-async function buildCharacterBlobs(
-  canvas: HTMLCanvasElement,
-): Promise<CharacterBlobResult> {
-  const boxes = findCharacterBoxes(canvas);
-  const edgeMargin = Math.max(8, Math.round(canvas.width * 0.02));
-
-  if (boxes.length < 6) {
-    return {
-      blobs: [],
-      isComplete: false,
-    };
-  }
-
-  const slicedBoxes = boxes.slice(0, 7);
-  const blobs: Blob[] = [];
-
-  for (const box of slicedBoxes) {
-    const paddingX = Math.max(6, Math.round(box.width * 0.3));
-    const paddingY = Math.max(6, Math.round(box.height * 0.25));
-    const cropX = Math.max(0, box.x - paddingX);
-    const cropY = Math.max(0, box.y - paddingY);
-    const cropWidth = Math.min(canvas.width - cropX, box.width + paddingX * 2);
-    const cropHeight = Math.min(
-      canvas.height - cropY,
-      box.height + paddingY * 2,
-    );
-    const charCanvas = createCanvas(cropWidth * 3, cropHeight * 3);
-    const charContext = charCanvas.getContext("2d");
-
-    if (!charContext) {
-      continue;
-    }
-
-    charContext.fillStyle = "#ffffff";
-    charContext.fillRect(0, 0, charCanvas.width, charCanvas.height);
-    charContext.drawImage(
-      canvas,
-      cropX,
-      cropY,
-      cropWidth,
-      cropHeight,
-      0,
-      0,
-      charCanvas.width,
-      charCanvas.height,
-    );
-
-    const blob = await canvasToBlob(charCanvas);
-    if (blob) {
-      blobs.push(blob);
-    }
-  }
-
-  const firstBox = slicedBoxes[0];
-  const lastBox = slicedBoxes[slicedBoxes.length - 1];
-  const touchesLeftEdge = firstBox.x <= edgeMargin;
-  const touchesRightEdge =
-    lastBox.x + lastBox.width >= canvas.width - edgeMargin;
-
-  return {
-    blobs,
-    isComplete:
-      boxes.length === 7 &&
-      blobs.length === 7 &&
-      !touchesLeftEdge &&
-      !touchesRightEdge,
-  };
 }
 
 async function buildRecognitionTargets(source: Blob | File) {
@@ -482,22 +278,20 @@ async function buildRecognitionTargets(source: Blob | File) {
   const height = "naturalHeight" in image ? image.naturalHeight : image.height;
   const targets: RecognitionTarget[] = [];
 
-  for (const region of getCropRegions(width, height)) {
+  for (const [index, region] of getCropRegions(width, height).entries()) {
     const sourceX = Math.floor(width * region.x);
     const sourceY = Math.floor(height * region.y);
     const cropWidth = Math.max(1, Math.floor(width * region.width));
     const cropHeight = Math.max(1, Math.floor(height * region.height));
     const scale = Math.max(2, Math.ceil(1600 / cropWidth));
-    const regionCanvas = createCanvas(cropWidth * scale, cropHeight * scale);
-    const regionContext = regionCanvas.getContext("2d", {
-      willReadFrequently: true,
-    });
+    const cropCanvas = createCanvas(cropWidth * scale, cropHeight * scale);
+    const cropContext = cropCanvas.getContext("2d");
 
-    if (!regionContext) {
+    if (!cropContext) {
       continue;
     }
 
-    regionContext.drawImage(
+    cropContext.drawImage(
       image,
       sourceX,
       sourceY,
@@ -505,56 +299,30 @@ async function buildRecognitionTargets(source: Blob | File) {
       cropHeight,
       0,
       0,
-      regionCanvas.width,
-      regionCanvas.height,
+      cropCanvas.width,
+      cropCanvas.height,
     );
 
-    const plateBounds = findBrightPlateBounds(
-      regionContext,
-      regionCanvas.width,
-      regionCanvas.height,
-    );
-    const plateCanvas = createCanvas(plateBounds.width, plateBounds.height);
-    const plateContext = plateCanvas.getContext("2d");
+    const variants: Array<"raw" | "grayscale" | "binary"> = [
+      "raw",
+      "grayscale",
+      "binary",
+    ];
 
-    if (!plateContext) {
-      continue;
+    for (const [variantIndex, variant] of variants.entries()) {
+      const variantCanvas = applyContrastVariant(cropCanvas, variant);
+      const blob = await canvasToBlob(variantCanvas);
+
+      if (!blob) {
+        continue;
+      }
+
+      targets.push({
+        blob,
+        previewUrl: await blobToDataUrl(blob),
+        weight: Math.max(1, 6 - index * 1.1 - variantIndex * 0.35),
+      });
     }
-
-    plateContext.drawImage(
-      regionCanvas,
-      plateBounds.x,
-      plateBounds.y,
-      plateBounds.width,
-      plateBounds.height,
-      0,
-      0,
-      plateCanvas.width,
-      plateCanvas.height,
-    );
-
-    const rawBlob = await canvasToBlob(plateCanvas);
-    if (!rawBlob) {
-      continue;
-    }
-
-    const processedCanvas = createProcessedCanvas(plateCanvas);
-    const processedBlob = await canvasToBlob(processedCanvas);
-    const characterResult = await buildCharacterBlobs(processedCanvas);
-    const regionEdgeMargin = Math.max(12, Math.round(regionCanvas.width * 0.015));
-    const plateTouchesRegionEdge =
-      plateBounds.x <= regionEdgeMargin ||
-      plateBounds.y <= regionEdgeMargin ||
-      plateBounds.x + plateBounds.width >= regionCanvas.width - regionEdgeMargin ||
-      plateBounds.y + plateBounds.height >=
-        regionCanvas.height - regionEdgeMargin;
-
-    targets.push({
-      blobs: processedBlob ? [rawBlob, processedBlob] : [rawBlob],
-      characterBlobs: characterResult.blobs,
-      isComplete: characterResult.isComplete && !plateTouchesRegionEdge,
-      previewUrl: await blobToDataUrl(rawBlob),
-    });
   }
 
   if ("close" in image) {
@@ -564,62 +332,12 @@ async function buildRecognitionTargets(source: Blob | File) {
   return targets;
 }
 
-async function setLineMode(worker: TesseractWorker, psm: PageSegMode) {
-  await worker.setParameters({
-    preserve_interword_spaces: "0",
-    tessedit_char_whitelist: OCR_WHITELIST,
-    tessedit_pageseg_mode: psm,
-  });
-}
-
-async function setSingleCharMode(
-  worker: TesseractWorker,
-  whitelist: string,
-  psm: PageSegMode,
-) {
-  await worker.setParameters({
-    preserve_interword_spaces: "0",
-    tessedit_char_whitelist: whitelist,
-    tessedit_pageseg_mode: psm,
-  });
-}
-
-async function recognizeCharacterSequence(worker: TesseractWorker, blobs: Blob[]) {
-  if (blobs.length < 7) {
-    return null;
-  }
-
-  const chars: string[] = [];
-
-  for (const [index, blob] of blobs.slice(0, 7).entries()) {
-    const isDigit = index < 4;
-    await setSingleCharMode(
-      worker,
-      isDigit ? DIGIT_WHITELIST : LETTER_WHITELIST,
-      PSM_SINGLE_CHAR,
-    );
-    const {
-      data: { text },
-    } = await worker.recognize(blob);
-    const char = normalizeSingleCharacter(text, isDigit ? "digit" : "letter");
-
-    if (!char) {
-      return null;
-    }
-
-    chars.push(char);
-  }
-
-  const joined = chars.join("");
-  return /^\d{4}[А-ЯӨҮЁ]{3}$/u.test(joined) ? joined : null;
-}
-
 export function TextScanner() {
   const videoRef = useRef<HTMLVideoElement | null>(null);
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const streamRef = useRef<MediaStream | null>(null);
-  const workerRef = useRef<TesseractWorker | null>(null);
-  const workerPromiseRef = useRef<Promise<TesseractWorker> | null>(null);
+  const ocrRef = useRef<PaddleOcrInstance | null>(null);
+  const ocrPromiseRef = useRef<Promise<PaddleOcrInstance> | null>(null);
   const previewUrlRef = useRef<string | null>(null);
   const [cameraActive, setCameraActive] = useState(false);
   const [recognizedText, setRecognizedText] = useState("");
@@ -649,40 +367,41 @@ export function TextScanner() {
     setStatus("Камер унтарсан байна.");
   }
 
-  async function getWorker() {
-    if (workerRef.current) {
-      return workerRef.current;
+  async function getOcr() {
+    if (ocrRef.current) {
+      return ocrRef.current;
     }
 
-    if (!workerPromiseRef.current) {
-      workerPromiseRef.current = import("tesseract.js").then(
-        async ({ createWorker }) => {
-          const worker = await createWorker("eng+mon", 1, {
-            logger: (message) => {
-              const percent = Math.round(message.progress * 100);
-              setProgressLabel(`${message.status} ${percent}%`);
+    if (!ocrPromiseRef.current) {
+      ocrPromiseRef.current = importRemoteModule(
+        "/vendor/paddleocr/index.mjs",
+      ).then(async ({ PaddleOCR }) => {
+          const ocr = (await PaddleOCR.create({
+            lang: "en",
+            ocrVersion: "PP-OCRv5",
+            ortOptions: {
+              backend: "wasm",
+              numThreads: 1,
+              simd: true,
+              wasmPaths: "https://cdn.jsdelivr.net/npm/onnxruntime-web/dist/",
             },
-            errorHandler: (workerError) => {
-              console.error(workerError);
-            },
-          });
+          })) as PaddleOcrInstance;
 
-          workerRef.current = worker;
-          return worker;
-        },
-      );
+          ocrRef.current = ocr;
+          return ocr;
+        });
     }
 
-    return workerPromiseRef.current;
+    return ocrPromiseRef.current;
   }
 
   useEffect(() => {
     return () => {
       stopCamera();
       revokePreviewUrl();
-      void workerRef.current?.terminate();
-      workerRef.current = null;
-      workerPromiseRef.current = null;
+      void ocrRef.current?.dispose?.();
+      ocrRef.current = null;
+      ocrPromiseRef.current = null;
     };
   }, []);
 
@@ -760,50 +479,58 @@ export function TextScanner() {
       setRecognizedText("");
       setCapturedImage(previewSource);
       setStatus(`${sourceLabel} OCR ажиллуулж байна...`);
-      setProgressLabel("OCR бэлдэж байна...");
+      setProgressLabel("OCR хөдөлгүүр ачаалж байна...");
 
-      const worker = await getWorker();
+      const ocr = await getOcr();
       const targets = await buildRecognitionTargets(image);
-
-      let bestText = "";
-      let bestPreview = previewSource;
+      const candidateScores = new Map<string, CandidateScore>();
 
       for (const [index, target] of targets.entries()) {
         setProgressLabel(`OCR оролдлого ${index + 1}/${targets.length}`);
 
-        for (const blob of target.blobs) {
-          await setLineMode(worker, PSM_SINGLE_LINE);
-          const {
-            data: { text },
-          } = await worker.recognize(blob);
+        const [result] = await ocr.predict(target.blob, {
+          textDetLimitSideLen: 960,
+          textDetBoxThresh: 0.45,
+          textDetUnclipRatio: 1.8,
+          textRecScoreThresh: 0,
+        });
 
-          const plateText = extractPlateText(text);
-          if (plateText && target.isComplete) {
-            bestText = plateText;
-            bestPreview = target.previewUrl;
-            break;
+        const texts = (result.items ?? [])
+          .map((item) => item.text?.trim() ?? "")
+          .filter(Boolean);
+        const merged = texts.join(" ");
+        const candidates = new Set<string>([
+          ...extractPlateCandidates(merged),
+          ...texts.flatMap((text) => extractPlateCandidates(text)),
+        ]);
+
+        for (const candidate of candidates) {
+          const itemScore =
+            (result.items ?? []).reduce((sum, item) => sum + (item.score ?? 0.7), 0) ||
+            0.7;
+          const score = itemScore * target.weight;
+          const current = candidateScores.get(candidate);
+
+          if (current) {
+            current.score += score;
+            continue;
           }
-        }
 
-        if (bestText) {
-          break;
-        }
-
-        const segmentedText = await recognizeCharacterSequence(
-          worker,
-          target.characterBlobs,
-        );
-        if (segmentedText && target.isComplete) {
-          bestText = segmentedText;
-          bestPreview = target.previewUrl;
-          break;
+          candidateScores.set(candidate, {
+            previewUrl: target.previewUrl,
+            score,
+          });
         }
       }
 
+      const winner = [...candidateScores.entries()].sort(
+        (left, right) => right[1].score - left[1].score,
+      )[0];
+
       startTransition(() => {
-        const normalized = bestText.trim();
+        const normalized = winner?.[0] ?? "";
         setRecognizedText(normalized);
-        setCapturedImage(bestPreview || previewSource);
+        setCapturedImage(winner?.[1].previewUrl ?? previewSource);
         setStatus(
           normalized
             ? "Дугаар амжилттай уншигдлаа."
