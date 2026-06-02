@@ -1,33 +1,21 @@
-import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
-
-const geistSans = Geist({
-  variable: "--font-geist-sans",
-  subsets: ["latin"],
-});
-
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
-  subsets: ["latin"],
-});
+import type { Metadata } from "next";
+import { ReactNode, Suspense } from "react";
+import { Toaster } from "sonner";
 
 export const metadata: Metadata = {
-  title: "Mechanic Mobile Scanner",
-  description: "Mobile-friendly camera OCR screen for reading text from a phone.",
+  title: "ERP-Admin",
+  description: "Your app description",
 };
 
-export default function RootLayout({
-  children,
-}: Readonly<{
-  children: React.ReactNode;
-}>) {
+export default function Root({ children }: { children: ReactNode }) {
   return (
-    <html
-      lang="mn"
-      className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
-    >
-      <body className="min-h-full flex flex-col">{children}</body>
+    <html lang="en" className="light" style={{ colorScheme: "light" }}>
+      <head />
+      <body>
+        <Suspense>{children}</Suspense>
+        <Toaster position="top-center" richColors />
+      </body>
     </html>
   );
 }
