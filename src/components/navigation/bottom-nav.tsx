@@ -67,25 +67,35 @@ export function BottomNav() {
                 ? item.match(pathname)
                 : pathname === item.href;
 
-              if (item.disabled) {
                 return (
-                  <button
+                  <Link
                     key={item.label}
-                    type="button"
-                    onClick={() =>
-                      toast.info(`${item.label} хэсэг удахгүй нэмэгдэнэ.`)
-                    }
-                    className="flex min-h-20 flex-col items-center justify-center gap-1.5 px-2 py-3 text-slate-500 transition hover:bg-slate-50"
+                    href={item.href}
+                    className={cn(
+                      "flex min-h-20 flex-col items-center justify-center gap-1.5 px-2 py-3 text-slate-500 transition",
+                      "hover:bg-slate-50",
+                      isActive && "text-blue-600",
+                    )}
                   >
-                    <span className="rounded-2xl border border-transparent p-2.5">
+                    <span
+                      className={cn(
+                        "rounded-2xl border border-transparent p-2.5 transition",
+                        isActive &&
+                          "border-blue-100 bg-linear-to-b from-blue-50 to-white text-blue-600 shadow-[0_10px_24px_rgba(37,99,235,0.16)]",
+                      )}
+                    >
                       <Icon className="h-6 w-6" strokeWidth={1.8} />
                     </span>
-                    <span className="text-[11px] font-medium">
+                    <span
+                      className={cn(
+                        "text-[11px] font-medium",
+                        isActive && "font-semibold",
+                      )}
+                    >
                       {item.label}
                     </span>
-                  </button>
+                  </Link>
                 );
-              }
 
               return (
                 <Link
