@@ -9,14 +9,12 @@ export const API_URL = "https://api.autosync.mn";
 
 const resolveToken = () => {
   if (typeof window === "undefined") return undefined;
-  const token = getCookie("adminAccessToken");
+  const token = getCookie("token");
   return typeof token === "string" ? token : undefined;
 };
 
 const authFetch: typeof fetch = async (input, init) => {
-  const headers = new Headers(
-    input instanceof Request ? input.headers : undefined,
-  );
+  const headers = new Headers(input instanceof Request ? input.headers : undefined);
 
   if (init?.headers) {
     new Headers(init.headers).forEach((value, key) => headers.set(key, value));
