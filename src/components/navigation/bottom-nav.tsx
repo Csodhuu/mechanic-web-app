@@ -2,13 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import {
-  ClipboardList,
-  History,
-  House,
-  ShieldCheck,
-  UserRound,
-} from "lucide-react";
+import { ClipboardList, History, House, ShieldCheck, UserRound } from "lucide-react";
 
 import { cn } from "@/lib/utils";
 
@@ -55,49 +49,36 @@ export function BottomNav() {
   return (
     <nav
       aria-label="Mobile navigation"
-      className="fixed inset-x-0 bottom-0 z-50 xl:hidden"
+      className="fixed inset-x-0 bottom-0 z-50 border-t border-slate-200 bg-white xl:hidden"
     >
-      <div className="mx-auto w-full max-w-3xl px-3 pb-[calc(env(safe-area-inset-bottom)+0.75rem)]">
-        <div className="overflow-hidden rounded-2xl border border-white/70 bg-white/95 shadow-[0_-12px_40px_rgba(37,99,235,0.18)] backdrop-blur-xl">
-          <div className="grid grid-cols-5">
-            {navItems.map((item) => {
-              const Icon = item.icon;
-              const isActive = item.match
-                ? item.match(pathname)
-                : pathname === item.href;
+      <div className="mx-auto grid h-[76px] w-full max-w-[430px] grid-cols-5 pb-[env(safe-area-inset-bottom)]">
+        {navItems.map((item) => {
+          const Icon = item.icon;
+          const isActive = item.match ? item.match(pathname) : pathname === item.href;
 
-              return (
-                <Link
-                  key={item.label}
-                  href={item.href}
-                  className={cn(
-                    "flex min-h-20 flex-col items-center justify-center gap-1.5 px-2 py-3 text-slate-500 transition",
-                    "hover:bg-slate-50",
-                    isActive && "text-blue-600",
-                  )}
-                >
-                  <span
-                    className={cn(
-                      "rounded-2xl border border-transparent p-2.5 transition",
-                      isActive &&
-                        "border-blue-100 bg-linear-to-b from-blue-50 to-white text-blue-600 shadow-[0_10px_24px_rgba(37,99,235,0.16)]",
-                    )}
-                  >
-                    <Icon className="h-6 w-6" strokeWidth={1.8} />
-                  </span>
-                  <span
-                    className={cn(
-                      "text-[11px] font-medium",
-                      isActive && "font-semibold",
-                    )}
-                  >
-                    {item.label}
-                  </span>
-                </Link>
-              );
-            })}
-          </div>
-        </div>
+          return (
+            <Link
+              key={item.label}
+              href={item.href}
+              className={cn(
+                "flex flex-col items-center justify-center gap-1 text-slate-500 transition hover:bg-slate-50",
+                isActive && "text-blue-600"
+              )}
+            >
+              <span className="flex h-8 items-center justify-center">
+                <Icon
+                  className={cn("h-7 w-7", isActive && "fill-blue-600/10")}
+                  strokeWidth={isActive ? 2.2 : 1.9}
+                />
+              </span>
+              <span
+                className={cn("text-[12px] font-medium leading-none", isActive && "font-semibold")}
+              >
+                {item.label}
+              </span>
+            </Link>
+          );
+        })}
       </div>
     </nav>
   );
