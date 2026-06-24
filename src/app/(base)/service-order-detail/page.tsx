@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { apiClient } from "@/lib/authClient";
 import { getCookie } from "cookies-next";
+import dayjs from "dayjs";
 import {
   ArrowLeft,
   BadgeCheck,
@@ -34,20 +35,7 @@ const formatMoney = (value?: number | null) =>
     maximumFractionDigits: 0,
   }).format(value ?? 0);
 
-const formatDate = (value?: string | null) => {
-  if (!value) return "-";
-
-  const date = new Date(value.replace(" ", "T"));
-  if (Number.isNaN(date.getTime())) return value;
-
-  return new Intl.DateTimeFormat("mn-MN", {
-    year: "numeric",
-    month: "2-digit",
-    day: "2-digit",
-    hour: "2-digit",
-    minute: "2-digit",
-  }).format(date);
-};
+const formatDate = (value?: string | null) => (value ? dayjs(value).format("YYYY-MM-DD HH.mm") : "-");
 
 function DetailRow({ label, value }: { label: string; value?: string | number | null }) {
   return (

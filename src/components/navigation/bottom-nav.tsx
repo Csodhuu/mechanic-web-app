@@ -20,10 +20,10 @@ const navItems = [
     match: (pathname: string) => pathname.startsWith("/jobs"),
   },
   {
-    href: "/control",
+    href: "/inspection",
     label: "Хяналт",
     icon: ShieldCheck,
-    match: (pathname: string) => pathname.startsWith("/control"),
+    match: (pathname: string) => pathname.startsWith("/inspection"),
   },
   {
     href: "/history",

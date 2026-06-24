@@ -1,143 +1,278 @@
 "use client";
 
-import { Card } from "@/components/ui/card";
 import { apiClient } from "@/lib/authClient";
+import { Input } from "@/components/ui/input";
 import { getCookie } from "cookies-next";
-import { ChevronRight } from "lucide-react";
-import { useEffect, useState } from "react";
-import { CpOrderQuery } from "../../model";
+import dayjs from "dayjs";
+import { CalendarClock, CarFront, ChevronRight, ClipboardCheck, Gauge, Phone, Search, X } from "lucide-react";
 import { useRouter } from "next/navigation";
+import { useEffect, useState } from "react";
+import { toast } from "sonner";
+import { CpOrderQuery } from "../../model";
 
-export default function ServiceList() {
+const INITIAL_INSPECTION_TEMPLATE_ID = "1378b5b1-c929-4f97-9957-7ae97ee64bed";
+
+const statusFilters = [
+  { value: "ALL", label: "Бүгд" },
+  { value: "CREATED", label: "Шинэ" },
+  { value: "PROGRESSING", label: "Явагдаж буй" },
+  { value: "COMPLETE", label: "Дууссан" },
+] as const;
+
+const searchFields = [
+  { value: "licensePlate", label: "Улсын дугаар", placeholder: "Жишээ: 1234 УБА" },
+  { value: "vin", label: "Арлын дугаар", placeholder: "Арлын дугаар оруулна уу" },
+  { value: "phone", label: "Утас", placeholder: "Утасны дугаар оруулна уу" },
+  { value: "model", label: "Модель", placeholder: "Модель оруулна уу" },
+] as const;
+
+type StatusFilter = (typeof statusFilters)[number]["value"];
+type SearchField = (typeof searchFields)[number]["value"];
+type CpOrderQueryParams = Parameters<(typeof apiClient.api.crm)["cp-order"]["get"]>[0]["query"];
+
+const formatDate = (value?: string | null) => (value ? dayjs(value).format("YYYY-MM-DD HH.mm") : "-");
+
+export default function ServiceList({ refreshKey }: { refreshKey: number }) {
   const router = useRouter();
   const [data, setData] = useState<CpOrderQuery | null>();
   const [isLoading, setLoading] = useState(false);
+  const [startingInspectionId, setStartingInspectionId] = useState<string | null>(null);
+  const [status, setStatus] = useState<StatusFilter>("ALL");
+  const [searchField, setSearchField] = useState<SearchField>("licensePlate");
+  const [search, setSearch] = useState("");
 
   const openDetail = (id: string) => {
     router.push(`/service-order-detail?id=${encodeURIComponent(id)}`);
+  };
+
+  const startInitialInspection = async (item: CpOrderQuery["result"][number]) => {
+    const machineId = item.vehicle?.id;
+    if (!machineId) {
+      toast.error("Машины мэдээлэл олдсонгүй.");
+      return;
+    }
+
+    try {
+      setStartingInspectionId(item.order.id);
+      const token = getCookie("token");
+      if (!token) throw new Error("Authentication token is missing");
+
+      const me = await apiClient.api.user.me.get({
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      const employeeId = me.data?.employeeId;
+      if (!employeeId) throw new Error("Employee ID is missing");
+
+      const created = await apiClient.api.fleet.inspection.post({
+        machineId,
+        templateId: INITIAL_INSPECTION_TEMPLATE_ID,
+        state: "CREATED",
+        employeeInspectedId: employeeId,
+      } as Parameters<typeof apiClient.api.fleet.inspection.post>[0]);
+
+      toast.success("Анхан үзлэг эхэллээ.");
+      const inspectionId = (created.data as { id?: string } | null)?.id;
+      router.push(
+        inspectionId ? `/inspection?id=${encodeURIComponent(inspectionId)}` : "/inspection"
+      );
+    } catch (error) {
+      console.error("Failed to start initial inspection:", error);
+      toast.error("Анхан үзлэг эхлүүлэхэд алдаа гарлаа.");
+    } finally {
+      setStartingInspectionId(null);
+    }
   };
 
   useEffect(() => {
     let isMounted = true;
 
     const fetchData = async () => {
-      await Promise.resolve();
       try {
         if (isMounted) setLoading(true);
         const token = getCookie("token");
         if (!token) return;
 
+        const query: CpOrderQueryParams = { pagination: { page: 1, size: 10 } };
+        if (status !== "ALL") query.state = status;
+
+        const searchValue = search.trim();
+        if (searchValue) {
+          if (searchField === "licensePlate") query.licensePlate = searchValue;
+          if (searchField === "vin") query.vin = searchValue;
+          if (searchField === "phone") query.phone = searchValue;
+          if (searchField === "model") query.model = searchValue;
+        }
+
         const res = await apiClient.api.crm["cp-order"].get({
-          query: {
-            pagination: { page: 1, size: 10 },
-          },
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
+          query,
+          headers: { Authorization: `Bearer ${token}` },
         });
         if (isMounted) setData(res.data);
       } catch (error) {
-        console.error("Failed to fetch merchant data:", error);
+        console.error("Failed to fetch service orders:", error);
       } finally {
         if (isMounted) setLoading(false);
       }
     };
 
-    void fetchData();
-
+    const debounceId = window.setTimeout(fetchData, search.trim() ? 350 : 0);
     return () => {
       isMounted = false;
+      window.clearTimeout(debounceId);
     };
-  }, []);
+  }, [refreshKey, search, searchField, status]);
+
+  const orders = data?.result ?? [];
 
   return (
-    <Card className="rounded-[28px] border border-slate-200 bg-white p-4 shadow-sm">
-      {/* Header */}
-      <div className="mb-5 flex items-center justify-between">
-        <h2 className="text-2xl font-bold text-slate-900">Засвар үйлчилгээ</h2>
+    <section className="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
+      <div className="flex items-center justify-between border-b border-slate-100 px-4 py-3 sm:px-5">
+        <div>
+          <h2 className="text-base font-semibold text-slate-950">Засвар үйлчилгээ</h2>
+          <p className="mt-0.5 text-xs text-slate-500">Нийт {data?.totalCount ?? orders.length} захиалга</p>
+        </div>
+        <span className="rounded-full bg-blue-50 px-2.5 py-1 text-xs font-medium text-blue-700">
+          Идэвхтэй
+        </span>
       </div>
 
-      {/* Cards */}
-      <div className="space-y-3">
-        {isLoading && (
-          <div className="rounded-[24px] border border-dashed border-slate-200 p-5 text-center text-sm text-slate-500">
-            Уншиж байна...
+      <div className="border-b border-slate-100 px-4 py-3 sm:px-5">
+        <div className="flex flex-col gap-2 sm:flex-row">
+          <div className="relative min-w-0 flex-1">
+            <Search className="pointer-events-none absolute top-1/2 left-3 size-4 -translate-y-1/2 text-slate-400" />
+            <Input
+              value={search}
+              onChange={(event) => setSearch(event.target.value)}
+              placeholder={searchFields.find((field) => field.value === searchField)?.placeholder}
+              className="h-9 pr-9 pl-9 text-sm"
+            />
+            {search && (
+              <button
+                type="button"
+                aria-label="Хайлтыг арилгах"
+                onClick={() => setSearch("")}
+                className="absolute top-1/2 right-2 flex size-6 -translate-y-1/2 items-center justify-center rounded-md text-slate-400 hover:bg-slate-100 hover:text-slate-700"
+              >
+                <X className="size-4" />
+              </button>
+            )}
           </div>
-        )}
-
-        {!isLoading && data?.result.length === 0 && (
-          <div className="rounded-[24px] border border-dashed border-slate-200 p-5 text-center text-sm text-slate-500">
-            Засвар үйлчилгээний ажил олдсонгүй.
-          </div>
-        )}
-
-        {data?.result.map((item, index) => (
-          <Card
-            key={item.order.id ?? index}
-            role="button"
-            tabIndex={0}
-            className="cursor-pointer rounded-[24px] border border-slate-200 p-2 shadow-none transition hover:border-blue-200 hover:bg-blue-50/30"
-            onClick={() => openDetail(item.order.id)}
-            onKeyDown={(event) => {
-              if (event.key === "Enter" || event.key === " ") {
-                event.preventDefault();
-                openDetail(item.order.id);
-              }
-            }}
+          <select
+            value={searchField}
+            onChange={(event) => setSearchField(event.target.value as SearchField)}
+            aria-label="Хайлтын төрөл"
+            className="h-9 rounded-lg border border-slate-200 bg-white px-3 text-sm font-medium text-slate-700 outline-none focus:border-blue-500 sm:w-40"
           >
-            {/* Top */}
-            <div className=" flex items-center justify-between gap-2">
-              <div className="flex items-center gap-2">
-                <span className="text-base font-medium text-slate-800">{item.vehicle?.vin}</span>
+            {searchFields.map((field) => (
+              <option key={field.value} value={field.value}>
+                {field.label}
+              </option>
+            ))}
+          </select>
+        </div>
 
-                <div className="h-2.5 w-2.5 rounded-full bg-blue-500" />
-              </div>
-
-              <div className="rounded-full bg-blue-50 px-4 py-2 text-xs font-medium text-blue-600">
-                {item.order.state}
-              </div>
-            </div>
-
-            {/* Body */}
-            <div className="grid grid-cols-[90px_1fr_20px] items-center gap-3">
-              {/* Image */}
-              <div className="flex items-center justify-center">
-                <img
-                  src={
-                    "https://www.pngall.com/wp-content/uploads/19/No-Brand-Car-Design-Concept-PNG.png"
-                  }
-                  alt={"image"}
-                  className="h-[70px] w-[90px] object-contain"
-                />
-              </div>
-
-              {/* Info */}
-              <div className="min-w-0">
-                <h3 className="truncate text-lg font-bold text-slate-900">
-                  {item.make?.name} {item.model?.name}
-                </h3>
-
-                <div className="mt-2 flex flex-wrap items-center gap-2">
-                  <span className="rounded-md border border-slate-300 px-2 py-1 text-xs font-medium text-slate-700">
-                    {item.vehicle?.licensePlate}
-                  </span>
-
-                  <span className="text-slate-300">|</span>
-
-                  <span className="text-sm text-slate-500">{item.vehicle?.km} Km</span>
-                </div>
-
-                <p className="mt-2 line-clamp-2 text-sm text-slate-500">
-                  {item.customer?.phoneNumber}
-                </p>
-              </div>
-
-              {/* Arrow */}
-              <ChevronRight className="h-5 w-5 text-slate-400" />
-            </div>
-          </Card>
-        ))}
+        <div className="mt-2 flex gap-1.5 overflow-x-auto pb-0.5">
+          {statusFilters.map((filter) => (
+            <button
+              key={filter.value}
+              type="button"
+              onClick={() => setStatus(filter.value)}
+              className={`h-7 shrink-0 rounded-full px-3 text-xs font-medium transition-colors ${
+                status === filter.value
+                  ? "bg-slate-900 text-white"
+                  : "bg-slate-100 text-slate-600 hover:bg-slate-200"
+              }`}
+            >
+              {filter.label}
+            </button>
+          ))}
+        </div>
       </div>
-    </Card>
+
+      <div className="divide-y divide-slate-100">
+        {isLoading && <ListMessage>Уншиж байна...</ListMessage>}
+
+        {!isLoading && orders.length === 0 && (
+          <ListMessage>Засвар үйлчилгээний ажил олдсонгүй.</ListMessage>
+        )}
+
+        {orders.map((item, index) => {
+          const vehicleName = [item.make?.name, item.model?.name].filter(Boolean).join(" ");
+          const isStartingInspection = startingInspectionId === item.order.id;
+
+          return (
+            <article
+              key={item.order.id ?? index}
+              role="button"
+              tabIndex={0}
+              className="group grid cursor-pointer grid-cols-[36px_minmax(0,1fr)_auto] items-center gap-3 px-4 py-3 transition-colors hover:bg-slate-50 focus-visible:bg-slate-50 focus-visible:outline-none sm:grid-cols-[40px_minmax(0,1fr)_auto_auto] sm:px-5"
+              onClick={() => openDetail(item.order.id)}
+              onKeyDown={(event) => {
+                if (event.key === "Enter" || event.key === " ") {
+                  event.preventDefault();
+                  openDetail(item.order.id);
+                }
+              }}
+            >
+              <div className="flex size-9 items-center justify-center rounded-xl bg-slate-100 text-slate-600 sm:size-10">
+                <CarFront className="size-4" />
+              </div>
+
+              <div className="min-w-0">
+                <div className="flex items-center gap-2">
+                  <h3 className="truncate text-sm font-semibold text-slate-900">
+                    {vehicleName || "Машины мэдээлэлгүй"}
+                  </h3>
+                  <span className="hidden shrink-0 rounded-full bg-blue-50 px-2 py-0.5 text-[10px] font-semibold text-blue-700 sm:inline-flex">
+                    {item.order.state}
+                  </span>
+                </div>
+                <div className="mt-1 flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-slate-500">
+                  <span className="font-medium text-slate-700">{item.vehicle?.licensePlate ?? "Дугааргүй"}</span>
+                  <span className="inline-flex items-center gap-1">
+                    <Gauge className="size-3" />
+                    {item.vehicle?.km ?? item.order.km ?? "-"} км
+                  </span>
+                  <span className="inline-flex items-center gap-1">
+                    <CalendarClock className="size-3" />
+                    {formatDate(item.order.createdAt)}
+                  </span>
+                  {item.customer?.phoneNumber && (
+                    <span className="inline-flex items-center gap-1">
+                      <Phone className="size-3" />
+                      {item.customer.phoneNumber}
+                    </span>
+                  )}
+                </div>
+                <span className="mt-1 inline-flex rounded-full bg-blue-50 px-2 py-0.5 text-[10px] font-semibold text-blue-700 sm:hidden">
+                  {item.order.state}
+                </span>
+              </div>
+
+              <button
+                type="button"
+                disabled={isStartingInspection}
+                aria-label="Анхан үзлэг эхлүүлэх"
+                title="Анхан үзлэг эхлүүлэх"
+                onClick={(event) => {
+                  event.stopPropagation();
+                  void startInitialInspection(item);
+                }}
+                className="flex size-8 items-center justify-center rounded-lg border border-slate-200 text-slate-600 transition hover:border-blue-200 hover:bg-blue-50 hover:text-blue-700 disabled:opacity-50 sm:size-auto sm:h-8 sm:gap-1.5 sm:px-3 sm:text-xs sm:font-semibold"
+              >
+                <ClipboardCheck className="size-4" />
+                <span className="hidden sm:inline">{isStartingInspection ? "Эхлүүлж байна..." : "Үзлэг"}</span>
+              </button>
+
+              <ChevronRight className="hidden size-4 text-slate-300 transition group-hover:translate-x-0.5 group-hover:text-slate-500 sm:block" />
+            </article>
+          );
+        })}
+      </div>
+    </section>
   );
+}
+
+function ListMessage({ children }: { children: React.ReactNode }) {
+  return <div className="px-4 py-10 text-center text-sm text-slate-500">{children}</div>;
 }
