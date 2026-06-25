@@ -1,10 +1,9 @@
 "use client";
 
+import { cn } from "@/lib/utils";
+import { ClipboardCheck, ClipboardList, History, House, UserRound } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { ClipboardList, History, House, ShieldCheck, UserRound } from "lucide-react";
-
-import { cn } from "@/lib/utils";
 
 const navItems = [
   {
@@ -15,14 +14,14 @@ const navItems = [
   },
   {
     href: "/jobs",
-    label: "Ажлууд",
+    label: "Ажил",
     icon: ClipboardList,
     match: (pathname: string) => pathname.startsWith("/jobs"),
   },
   {
     href: "/inspection",
-    label: "Хяналт",
-    icon: ShieldCheck,
+    label: "Үзлэг",
+    icon: ClipboardCheck,
     match: (pathname: string) => pathname.startsWith("/inspection"),
   },
   {
@@ -49,12 +48,12 @@ export function BottomNav() {
   return (
     <nav
       aria-label="Mobile navigation"
-      className="fixed inset-x-0 bottom-0 z-50 border-t border-slate-200 bg-white xl:hidden"
+      className="fixed inset-x-0 bottom-0 z-50 border-t border-slate-200 bg-white/95 shadow-[0_-12px_40px_-30px_rgba(15,23,42,0.5)] backdrop-blur xl:hidden"
     >
-      <div className="mx-auto grid h-[76px] w-full max-w-[430px] grid-cols-5 pb-[env(safe-area-inset-bottom)]">
+      <div className="mx-auto grid h-[76px] w-full max-w-[520px] grid-cols-5 pb-[env(safe-area-inset-bottom)]">
         {navItems.map((item) => {
           const Icon = item.icon;
-          const isActive = item.match ? item.match(pathname) : pathname === item.href;
+          const isActive = item.match(pathname);
 
           return (
             <Link
@@ -65,15 +64,15 @@ export function BottomNav() {
                 isActive && "text-blue-600"
               )}
             >
-              <span className="flex h-8 items-center justify-center">
-                <Icon
-                  className={cn("h-7 w-7", isActive && "fill-blue-600/10")}
-                  strokeWidth={isActive ? 2.2 : 1.9}
-                />
-              </span>
               <span
-                className={cn("text-[12px] font-medium leading-none", isActive && "font-semibold")}
+                className={cn(
+                  "flex size-9 items-center justify-center rounded-2xl",
+                  isActive && "bg-blue-50"
+                )}
               >
+                <Icon className="size-5" strokeWidth={isActive ? 2.3 : 1.9} />
+              </span>
+              <span className={cn("text-[11px] font-medium leading-none", isActive && "font-semibold")}>
                 {item.label}
               </span>
             </Link>

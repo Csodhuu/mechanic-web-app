@@ -1,8 +1,10 @@
 "use client";
 
+import { EmptyState, MetricCard, PageShell } from "@/components/page-shell";
 import { apiClient } from "@/lib/authClient";
 import { cn } from "@/lib/utils";
 import { getCookie } from "cookies-next";
+import type { LucideIcon } from "lucide-react";
 import {
   BadgeCheck,
   BriefcaseBusiness,
@@ -16,7 +18,7 @@ import {
 import { useEffect, useMemo, useState } from "react";
 
 type MeQuery = NonNullable<
-  Awaited<ReturnType<typeof import("@/lib/authClient").apiClient.api.user.me.get>>["data"]
+  Awaited<ReturnType<typeof apiClient.api.user.me.get>>["data"]
 >;
 
 const kindLabel: Record<string, string> = {
@@ -28,7 +30,6 @@ const kindLabel: Record<string, string> = {
 
 function formatDate(value?: Date | string | null) {
   if (!value) return "-";
-
   return new Intl.DateTimeFormat("mn-MN", {
     year: "numeric",
     month: "2-digit",
@@ -38,7 +39,6 @@ function formatDate(value?: Date | string | null) {
 
 function getInitials(name?: string | null) {
   if (!name) return "U";
-
   return name
     .split(" ")
     .filter(Boolean)
@@ -53,18 +53,18 @@ function DetailRow({
   label,
   value,
 }: {
-  icon: typeof UserRound;
+  icon: LucideIcon;
   label: string;
   value?: string | number | boolean | null;
 }) {
   return (
     <div className="flex items-start gap-3 border-b border-slate-100 py-3 last:border-b-0">
-      <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-blue-50 text-blue-600">
-        <Icon className="h-4.5 w-4.5" strokeWidth={2} />
+      <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl bg-blue-50 text-blue-600">
+        <Icon className="size-4" />
       </span>
       <div className="min-w-0 flex-1">
-        <p className="text-[11px] font-semibold leading-4 text-slate-400">{label}</p>
-        <p className="mt-0.5 truncate text-[14px] font-semibold leading-5 text-[#101735]">
+        <p className="text-xs font-semibold text-slate-400">{label}</p>
+        <p className="mt-0.5 truncate text-sm font-semibold text-slate-950">
           {value === true ? "Тийм" : value === false ? "Үгүй" : value || "-"}
         </p>
       </div>
@@ -84,7 +84,6 @@ export default function Profile() {
     let isMounted = true;
 
     const fetchMe = async () => {
-      await Promise.resolve();
       try {
         if (isMounted) {
           setLoading(true);
@@ -98,7 +97,6 @@ export default function Profile() {
         }
 
         const res = await apiClient.api.user.me.get();
-
         if (isMounted) {
           setUser(res.data ?? null);
           if (!res.data) setError("Хэрэглэгчийн мэдээлэл олдсонгүй.");
@@ -119,38 +117,26 @@ export default function Profile() {
   }, []);
 
   return (
-    <main className="mx-auto min-h-[calc(100svh-8rem)] w-full max-w-[430px] bg-white px-4 pb-3 pt-2">
-      <header className="mb-4 pt-[env(safe-area-inset-top)]">
-        <div className="grid h-14 grid-cols-[48px_1fr_48px] items-center">
-          <span className="flex h-11 w-11 items-center justify-center rounded-full bg-blue-50 text-blue-600">
-            <UserRound className="h-6 w-6" strokeWidth={2.1} />
-          </span>
-          <div className="min-w-0 text-center">
-            <h1 className="truncate text-[20px] font-bold leading-6 text-[#101735]">Профайл</h1>
-            <p className="truncate text-[13px] font-medium text-slate-500">Миний хувийн мэдээлэл</p>
-          </div>
-          <span />
-        </div>
-      </header>
-
+    <PageShell
+      eyebrow="Account"
+      title="Профайл"
+      description="Нэвтэрсэн ажилтны эрх, салбар, холбоо барих мэдээлэл."
+      icon={<UserRound className="size-5" />}
+    >
       {isLoading && (
-        <div className="rounded-[15px] border border-dashed border-slate-200 bg-white p-5 text-center text-sm text-slate-500">
-          Хувийн мэдээлэл уншиж байна...
-        </div>
+        <EmptyState title="Уншиж байна" description="Хувийн мэдээлэл татаж байна..." />
       )}
 
       {!isLoading && error && (
-        <div className="rounded-[15px] border border-red-100 bg-red-50 p-5 text-sm font-medium text-red-700">
-          {error}
-        </div>
+        <EmptyState title="Мэдээлэл авах боломжгүй" description={error} />
       )}
 
       {!isLoading && user && (
-        <div className="space-y-4">
-          <section className="overflow-hidden rounded-[18px] border border-slate-200 bg-white shadow-sm">
-            <div className="bg-[#101735] px-4 py-5 text-white">
+        <>
+          <section className="overflow-hidden rounded-2xl border border-slate-200/80 bg-white shadow-sm">
+            <div className="bg-slate-950 px-4 py-5 text-white">
               <div className="flex items-center gap-3">
-                <div className="flex h-16 w-16 shrink-0 items-center justify-center overflow-hidden rounded-full bg-white/10 text-[22px] font-bold">
+                <div className="flex h-16 w-16 shrink-0 items-center justify-center overflow-hidden rounded-2xl bg-white/10 text-xl font-bold">
                   {user.image ? (
                     // eslint-disable-next-line @next/next/no-img-element
                     <img src={user.image} alt={user.name} className="h-full w-full object-cover" />
@@ -159,58 +145,53 @@ export default function Profile() {
                   )}
                 </div>
                 <div className="min-w-0">
-                  <h2 className="truncate text-[21px] font-bold leading-7">{user.name}</h2>
-                  <p className="mt-0.5 truncate text-[13px] font-medium text-slate-300">
-                    {user.email}
-                  </p>
+                  <h2 className="truncate text-xl font-bold">{user.name}</h2>
+                  <p className="mt-1 truncate text-sm text-slate-300">{user.email}</p>
                 </div>
               </div>
             </div>
+          </section>
 
-            <div className="grid grid-cols-3 gap-2 p-3">
-              <div className="rounded-[10px] bg-blue-50 px-3 py-2.5 text-blue-700">
-                <p className="text-[11px] font-semibold leading-4 opacity-80">Төрөл</p>
-                <p className="mt-0.5 truncate text-[13px] font-bold leading-5">{userKind}</p>
-              </div>
-              <div className="rounded-[10px] bg-emerald-50 px-3 py-2.5 text-emerald-700">
-                <p className="text-[11px] font-semibold leading-4 opacity-80">Имэйл</p>
-                <p className="mt-0.5 truncate text-[13px] font-bold leading-5">
-                  {user.emailVerified ? "Баталгаажсан" : "Баталгаажаагүй"}
-                </p>
-              </div>
-              <div
-                className={cn(
-                  "rounded-[10px] px-3 py-2.5",
-                  user.banned ? "bg-red-50 text-red-700" : "bg-slate-100 text-slate-700"
-                )}
-              >
-                <p className="text-[11px] font-semibold leading-4 opacity-80">Төлөв</p>
-                <p className="mt-0.5 truncate text-[13px] font-bold leading-5">
-                  {user.banned ? "Хязгаарласан" : "Идэвхтэй"}
-                </p>
-              </div>
+          <section className="grid gap-3 sm:grid-cols-3">
+            <MetricCard
+              label="Төрөл"
+              value={userKind}
+              description="Хэрэглэгчийн ангилал"
+              tone="blue"
+              icon={<ShieldCheck className="size-5" />}
+            />
+            <MetricCard
+              label="Имэйл"
+              value={user.emailVerified ? "Баталгаажсан" : "Баталгаажаагүй"}
+              description="Нэвтрэх мэдээллийн төлөв"
+              tone="emerald"
+              icon={<BadgeCheck className="size-5" />}
+            />
+            <MetricCard
+              label="Төлөв"
+              value={user.banned ? "Хязгаарласан" : "Идэвхтэй"}
+              description="Системийн эрх"
+              tone={user.banned ? "amber" : "slate"}
+              icon={<UserRound className="size-5" />}
+            />
+          </section>
+
+          <section className="grid gap-4 lg:grid-cols-2">
+            <div className="rounded-2xl border border-slate-200/80 bg-white px-4 shadow-sm">
+              <DetailRow icon={UserRound} label="Нэр" value={user.name} />
+              <DetailRow icon={Mail} label="Имэйл" value={user.email} />
+              <DetailRow icon={ShieldCheck} label="Эрх" value={user.role ?? userKind} />
+              <DetailRow icon={BriefcaseBusiness} label="Ажилтны ID" value={user.employeeId} />
+            </div>
+            <div className={cn("rounded-2xl border border-slate-200/80 bg-white px-4 shadow-sm")}>
+              <DetailRow icon={Building2} label="Компанийн ID" value={user.companyId} />
+              <DetailRow icon={IdCard} label="Салбарын ID" value={user.branchId} />
+              <DetailRow icon={CalendarDays} label="Үүссэн огноо" value={formatDate(user.createdAt)} />
+              <DetailRow icon={BadgeCheck} label="Имэйл баталгаажсан" value={user.emailVerified} />
             </div>
           </section>
-
-          <section className="rounded-[15px] border border-slate-200 bg-white px-3 shadow-sm">
-            <DetailRow icon={UserRound} label="Нэр" value={user.name} />
-            <DetailRow icon={Mail} label="Имэйл" value={user.email} />
-            <DetailRow icon={ShieldCheck} label="Эрх" value={user.role ?? userKind} />
-            <DetailRow icon={BriefcaseBusiness} label="Ажилтны ID" value={user.employeeId} />
-          </section>
-
-          <section className="rounded-[15px] border border-slate-200 bg-white px-3 shadow-sm">
-            <DetailRow icon={Building2} label="Компанийн ID" value={user.companyId} />
-            <DetailRow icon={IdCard} label="Салбарын ID" value={user.branchId} />
-            <DetailRow
-              icon={CalendarDays}
-              label="Үүссэн огноо"
-              value={formatDate(user.createdAt)}
-            />
-            <DetailRow icon={BadgeCheck} label="Имэйл баталгаажсан" value={user.emailVerified} />
-          </section>
-        </div>
+        </>
       )}
-    </main>
+    </PageShell>
   );
 }

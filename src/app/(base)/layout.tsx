@@ -16,10 +16,10 @@ export default function RootLayout({ children }: RootLayoutProps) {
 function AppWithMe({ children }: { children: ReactNode }) {
   return (
     <ThemeProvider attribute="class" defaultTheme="light" enableSystem>
-      <div className="min-h-[100dvh] w-full bg-gradient-to-b from-gray-50 to-gray-100 transition-colors duration-300 dark:from-gray-900 dark:to-gray-950">
+      <div className="min-h-[100dvh] w-full bg-slate-50 text-slate-950 transition-colors duration-300">
         <div className="flex h-[100dvh] min-h-[100svh] w-full overflow-hidden">
-          <div className="flex-1 overflow-auto w-full">
-            <div className="mx-auto max-w-full space-y-8 p-4 pb-[calc(7rem+env(safe-area-inset-bottom))] xl:pb-4">
+          <div className="w-full flex-1 overflow-auto">
+            <div className="mx-auto max-w-full">
               <WithAuthClient>
                 <Suspense>{children}</Suspense>
                 <Toaster richColors position="top-center" />

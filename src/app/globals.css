@@ -162,11 +162,34 @@
   }
   html {
     min-height: 100%;
-    background: #f8fafc;
+    background:
+      radial-gradient(circle at top left, rgba(59, 130, 246, 0.08), transparent 32%),
+      radial-gradient(circle at top right, rgba(15, 23, 42, 0.05), transparent 28%),
+      #f8fafc;
+    color-scheme: light;
   }
   body {
     @apply bg-background text-foreground;
     min-height: 100%;
     overscroll-behavior-y: none;
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+  }
+  ::selection {
+    background: rgba(37, 99, 235, 0.16);
+    color: #0f172a;
+  }
+  ::-webkit-scrollbar {
+    width: 10px;
+    height: 10px;
+  }
+  ::-webkit-scrollbar-thumb {
+    background: rgba(148, 163, 184, 0.5);
+    border-radius: 999px;
+    border: 3px solid transparent;
+    background-clip: padding-box;
+  }
+  ::-webkit-scrollbar-track {
+    background: transparent;
   }
 }

@@ -254,7 +254,7 @@ export default function Control() {
   };
 
   return (
-    <div className="mx-auto min-h-[calc(100svh-8rem)] w-full max-w-[430px] bg-white px-4 pb-3 pt-2 sm:hidden">
+    <div className="mx-auto min-h-[calc(100svh-8rem)] w-full max-w-[1120px] px-4 pb-[calc(6rem+env(safe-area-inset-bottom))] pt-2 sm:px-6 lg:px-8">
       <header className="mb-4 pt-[env(safe-area-inset-top)]">
         <div className="grid h-14 grid-cols-[48px_1fr_48px] items-center">
           <button
@@ -336,7 +336,7 @@ export default function Control() {
         </div>
       )}
 
-      <section className="mt-4 space-y-3">
+      <section className="mt-4 grid gap-3 lg:grid-cols-2">
         {loading && (
           <div className="rounded-[15px] border border-dashed border-slate-200 bg-white p-5 text-center text-sm text-slate-500">
             Хяналтын ажлууд уншиж байна...
