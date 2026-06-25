@@ -14,7 +14,7 @@ export default function TabsButton() {
     <>
       <div className="flex justify-end">
         <Button type="button" size="sm" onClick={() => setOpen(true)}>
-          Шинэ захиалга <Plus />
+          Анхан үзлэг <Plus />
         </Button>
 
         <ServiceOrderDialog

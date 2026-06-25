@@ -4,13 +4,10 @@ import { apiClient } from "@/lib/authClient";
 import { Input } from "@/components/ui/input";
 import { getCookie } from "cookies-next";
 import dayjs from "dayjs";
-import { CalendarClock, CarFront, ChevronRight, ClipboardCheck, Gauge, Phone, Search, X } from "lucide-react";
+import { CalendarClock, CarFront, ChevronRight, Gauge, Phone, Search, X } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
-import { toast } from "sonner";
 import { CpOrderQuery } from "../../model";
-
-const INITIAL_INSPECTION_TEMPLATE_ID = "1378b5b1-c929-4f97-9957-7ae97ee64bed";
 
 const statusFilters = [
   { value: "ALL", label: "Бүгд" },
@@ -36,51 +33,12 @@ export default function ServiceList({ refreshKey }: { refreshKey: number }) {
   const router = useRouter();
   const [data, setData] = useState<CpOrderQuery | null>();
   const [isLoading, setLoading] = useState(false);
-  const [startingInspectionId, setStartingInspectionId] = useState<string | null>(null);
   const [status, setStatus] = useState<StatusFilter>("ALL");
   const [searchField, setSearchField] = useState<SearchField>("licensePlate");
   const [search, setSearch] = useState("");
 
   const openDetail = (id: string) => {
     router.push(`/service-order-detail?id=${encodeURIComponent(id)}`);
-  };
-
-  const startInitialInspection = async (item: CpOrderQuery["result"][number]) => {
-    const machineId = item.vehicle?.id;
-    if (!machineId) {
-      toast.error("Машины мэдээлэл олдсонгүй.");
-      return;
-    }
-
-    try {
-      setStartingInspectionId(item.order.id);
-      const token = getCookie("token");
-      if (!token) throw new Error("Authentication token is missing");
-
-      const me = await apiClient.api.user.me.get({
-        headers: { Authorization: `Bearer ${token}` },
-      });
-      const employeeId = me.data?.employeeId;
-      if (!employeeId) throw new Error("Employee ID is missing");
-
-      const created = await apiClient.api.fleet.inspection.post({
-        machineId,
-        templateId: INITIAL_INSPECTION_TEMPLATE_ID,
-        state: "CREATED",
-        employeeInspectedId: employeeId,
-      } as Parameters<typeof apiClient.api.fleet.inspection.post>[0]);
-
-      toast.success("Анхан үзлэг эхэллээ.");
-      const inspectionId = (created.data as { id?: string } | null)?.id;
-      router.push(
-        inspectionId ? `/inspection?id=${encodeURIComponent(inspectionId)}` : "/inspection"
-      );
-    } catch (error) {
-      console.error("Failed to start initial inspection:", error);
-      toast.error("Анхан үзлэг эхлүүлэхэд алдаа гарлаа.");
-    } finally {
-      setStartingInspectionId(null);
-    }
   };
 
   useEffect(() => {
@@ -198,7 +156,6 @@ export default function ServiceList({ refreshKey }: { refreshKey: number }) {
 
         {orders.map((item, index) => {
           const vehicleName = [item.make?.name, item.model?.name].filter(Boolean).join(" ");
-          const isStartingInspection = startingInspectionId === item.order.id;
 
           return (
             <article
@@ -248,21 +205,6 @@ export default function ServiceList({ refreshKey }: { refreshKey: number }) {
                   {item.order.state}
                 </span>
               </div>
-
-              <button
-                type="button"
-                disabled={isStartingInspection}
-                aria-label="Анхан үзлэг эхлүүлэх"
-                title="Анхан үзлэг эхлүүлэх"
-                onClick={(event) => {
-                  event.stopPropagation();
-                  void startInitialInspection(item);
-                }}
-                className="flex size-8 items-center justify-center rounded-lg border border-slate-200 text-slate-600 transition hover:border-blue-200 hover:bg-blue-50 hover:text-blue-700 disabled:opacity-50 sm:size-auto sm:h-8 sm:gap-1.5 sm:px-3 sm:text-xs sm:font-semibold"
-              >
-                <ClipboardCheck className="size-4" />
-                <span className="hidden sm:inline">{isStartingInspection ? "Эхлүүлж байна..." : "Үзлэг"}</span>
-              </button>
 
               <ChevronRight className="hidden size-4 text-slate-300 transition group-hover:translate-x-0.5 group-hover:text-slate-500 sm:block" />
             </article>

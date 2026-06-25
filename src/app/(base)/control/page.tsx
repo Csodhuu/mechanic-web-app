@@ -1,247 +1,468 @@
 "use client";
 
+import { Button } from "@/components/ui/button";
+import { Card } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { apiClient } from "@/lib/authClient";
 import { cn } from "@/lib/utils";
+import { getCookie } from "cookies-next";
 import {
   ArrowLeft,
+  CalendarClock,
+  CarFront,
   ChevronRight,
-  ClipboardCheck,
-  Clock,
-  Funnel,
-  Gauge,
-  User,
-  Wrench,
+  Clock3,
+  RefreshCw,
+  Search,
+  ShieldCheck,
 } from "lucide-react";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
+import { useCallback, useEffect, useMemo, useState } from "react";
+import { toast } from "sonner";
 
-const tabs = [
-  { label: "Хүлээгдэж буй", count: 3, active: true },
-  { label: "Хянаж буй", count: 1, active: false },
-  { label: "Дууссан", count: 12, active: false },
+import { CpOrderQuery } from "@/app/(base)/jobs/model";
+
+type OrderItem = CpOrderQuery["result"][number];
+type OrderState = OrderItem["order"]["state"];
+
+const tabs: { value: OrderState; label: string; detail: string }[] = [
+  { value: "CREATED", label: "Хүлээгдэж буй", detail: "Хяналт руу шилжүүлэхэд бэлэн" },
+  { value: "PROGRESSING", label: "Хяналтанд буй", detail: "Одоогоор хяналт хийж байна" },
+  { value: "COMPLETE", label: "Дууссан", detail: "Хяналт дууссан ажлууд" },
 ];
 
-const orders = [
-  {
-    orderNo: "A-2024-000123",
-    vehicle: "Toyota Land Cruiser 200",
-    plate: "1234 УБА",
-    km: "128,450 км",
-    mechanic: "Бат-Эрдэнэ",
-    taskCount: 3,
-    tasks: "Ремень солих, Тосны алдагдал оношлох, OBD оношилгоо",
-    image: "https://www.pngall.com/wp-content/uploads/2016/05/Toyota-Land-Cruiser-PNG-HD.png",
-    status: "QC хүлээж буй",
-    statusTone: "green",
-    highlighted: true,
+const stateStyle: Record<
+  OrderState,
+  { label: string; className: string; icon: typeof ShieldCheck }
+> = {
+  CREATED: {
+    label: "Хүлээгдэж буй",
+    className: "border-amber-200 bg-amber-50 text-amber-700",
+    icon: Clock3,
   },
-  {
-    orderNo: "A-2024-000124",
-    vehicle: "Toyota Prius 30",
-    plate: "5678 УББ",
-    km: "98,320 км",
-    mechanic: "Сүхбат",
-    taskCount: 2,
-    tasks: "Тос солих, Тормосны диск солих",
-    image: "https://www.pngall.com/wp-content/uploads/5/Toyota-Prius-PNG-Image.png",
-    status: "Яаралтай",
-    statusTone: "amber",
-    highlighted: false,
+  PROGRESSING: {
+    label: "Хяналтанд буй",
+    className: "border-blue-200 bg-blue-50 text-blue-700",
+    icon: ShieldCheck,
   },
-  {
-    orderNo: "A-2024-000125",
-    vehicle: "Hyundai Tucson 2018",
-    plate: "9012 УВС",
-    km: "76,210 км",
-    mechanic: "Эрдэнэ",
-    taskCount: 3,
-    tasks: "Арын тормос шалгах, Тосны алдагдал оношлох, Агаар шүүгч солих",
-    image: "https://www.pngall.com/wp-content/uploads/13/Hyundai-Tucson-PNG-Pic.png",
-    status: "QC хүлээж буй",
-    statusTone: "slate",
-    highlighted: false,
+  COMPLETE: {
+    label: "Дууссан",
+    className: "border-emerald-200 bg-emerald-50 text-emerald-700",
+    icon: ShieldCheck,
   },
-];
-
-const statusClass = {
-  green: "border-emerald-200 bg-emerald-50 text-emerald-700",
-  amber: "border-amber-200 bg-amber-50 text-amber-700",
-  slate: "border-slate-200 bg-slate-100 text-slate-600",
 };
 
-const dotClass = {
-  green: "bg-emerald-500",
-  amber: "bg-amber-500",
-  slate: "bg-slate-500",
-};
+function formatDate(value?: string | null) {
+  if (!value) return "-";
 
-function MetaItem({ icon: Icon, label }: { icon: typeof Wrench; label: string }) {
+  return new Intl.DateTimeFormat("mn-MN", {
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+    hour: "2-digit",
+    minute: "2-digit",
+  }).format(new Date(value));
+}
+
+function getVehicleName(item: OrderItem) {
+  return [item.make?.name, item.model?.name].filter(Boolean).join(" ") || "Машины мэдээлэлгүй";
+}
+
+function getCustomerName(item: OrderItem) {
   return (
-    <span className="flex min-w-0 items-center gap-1 text-[11px] font-medium leading-4 text-slate-500">
-      <Icon className="h-3.5 w-3.5 shrink-0 text-slate-500" strokeWidth={1.8} />
-      <span className="truncate">{label}</span>
-    </span>
+    [item.customer?.lastname, item.customer?.firstname].filter(Boolean).join(" ") ||
+    item.customer?.phoneNumber ||
+    "-"
   );
 }
 
-function StatusPill({ label, tone }: { label: string; tone: keyof typeof statusClass }) {
-  return (
-    <span
-      className={cn(
-        "inline-flex h-7 shrink-0 items-center gap-1.5 rounded-full border px-2.5 text-[11px] font-semibold",
-        statusClass[tone]
-      )}
-    >
-      {tone === "amber" ? (
-        <Clock className="h-3.5 w-3.5" strokeWidth={1.9} />
-      ) : (
-        <span className={cn("h-2 w-2 rounded-full", dotClass[tone])} />
-      )}
-      {label}
-    </span>
-  );
-}
-
-function InspectionCard({ order }: { order: (typeof orders)[number] }) {
-  return (
-    <article
-      className={cn(
-        "rounded-[15px] border bg-white p-3.5 shadow-sm",
-        order.highlighted
-          ? "border-blue-600 shadow-[0_12px_28px_rgba(37,99,235,0.12)]"
-          : "border-slate-200"
-      )}
-    >
-      <div className="mb-3 flex items-start justify-between gap-2">
-        <h2 className="max-w-[55%] text-[20px] font-bold leading-6 text-[#101735]">
-          {order.orderNo}
-        </h2>
-        <StatusPill label={order.status} tone={order.statusTone as keyof typeof statusClass} />
-      </div>
-
-      <div className="grid grid-cols-[96px_minmax(0,1fr)_18px] items-center gap-2">
-        <div
-          aria-label={order.vehicle}
-          role="img"
-          className="h-[64px] bg-contain bg-center bg-no-repeat"
-          style={{ backgroundImage: `url(${order.image})` }}
-        ></div>
-
-        <div className="min-w-0">
-          <h3 className="truncate text-[17px] font-bold leading-6 text-[#121a3a]">
-            {order.vehicle}
-          </h3>
-          <div className="mt-1 grid grid-cols-2 gap-x-2 gap-y-1.5">
-            <MetaItem icon={Wrench} label={order.plate} />
-            <MetaItem icon={Gauge} label={order.km} />
-            <span className="col-span-2">
-              <MetaItem icon={User} label={`Механик: ${order.mechanic}`} />
-            </span>
-          </div>
-        </div>
-
-        {!order.highlighted && (
-          <ChevronRight className="h-6 w-6 text-slate-500" strokeWidth={2.1} />
-        )}
-      </div>
-
-      <div className="mt-3 border-t border-slate-200 pt-3">
-        <div className="grid grid-cols-[46px_minmax(0,1fr)] gap-3">
-          <span className="flex h-11 w-11 items-center justify-center rounded-full bg-blue-50 text-blue-600">
-            <ClipboardCheck className="h-6 w-6" strokeWidth={2} />
-          </span>
-          <div className="min-w-0">
-            <p className="text-[15px] font-bold leading-5 text-[#101735]">
-              {order.taskCount} ажил QC-д бэлэн
-            </p>
-            <p className="mt-1 line-clamp-2 text-[13px] leading-5 text-slate-500">{order.tasks}</p>
-          </div>
-        </div>
-      </div>
-
-      {order.highlighted && (
-        <div className="mt-4 grid grid-cols-2 gap-3">
-          <button
-            type="button"
-            className="h-11 rounded-[7px] border-2 border-blue-600 bg-white text-[14px] font-semibold text-blue-600"
-          >
-            Дэлгэрэнгүй
-          </button>
-          <button
-            type="button"
-            className="h-11 rounded-[7px] bg-blue-600 text-[14px] font-semibold text-white shadow-[0_8px_18px_rgba(37,99,235,0.22)]"
-          >
-            Хяналт эхлүүлэх
-          </button>
-        </div>
-      )}
-    </article>
-  );
+function getHeaders() {
+  const token = getCookie("token");
+  return token ? { Authorization: `Bearer ${token}` } : undefined;
 }
 
 export default function Control() {
-  return (
-    <>
-      <main className="mx-auto min-h-[calc(100svh-8rem)] w-full max-w-[430px] bg-white px-4 pb-3 pt-2 sm:hidden">
-        <header className="mb-5 pt-[env(safe-area-inset-top)]">
-          <div className="grid h-14 grid-cols-[48px_1fr_48px] items-center">
-            <button
-              type="button"
-              aria-label="Буцах"
-              className="flex h-11 w-11 items-center justify-center text-blue-600"
-            >
-              <ArrowLeft className="h-8 w-8" strokeWidth={2.4} />
-            </button>
-            <div className="min-w-0 text-center">
-              <h1 className="truncate text-[20px] font-bold leading-6 text-[#101735]">
-                Хяналтын инженер
-              </h1>
-              <p className="truncate text-[13px] font-medium text-slate-500">
-                Хяналт хүлээж буй ажлууд
-              </p>
-            </div>
-            <button
-              type="button"
-              aria-label="Шүүлтүүр"
-              className="ml-auto flex h-11 w-11 items-center justify-center text-blue-600"
-            >
-              <Funnel className="h-7 w-7" strokeWidth={2.2} />
-            </button>
-          </div>
-        </header>
+  const router = useRouter();
+  const pathname = usePathname();
+  const searchParams = useSearchParams();
 
-        <div className="mb-4 grid grid-cols-3 overflow-hidden rounded-[10px] border border-slate-200 bg-white">
-          {tabs.map((tab) => (
-            <button
-              key={tab.label}
-              type="button"
-              className={cn(
-                "flex h-[52px] min-w-0 items-center justify-center gap-1.5 border-r border-slate-200 px-1 text-[13px] font-semibold leading-4 last:border-r-0",
-                tab.active ? "bg-blue-600 text-white" : "bg-white text-slate-500"
-              )}
-            >
-              <span className="min-w-0 text-center">{tab.label}</span>
-              <span
+  const initialState = useMemo(() => {
+    const value = searchParams.get("state");
+    if (value === "CREATED" || value === "PROGRESSING" || value === "COMPLETE") return value;
+    return "CREATED";
+  }, [searchParams]);
+
+  const [activeState, setActiveState] = useState<OrderState>(initialState);
+  const [orders, setOrders] = useState<OrderItem[]>([]);
+  const [counts, setCounts] = useState<Record<OrderState, number>>({
+    CREATED: 0,
+    PROGRESSING: 0,
+    COMPLETE: 0,
+  });
+  const [search, setSearch] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [mutatingId, setMutatingId] = useState<string | null>(null);
+  const [refreshKey, setRefreshKey] = useState(0);
+
+  useEffect(() => {
+    const value = searchParams.get("state");
+    if (value === "CREATED" || value === "PROGRESSING" || value === "COMPLETE") {
+      setActiveState(value);
+    }
+  }, [searchParams]);
+
+  const loadData = useCallback(async () => {
+    try {
+      setLoading(true);
+      setError(null);
+
+      const headers = getHeaders();
+      if (!headers) {
+        setError("Нэвтрэх token олдсонгүй.");
+        return;
+      }
+
+      const searchValue = search.trim();
+      const queryBase = {
+        pagination: { page: 1, size: 25 },
+        ...(searchValue ? { licensePlate: searchValue } : {}),
+      };
+
+      const [createdRes, progressingRes, completeRes, activeRes] = await Promise.all([
+        apiClient.api.crm["cp-order"].get({
+          query: { ...queryBase, state: "CREATED" },
+          headers,
+        }),
+        apiClient.api.crm["cp-order"].get({
+          query: { ...queryBase, state: "PROGRESSING" },
+          headers,
+        }),
+        apiClient.api.crm["cp-order"].get({
+          query: { ...queryBase, state: "COMPLETE" },
+          headers,
+        }),
+        apiClient.api.crm["cp-order"].get({
+          query: { ...queryBase, state: activeState },
+          headers,
+        }),
+      ]);
+
+      if (createdRes.error || progressingRes.error || completeRes.error || activeRes.error) {
+        throw createdRes.error || progressingRes.error || completeRes.error || activeRes.error;
+      }
+
+      setCounts({
+        CREATED: createdRes.data?.totalCount ?? 0,
+        PROGRESSING: progressingRes.data?.totalCount ?? 0,
+        COMPLETE: completeRes.data?.totalCount ?? 0,
+      });
+      setOrders(activeRes.data?.result ?? []);
+    } catch (fetchError) {
+      console.error("Failed to fetch control orders:", fetchError);
+      setError("Хяналтын ажлуудыг уншихад алдаа гарлаа.");
+    } finally {
+      setLoading(false);
+    }
+  }, [activeState, search]);
+
+  useEffect(() => {
+    const timeoutId = window.setTimeout(() => void loadData(), search.trim() ? 300 : 0);
+    return () => window.clearTimeout(timeoutId);
+  }, [loadData, refreshKey, search]);
+
+  const handleTabChange = (nextState: OrderState) => {
+    setActiveState(nextState);
+
+    const params = new URLSearchParams(searchParams.toString());
+    if (nextState === "CREATED") {
+      params.delete("state");
+    } else {
+      params.set("state", nextState);
+    }
+
+    const nextUrl = params.toString() ? `${pathname}?${params.toString()}` : pathname;
+    router.replace(nextUrl, { scroll: false });
+  };
+
+  const startControl = async (item: OrderItem) => {
+    try {
+      setMutatingId(item.order.id);
+      const headers = getHeaders();
+      if (!headers) {
+        toast.error("Нэвтрэх token олдсонгүй.");
+        return;
+      }
+
+      const response = await apiClient.api.crm["cp-order"]({ id: item.order.id }).put(
+        {
+          state: "PROGRESSING",
+          isQualityCheck: true,
+        },
+        { headers }
+      );
+
+      if (response.error || !response.data) throw response.error;
+
+      toast.success("Хяналтанд шилжлээ.");
+      setRefreshKey((current) => current + 1);
+      if (activeState === "CREATED") {
+        handleTabChange("PROGRESSING");
+      }
+    } catch (mutateError) {
+      console.error("Failed to start control:", mutateError);
+      toast.error("Хяналт руу шилжүүлэхэд алдаа гарлаа.");
+    } finally {
+      setMutatingId(null);
+    }
+  };
+
+  const completeControl = async (item: OrderItem) => {
+    try {
+      setMutatingId(item.order.id);
+      const headers = getHeaders();
+      if (!headers) {
+        toast.error("Нэвтрэх token олдсонгүй.");
+        return;
+      }
+
+      const response = await apiClient.api.crm["cp-order"].complete.post(
+        {
+          id: item.order.id,
+          km: item.vehicle?.km ?? item.order.km,
+        },
+        { headers }
+      );
+
+      if (response.error || !response.data) throw response.error;
+
+      toast.success("Хяналт дууслаа.");
+      setRefreshKey((current) => current + 1);
+      if (activeState === "PROGRESSING") {
+        handleTabChange("COMPLETE");
+      }
+    } catch (mutateError) {
+      console.error("Failed to complete control:", mutateError);
+      toast.error("Хяналтыг дуусгахад алдаа гарлаа.");
+    } finally {
+      setMutatingId(null);
+    }
+  };
+
+  const openDetail = (id: string) => {
+    router.push(`/service-order-detail?id=${encodeURIComponent(id)}`);
+  };
+
+  return (
+    <div className="mx-auto min-h-[calc(100svh-8rem)] w-full max-w-[430px] bg-white px-4 pb-3 pt-2 sm:hidden">
+      <header className="mb-4 pt-[env(safe-area-inset-top)]">
+        <div className="grid h-14 grid-cols-[48px_1fr_48px] items-center">
+          <button
+            type="button"
+            aria-label="Буцах"
+            onClick={() => router.back()}
+            className="flex h-11 w-11 items-center justify-center text-blue-600"
+          >
+            <ArrowLeft className="h-8 w-8" strokeWidth={2.4} />
+          </button>
+          <div className="min-w-0 text-center">
+            <h1 className="truncate text-[20px] font-bold leading-6 text-[#101735]">
+              Хяналтын инженер
+            </h1>
+            <p className="truncate text-[13px] font-medium text-slate-500">
+              Хяналтанд шилжсэн ажлууд
+            </p>
+          </div>
+          <button
+            type="button"
+            aria-label="Дахин ачаалах"
+            onClick={() => setRefreshKey((current) => current + 1)}
+            className="ml-auto flex h-11 w-11 items-center justify-center text-blue-600"
+          >
+            <RefreshCw className={cn("h-7 w-7", loading && "animate-spin")} strokeWidth={2.2} />
+          </button>
+        </div>
+      </header>
+
+      <Card className="rounded-[14px] border border-slate-200 bg-white p-3 shadow-sm">
+        <div className="grid grid-cols-3 gap-2">
+          {tabs.map((tab) => {
+            const isActive = activeState === tab.value;
+            return (
+              <button
+                key={tab.value}
+                type="button"
+                onClick={() => handleTabChange(tab.value)}
                 className={cn(
-                  "inline-flex h-6 min-w-6 shrink-0 items-center justify-center rounded-full px-1.5 text-[13px] font-bold",
-                  tab.active ? "bg-white/25 text-white" : "bg-slate-100 text-slate-500"
+                  "rounded-xl border px-2 py-2 text-left transition",
+                  isActive
+                    ? "border-blue-200 bg-blue-50"
+                    : "border-slate-200 bg-white hover:bg-slate-50"
                 )}
               >
-                {tab.count}
-              </span>
-            </button>
-          ))}
+                <p
+                  className={cn(
+                    "text-[11px] font-semibold leading-4",
+                    isActive ? "text-blue-700" : "text-slate-500"
+                  )}
+                >
+                  {tab.label}
+                </p>
+                <p className="mt-1 text-[18px] font-bold leading-5 text-[#101735]">
+                  {counts[tab.value]}
+                </p>
+                <p className="mt-1 line-clamp-2 text-[10px] leading-4 text-slate-500">
+                  {tab.detail}
+                </p>
+              </button>
+            );
+          })}
         </div>
+      </Card>
 
-        <section className="space-y-3">
-          {orders.map((order) => (
-            <InspectionCard key={order.orderNo} order={order} />
-          ))}
-        </section>
-      </main>
-
-      <div className="hidden min-h-[60svh] place-items-center sm:grid">
-        <div className="max-w-sm rounded-2xl border border-slate-200 bg-white p-5 text-center text-sm font-medium text-slate-500 shadow-sm">
-          Хяналтын хуудас одоогоор зөвхөн утасны дэлгэц дээр харагдана.
-        </div>
+      <div className="mt-3 flex h-11 items-center gap-2 rounded-[10px] border border-slate-200 bg-white px-3 text-slate-500">
+        <Search className="h-4.5 w-4.5 shrink-0" strokeWidth={2} />
+        <input
+          value={search}
+          onChange={(event) => setSearch(event.target.value)}
+          className="min-w-0 flex-1 bg-transparent text-[13px] font-medium outline-none placeholder:text-slate-400"
+          placeholder="Улсын дугаараар хайх"
+        />
       </div>
-    </>
+
+      {error && (
+        <div className="mt-3 rounded-[15px] border border-red-100 bg-red-50 p-4 text-sm font-medium text-red-700">
+          {error}
+        </div>
+      )}
+
+      <section className="mt-4 space-y-3">
+        {loading && (
+          <div className="rounded-[15px] border border-dashed border-slate-200 bg-white p-5 text-center text-sm text-slate-500">
+            Хяналтын ажлууд уншиж байна...
+          </div>
+        )}
+
+        {!loading && !error && orders.length === 0 && (
+          <div className="rounded-[15px] border border-dashed border-slate-200 bg-white p-5 text-center text-sm text-slate-500">
+            Хяналтанд буй ажил олдсонгүй.
+          </div>
+        )}
+
+        {orders.map((item) => {
+          const stateBadge = stateStyle[item.order.state];
+          const StateIcon = stateBadge.icon;
+          const actionLabel =
+            item.order.state === "CREATED"
+              ? "Хяналт эхлүүлэх"
+              : item.order.state === "PROGRESSING"
+                ? "Дуусгах"
+                : "Дууссан";
+
+          return (
+            <Card
+              key={item.order.id}
+              className="rounded-[15px] border border-slate-200 bg-white p-3.5 shadow-sm"
+            >
+              <div className="flex items-start justify-between gap-2">
+                <div className="min-w-0">
+                  <h2 className="truncate text-[18px] font-bold leading-6 text-[#101735]">
+                    {item.order.orderId}
+                  </h2>
+                  <p className="mt-0.5 truncate text-[12px] font-medium text-slate-500">
+                    {getVehicleName(item)}
+                  </p>
+                </div>
+                <span
+                  className={cn(
+                    "inline-flex shrink-0 items-center gap-1.5 rounded-full border px-2.5 py-1 text-[11px] font-semibold",
+                    stateBadge.className
+                  )}
+                >
+                  <StateIcon className="h-3.5 w-3.5" strokeWidth={2} />
+                  {stateBadge.label}
+                </span>
+              </div>
+
+              <div className="mt-3 grid grid-cols-[84px_minmax(0,1fr)] gap-3 border-t border-slate-100 pt-3">
+                <div className="flex h-[68px] items-center justify-center rounded-xl bg-blue-50 text-blue-600">
+                  <CarFront className="h-10 w-10" strokeWidth={1.9} />
+                </div>
+
+                <div className="min-w-0">
+                  <div className="grid grid-cols-2 gap-x-2 gap-y-1.5 text-[11px] text-slate-500">
+                    <Meta label={item.vehicle?.licensePlate ?? "-"} icon={ShieldCheck} />
+                    <Meta
+                      label={`${item.vehicle?.km ?? item.order.km} км`}
+                      icon={CalendarClock}
+                    />
+                    <Meta label={getCustomerName(item)} icon={CarFront} />
+                    <Meta label={formatDate(item.order.createdAt)} icon={Clock3} />
+                  </div>
+                  <p className="mt-2 line-clamp-2 text-[13px] leading-5 text-slate-600">
+                    {item.order.description || "Тайлбар ороогүй"}
+                  </p>
+                </div>
+              </div>
+
+              <div className="mt-3 flex items-center gap-2 border-t border-slate-100 pt-3">
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  className="flex-1"
+                  onClick={() => openDetail(item.order.id)}
+                >
+                  Дэлгэрэнгүй
+                  <ChevronRight className="h-4 w-4" />
+                </Button>
+                {item.order.state === "CREATED" && (
+                  <Button
+                    type="button"
+                    size="sm"
+                    className="flex-1"
+                    disabled={mutatingId === item.order.id}
+                    onClick={() => void startControl(item)}
+                  >
+                    {mutatingId === item.order.id ? "Шилжиж байна..." : actionLabel}
+                  </Button>
+                )}
+                {item.order.state === "PROGRESSING" && (
+                  <Button
+                    type="button"
+                    size="sm"
+                    className="flex-1"
+                    disabled={mutatingId === item.order.id}
+                    onClick={() => void completeControl(item)}
+                  >
+                    {mutatingId === item.order.id ? "Дуусгаж байна..." : actionLabel}
+                  </Button>
+                )}
+                {item.order.state === "COMPLETE" && (
+                  <div className="flex-1 rounded-xl bg-emerald-50 px-3 py-2 text-center text-xs font-semibold text-emerald-700">
+                    Дууссан
+                  </div>
+                )}
+              </div>
+            </Card>
+          );
+        })}
+      </section>
+    </div>
+  );
+}
+
+function Meta({
+  icon: Icon,
+  label,
+}: {
+  icon: typeof ShieldCheck;
+  label: string;
+}) {
+  return (
+    <span className="flex min-w-0 items-center gap-1">
+      <Icon className="h-3.5 w-3.5 shrink-0 text-slate-500" strokeWidth={1.8} />
+      <span className="truncate">{label}</span>
+    </span>
   );
 }

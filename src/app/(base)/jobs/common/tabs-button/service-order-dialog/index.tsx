@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { apiClient } from "@/lib/authClient";
+import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { toast } from "sonner";
 
@@ -16,10 +17,10 @@ type Props = {
 type Vehicle = NonNullable<Awaited<ReturnType<typeof apiClient.api.crm.vehicle.get>>["data"]>;
 
 export function ServiceOrderDialog({ open, onOpenChange, onCreated }: Props) {
+  const router = useRouter();
   const [licensePlate, setLicensePlate] = useState("");
   const [vehicle, setVehicle] = useState<Vehicle | null>(null);
   const [isSearching, setIsSearching] = useState(false);
-  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const resetDialog = () => {
     setLicensePlate("");
@@ -55,37 +56,26 @@ export function ServiceOrderDialog({ open, onOpenChange, onCreated }: Props) {
     }
   };
 
-  const createServiceOrder = async () => {
+  const startInspection = () => {
     const value = licensePlate.trim();
     if (!vehicle || !value) {
       toast.error("Эхлээд улсын дугаараар машиныг шалгана уу.");
       return;
     }
 
-    try {
-      setIsSubmitting(true);
-      const response = await apiClient.api.crm["cp-order"].post({ licensePlate: value });
-      if (response.error) throw response.error;
-
-      toast.success("Үйлчилгээний захиалга амжилттай үүслээ.");
-      resetDialog();
-      onOpenChange(false);
-      onCreated();
-    } catch (error) {
-      console.error("Failed to create service order:", error);
-      toast.error("Үйлчилгээний захиалга үүсгэхэд алдаа гарлаа.");
-    } finally {
-      setIsSubmitting(false);
-    }
+    resetDialog();
+    onOpenChange(false);
+    onCreated();
+    router.push(`/jobs/initial-inspection?licensePlate=${encodeURIComponent(value)}`);
   };
 
-  const isBusy = isSearching || isSubmitting;
+  const isBusy = isSearching;
 
   return (
     <Dialog open={open} onOpenChange={handleInternalOpenChange}>
       <DialogContent className="gap-3 p-4 sm:max-w-[440px] sm:p-5">
         <DialogHeader>
-          <DialogTitle className="text-base font-semibold">Улсын дугаараар хайх</DialogTitle>
+          <DialogTitle className="text-base font-semibold">Анхан үзлэгийн машин сонгох</DialogTitle>
         </DialogHeader>
 
         <div className="flex gap-2">
@@ -127,10 +117,10 @@ export function ServiceOrderDialog({ open, onOpenChange, onCreated }: Props) {
           type="button"
           size="sm"
           className="w-full text-xs"
-          onClick={() => void createServiceOrder()}
+          onClick={startInspection}
           disabled={!vehicle || isBusy}
         >
-          {isSubmitting ? "Үүсгэж байна..." : "Засвар үйлчилгээ үүсгэх"}
+          Анхан үзлэг эхлүүлэх
         </Button>
       </DialogContent>
     </Dialog>
