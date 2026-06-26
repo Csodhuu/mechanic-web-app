@@ -1,26 +1,19 @@
 "use client";
 
-import { PageShell, MetricCard } from "@/components/page-shell";
+import { PageShell } from "@/components/page-shell";
 import { Button } from "@/components/ui/button";
-import { Card } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
 import { apiClient } from "@/lib/authClient";
-import {
-  createInitialInspectionChecklist,
-  type ChecklistStatus,
-  type ChecklistValue,
-} from "@/lib/inspection-checklist";
+import { createInitialInspectionChecklist, type ChecklistValue } from "@/lib/inspection-checklist";
 import { getCookie } from "cookies-next";
-import { ArrowLeft, CarFront, CheckCircle2, ClipboardCheck } from "lucide-react";
+import { ArrowLeft } from "lucide-react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useMemo, useState } from "react";
 import { toast } from "sonner";
 
-const statusOptions: { value: ChecklistStatus; label: string; className: string }[] = [
-  { value: "Regular", label: "Хэвийн", className: "border-emerald-200 bg-emerald-50 text-emerald-700" },
-  { value: "Warning", label: "Анхаарах", className: "border-amber-200 bg-amber-50 text-amber-700" },
-  { value: "Danger", label: "Яаралтай", className: "border-rose-200 bg-rose-50 text-rose-700" },
-];
+import { VehicleSummary } from "./_components/molecules/vehicle-summary";
+import { ChecklistGroup } from "./_components/organisms/checklist-group";
+import { InspectionNoteCard } from "./_components/organisms/inspection-note-card";
+import { InspectionSubmitBar } from "./_components/organisms/inspection-submit-bar";
 
 export default function InitialInspectionPage() {
   const router = useRouter();
@@ -117,109 +110,23 @@ export default function InitialInspectionPage() {
       }
       contentClassName="space-y-5"
     >
-      <section className="grid gap-3 lg:grid-cols-[1fr_280px]">
-        <Card className="rounded-2xl border-slate-200 bg-white p-4 shadow-sm">
-          <div className="flex items-start gap-3">
-            <span className="flex size-12 shrink-0 items-center justify-center rounded-2xl bg-blue-50 text-blue-600">
-              <CarFront className="size-6" />
-            </span>
-            <div className="min-w-0 flex-1">
-              <p className="text-xs font-semibold uppercase tracking-[0.08em] text-slate-400">
-                Сонгосон машин
-              </p>
-              <h2 className="mt-1 truncate text-lg font-semibold text-slate-950">
-                {licensePlate || "Машин сонгогдоогүй"}
-              </h2>
-              <p className="mt-1 truncate text-sm text-slate-500">
-                {vehicleName || "Сонгосон машины мэдээлэл татагдаж байна..."}
-              </p>
-            </div>
-          </div>
-        </Card>
-
-        <MetricCard
-          label="Дууссан"
-          value={`${totals.answered}/${totals.total}`}
-          description={`Progress ${totals.progress}%`}
-          tone="blue"
-          icon={<CheckCircle2 className="size-5" />}
-        />
-      </section>
+      <VehicleSummary licensePlate={licensePlate} vehicleName={vehicleName} totals={totals} />
 
       {checklist.map((group, groupIndex) => (
-        <Card key={group.type} className="rounded-2xl border-slate-200 bg-white p-4 shadow-sm">
-          <div className="flex items-center justify-between gap-3">
-            <div>
-              <h2 className="text-base font-semibold text-slate-950">
-                {group.type === "General" ? "Ерөнхий шалгалт" : "Техникийн шалгалт"}
-              </h2>
-              <p className="mt-0.5 text-sm text-slate-500">
-                {group.type === "General"
-                  ? "Гадна байдал, гэрэл, суудал, аюулгүй байдал"
-                  : "Тулгуур эд анги, шингэн, хөдөлгүүр, явах эд анги"}
-              </p>
-            </div>
-            <span className="rounded-full bg-slate-100 px-3 py-1 text-xs font-semibold text-slate-600">
-              {group.values.filter((value) => Boolean(value.answer)).length}/{group.values.length}
-            </span>
-          </div>
-
-          <div className="mt-4 space-y-4">
-            {group.values.map((value, valueIndex) => (
-              <section key={value.question} className="rounded-2xl border border-slate-200 bg-slate-50/80 p-4">
-                <p className="text-sm font-medium leading-6 text-slate-900">{value.question}</p>
-                <div className="mt-3 flex flex-wrap gap-2">
-                  {statusOptions.map((option) => (
-                    <button
-                      key={option.value}
-                      type="button"
-                      onClick={() => updateValue(groupIndex, valueIndex, { answer: option.value })}
-                      className={`rounded-full border px-3.5 py-1.5 text-xs font-semibold transition ${
-                        value.answer === option.value
-                          ? option.className
-                          : "border-slate-200 bg-white text-slate-600 hover:border-slate-300 hover:bg-slate-100"
-                      }`}
-                    >
-                      {option.label}
-                    </button>
-                  ))}
-                </div>
-
-                {value.answer !== "Regular" && value.answer && (
-                  <Input
-                    value={value.description}
-                    onChange={(event) =>
-                      updateValue(groupIndex, valueIndex, { description: event.target.value })
-                    }
-                    className="mt-3"
-                    placeholder="Тайлбар, шаардлагатай засвар"
-                  />
-                )}
-              </section>
-            ))}
-          </div>
-        </Card>
+        <ChecklistGroup
+          key={group.type}
+          group={group}
+          groupIndex={groupIndex}
+          onValueChange={updateValue}
+        />
       ))}
 
-      <Card className="rounded-2xl border-slate-200 bg-white p-4 shadow-sm">
-        <label className="text-sm font-semibold text-slate-900" htmlFor="inspection-note">
-          Нэмэлт тэмдэглэл
-        </label>
-        <textarea
-          id="inspection-note"
-          value={description}
-          onChange={(event) => setDescription(event.target.value)}
-          className="mt-2 min-h-24 w-full rounded-2xl border border-slate-200 bg-white p-3 text-sm outline-none transition focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10"
-          placeholder="Үзлэгийн ерөнхий тайлбар"
-        />
-      </Card>
-
-      <div className="sticky bottom-[calc(5rem+env(safe-area-inset-bottom))] z-10 -mx-4 border-t border-slate-200 bg-white/95 px-4 py-3 backdrop-blur sm:static sm:mx-0 sm:border sm:rounded-2xl sm:px-4">
-        <Button type="button" size="lg" className="w-full" disabled={isSaving || !licensePlate} onClick={() => void submitInspection()}>
-          <ClipboardCheck className="size-4" />
-          {isSaving ? "Захиалга үүсгэж байна..." : "Үзлэг дуусгаж, захиалга үүсгэх"}
-        </Button>
-      </div>
+      <InspectionNoteCard value={description} onChange={setDescription} />
+      <InspectionSubmitBar
+        disabled={isSaving || !licensePlate}
+        isSaving={isSaving}
+        onSubmit={() => void submitInspection()}
+      />
     </PageShell>
   );
 }

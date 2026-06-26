@@ -1,7 +1,7 @@
 "use client";
 
 import { Card } from "@/components/ui/card";
-import {  Stethoscope, Wrench, RefreshCw, Key } from "lucide-react";
+import { Stethoscope, Wrench, RefreshCw } from "lucide-react";
 import { useState } from "react";
 
 const serviceInfo = [
@@ -60,7 +60,7 @@ export default function ServiceInfo() {
             <p className="text-[10px] sm:text-sm font-medium leading-tight">
               {item.name}
             </p>
-            <p className={`text-2xl font-bold ${item.textColor} mt-1`}>
+            <p className={`text-lg font-bold sm:text-2xl ${item.textColor} mt-1`}>
               {item.value}
             </p>
             <p className="text-[9px] sm:text-xs text-slate-500 leading-tight">

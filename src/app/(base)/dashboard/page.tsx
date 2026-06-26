@@ -3,7 +3,7 @@
 import { PageShell, EmptyState, MetricCard } from "@/components/page-shell";
 import { Button } from "@/components/ui/button";
 import { apiClient } from "@/lib/authClient";
-import { CpOrderQuery } from "../jobs/model";
+import { CpOrderQuery } from "../jobs/_types/cp-order";
 import { getCookie } from "cookies-next";
 import {
   ArrowRight,
@@ -12,7 +12,6 @@ import {
   ClipboardList,
   History as HistoryIcon,
   ShieldCheck,
-  Sparkles,
   Wrench,
 } from "lucide-react";
 import { useRouter } from "next/navigation";
@@ -28,12 +27,6 @@ const stateLabel: Record<OrderItem["order"]["state"], string> = {
   CREATED: "Шинэ",
   PROGRESSING: "Хийгдэж байна",
   COMPLETE: "Дууссан",
-};
-
-const stateTone: Record<OrderItem["order"]["state"], "blue" | "amber" | "emerald"> = {
-  CREATED: "amber",
-  PROGRESSING: "blue",
-  COMPLETE: "emerald",
 };
 
 function getCustomerName(item: OrderItem) {
@@ -199,7 +192,7 @@ export default function Dashboard() {
               },
               {
                 title: "Түүх",
-                detail: "Дууссан засварууд, дүн, хугацааг харах.",
+                detail: "Дууссан засварууд болон хугацааг харах.",
                 icon: HistoryIcon,
                 onClick: () => router.push("/history"),
               },
@@ -227,7 +220,7 @@ export default function Dashboard() {
           <p className="text-[11px] font-semibold uppercase tracking-[0.12em] text-slate-400">
             Today
           </p>
-          <h2 className="mt-2 text-lg font-semibold">Одоогийн ажлын тойм</h2>
+          <h2 className="mt-2 text-base font-semibold sm:text-lg">Одоогийн ажлын тойм</h2>
           <p className="mt-1 text-sm leading-6 text-slate-300">
             Өнөөдрийн урсгал: үзлэг -&gt; хяналт -&gt; дуусгах.
           </p>

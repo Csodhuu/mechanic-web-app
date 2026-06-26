@@ -19,12 +19,12 @@ export default function AppErrorState({
 
   return (
     <div className="flex min-h-[60vh] items-center justify-center px-4 py-10">
-      <div className="w-full max-w-xl rounded-[28px] border border-rose-200/80 bg-white/95 p-8 text-center shadow-[0_24px_64px_-42px_rgba(15,23,42,0.35)]">
+      <div className="w-full max-w-xl rounded-2xl border border-rose-200/80 bg-white/95 p-5 text-center shadow-[0_24px_64px_-42px_rgba(15,23,42,0.35)] sm:rounded-[28px] sm:p-8">
         <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl bg-rose-50 text-rose-600">
           <AlertTriangle className="h-7 w-7" />
         </div>
 
-        <h1 className="mt-5 text-2xl font-semibold tracking-tight text-slate-950">
+        <h1 className="mt-5 text-xl font-semibold tracking-tight text-slate-950 sm:text-2xl">
           {title}
         </h1>
         <p className="mt-2 text-sm leading-6 text-slate-600">{errorMessage}</p>

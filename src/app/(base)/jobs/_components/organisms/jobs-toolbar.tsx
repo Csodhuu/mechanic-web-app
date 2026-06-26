@@ -3,8 +3,8 @@
 import { Button } from "@/components/ui/button";
 import { ClipboardPlus } from "lucide-react";
 import { useState } from "react";
-import ServiceList from "../service-list";
-import { ServiceOrderDialog } from "./service-order-dialog";
+import { ServiceOrderDialog } from "../molecules/service-order-dialog";
+import ServiceList from "./service-list";
 
 export default function TabsButton() {
   const [open, setOpen] = useState(false);

@@ -1,10 +1,10 @@
 "use client";
 
-import { CpOrderQuery } from "@/app/(base)/jobs/model";
+import { CpOrderQuery } from "@/app/(base)/jobs/_types/cp-order";
 import { Card } from "@/components/ui/card";
 import { apiClient } from "@/lib/authClient";
 import { getCookie } from "cookies-next";
-import { ChevronRight } from "lucide-react";
+import { CarFront, ChevronRight } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 
@@ -38,10 +38,8 @@ export default function InitialExamination() {
   };
 
   useEffect(() => {
-    fetchData();
+    void Promise.resolve().then(fetchData);
   }, []);
-
-  console.log(data);
 
   return (
     <Card className="rounded-[28px] border border-slate-200 bg-white p-4 shadow-sm">
@@ -59,6 +57,11 @@ export default function InitialExamination() {
       </div>
       {/* Cards */}
       <div className="space-y-3">
+        {isLoading && (
+          <p className="rounded-2xl border border-dashed border-slate-200 p-4 text-center text-sm text-slate-500">
+            Уншиж байна...
+          </p>
+        )}
         {data?.result.map((item, index) => (
           <Card key={index} className="rounded-[24px] border border-slate-200 p-2 shadow-none">
             {/* Top */}
@@ -76,15 +79,10 @@ export default function InitialExamination() {
 
             {/* Body */}
             <div className="grid grid-cols-[90px_1fr_20px] items-center gap-3">
-              {/* Image */}
               <div className="flex items-center justify-center">
-                <img
-                  src={
-                    "https://www.pngall.com/wp-content/uploads/19/No-Brand-Car-Design-Concept-PNG.png"
-                  }
-                  alt={"image"}
-                  className="h-[70px] w-[90px] object-contain"
-                />
+                <span className="flex h-[70px] w-[90px] items-center justify-center rounded-2xl bg-blue-50 text-blue-600">
+                  <CarFront className="size-8" />
+                </span>
               </div>
 
               {/* Info */}

@@ -17,14 +17,12 @@ function AppWithMe({ children }: { children: ReactNode }) {
   return (
     <ThemeProvider attribute="class" defaultTheme="light" enableSystem>
       <div className="min-h-[100dvh] w-full bg-slate-50 text-slate-950 transition-colors duration-300">
-        <div className="flex h-[100dvh] min-h-[100svh] w-full overflow-hidden">
-          <div className="w-full flex-1 overflow-auto">
-            <div className="mx-auto max-w-full">
-              <WithAuthClient>
-                <Suspense>{children}</Suspense>
-                <Toaster richColors position="top-center" />
-              </WithAuthClient>
-            </div>
+        <div className="min-h-[100svh] w-full">
+          <div className="mx-auto max-w-full">
+            <WithAuthClient>
+              <Suspense>{children}</Suspense>
+              <Toaster richColors position="top-center" />
+            </WithAuthClient>
           </div>
         </div>
         <BottomNav />

@@ -2,7 +2,7 @@
 
 import { PageShell } from "@/components/page-shell";
 import { ClipboardList } from "lucide-react";
-import TabsButton from "./common/tabs-button";
+import JobsToolbar from "./_components/organisms/jobs-toolbar";
 
 export default function Jobs() {
   return (
@@ -13,7 +13,7 @@ export default function Jobs() {
       icon={<ClipboardList className="size-5" />}
       contentClassName="space-y-4"
     >
-      <TabsButton />
+      <JobsToolbar />
     </PageShell>
   );
 }

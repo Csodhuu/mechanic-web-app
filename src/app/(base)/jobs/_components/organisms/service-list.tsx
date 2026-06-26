@@ -7,7 +7,7 @@ import dayjs from "dayjs";
 import { CalendarClock, CarFront, ChevronRight, Gauge, Phone, Search, X } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
-import { CpOrderQuery } from "../../model";
+import { CpOrderQuery } from "../../_types/cp-order";
 
 const statusFilters = [
   { value: "ALL", label: "Бүгд" },
