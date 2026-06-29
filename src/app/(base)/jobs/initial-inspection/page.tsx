@@ -107,7 +107,7 @@ export default function InitialInspectionPage() {
     <PageShell
       eyebrow="Jobs / Анхан үзлэг"
       title="Анхан үзлэг"
-      description="Хяналтанд шилжсэн машин дээр checklist бөглөж, дараа нь засвар үйлчилгээ эхлүүлнэ."
+      description="Үүсгэсэн ажил дээр checklist бөглөж, дараа нь засвар үйлчилгээ эхлүүлнэ."
       action={
         <Button
           type="button"

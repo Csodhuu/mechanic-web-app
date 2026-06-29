@@ -49,7 +49,7 @@ export function LoginFormPanel({
   const passwordErrorId = fieldErrors.password ? "password-error" : undefined;
 
   return (
-    <section className="bg-white px-5 py-6 sm:px-8 sm:py-9 lg:px-10">
+    <section className="bg-white px-5 py-7 sm:px-8 sm:py-9 lg:px-10">
       <div className="mx-auto flex min-h-full max-w-[430px] flex-col justify-center">
         <div className="mb-7">
           <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-slate-950 text-white shadow-sm">

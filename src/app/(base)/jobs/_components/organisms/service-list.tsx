@@ -2,6 +2,7 @@
 
 import { apiClient } from "@/lib/authClient";
 import { Input } from "@/components/ui/input";
+import { PaginationControls } from "@/components/ui/pagination-controls";
 import { getCookie } from "cookies-next";
 import dayjs from "dayjs";
 import { CalendarClock, CarFront, ChevronRight, Gauge, Phone, Search, X } from "lucide-react";
@@ -30,6 +31,8 @@ type CpOrderQueryParams = Parameters<(typeof apiClient.api.crm)["cp-order"]["get
 const formatDate = (value?: string | null) =>
   value ? dayjs(value).format("YYYY-MM-DD HH.mm") : "-";
 
+const PAGE_SIZE = 10;
+
 export default function ServiceList({ refreshKey }: { refreshKey: number }) {
   const router = useRouter();
   const [data, setData] = useState<CpOrderQuery | null>();
@@ -37,6 +40,7 @@ export default function ServiceList({ refreshKey }: { refreshKey: number }) {
   const [status, setStatus] = useState<StatusFilter>("ALL");
   const [searchField, setSearchField] = useState<SearchField>("licensePlate");
   const [search, setSearch] = useState("");
+  const [page, setPage] = useState(1);
 
   const openDetail = (id: string) => {
     router.push(`/service-order-detail?id=${encodeURIComponent(id)}`);
@@ -51,7 +55,7 @@ export default function ServiceList({ refreshKey }: { refreshKey: number }) {
         const token = getCookie("token");
         if (!token) return;
 
-        const query: CpOrderQueryParams = { pagination: { page: 1, size: 10 } };
+        const query: CpOrderQueryParams = { pagination: { page, size: PAGE_SIZE } };
         if (status !== "ALL") query.state = status;
 
         const searchValue = search.trim();
@@ -79,7 +83,7 @@ export default function ServiceList({ refreshKey }: { refreshKey: number }) {
       isMounted = false;
       window.clearTimeout(debounceId);
     };
-  }, [refreshKey, search, searchField, status]);
+  }, [page, refreshKey, search, searchField, status]);
 
   const orders = data?.result ?? [];
 
@@ -103,7 +107,10 @@ export default function ServiceList({ refreshKey }: { refreshKey: number }) {
             <Search className="pointer-events-none absolute top-1/2 left-3 size-4 -translate-y-1/2 text-slate-400" />
             <Input
               value={search}
-              onChange={(event) => setSearch(event.target.value)}
+              onChange={(event) => {
+                setPage(1);
+                setSearch(event.target.value);
+              }}
               placeholder={searchFields.find((field) => field.value === searchField)?.placeholder}
               className="h-9 pr-9 pl-9 text-sm"
             />
@@ -111,7 +118,10 @@ export default function ServiceList({ refreshKey }: { refreshKey: number }) {
               <button
                 type="button"
                 aria-label="Хайлтыг арилгах"
-                onClick={() => setSearch("")}
+                onClick={() => {
+                  setPage(1);
+                  setSearch("");
+                }}
                 className="absolute top-1/2 right-2 flex size-6 -translate-y-1/2 items-center justify-center rounded-md text-slate-400 hover:bg-slate-100 hover:text-slate-700"
               >
                 <X className="size-4" />
@@ -120,7 +130,10 @@ export default function ServiceList({ refreshKey }: { refreshKey: number }) {
           </div>
           <select
             value={searchField}
-            onChange={(event) => setSearchField(event.target.value as SearchField)}
+            onChange={(event) => {
+              setPage(1);
+              setSearchField(event.target.value as SearchField);
+            }}
             aria-label="Хайлтын төрөл"
             className="h-9 rounded-lg border border-slate-200 bg-white px-3 text-sm font-medium text-slate-700 outline-none focus:border-blue-500 sm:w-40"
           >
@@ -137,7 +150,10 @@ export default function ServiceList({ refreshKey }: { refreshKey: number }) {
             <button
               key={filter.value}
               type="button"
-              onClick={() => setStatus(filter.value)}
+              onClick={() => {
+                setPage(1);
+                setStatus(filter.value);
+              }}
               className={`h-7 shrink-0 rounded-full px-3 text-xs font-medium transition-colors ${
                 status === filter.value
                   ? "bg-slate-900 text-white"
@@ -216,6 +232,17 @@ export default function ServiceList({ refreshKey }: { refreshKey: number }) {
           );
         })}
       </div>
+
+      <PaginationControls
+        disabled={isLoading}
+        embedded
+        page={page}
+        pageSize={PAGE_SIZE}
+        totalCount={data?.totalCount ?? orders.length}
+        totalPage={data?.totalPage}
+        visibleCount={orders.length}
+        onPageChange={setPage}
+      />
     </section>
   );
 }

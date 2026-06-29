@@ -2,7 +2,7 @@
 
 import { deleteCookie, setCookie } from "cookies-next";
 import { useRouter } from "next/navigation";
-import { FormEvent, useEffect, useState } from "react";
+import { FormEvent, useState } from "react";
 import { toast } from "sonner";
 
 import { authClient } from "@/lib/authClient";
@@ -38,22 +38,18 @@ function validateLoginInput(input: LoginInput): LoginFieldErrors {
 export default function Login() {
   const router = useRouter();
 
-  const [loginInput, setLoginInput] = useState<LoginInput>({
-    email: "",
+  const [loginInput, setLoginInput] = useState<LoginInput>(() => ({
+    email:
+      typeof window === "undefined"
+        ? ""
+        : (window.localStorage.getItem(REMEMBERED_EMAIL_KEY) ?? ""),
     password: "",
-  });
+  }));
   const [fieldErrors, setFieldErrors] = useState<LoginFieldErrors>({});
   const [loading, setLoading] = useState(false);
   const [formError, setFormError] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [rememberMe, setRememberMe] = useState(true);
-
-  useEffect(() => {
-    const rememberedEmail = window.localStorage.getItem(REMEMBERED_EMAIL_KEY);
-    if (rememberedEmail) {
-      setLoginInput((current) => ({ ...current, email: rememberedEmail }));
-    }
-  }, []);
 
   const updateLoginInput = (value: LoginInput) => {
     setLoginInput(value);
@@ -136,7 +132,7 @@ export default function Login() {
   return (
     <div className="min-h-screen bg-slate-100 px-3 py-4 sm:px-6 sm:py-6">
       <div className="mx-auto flex min-h-[calc(100svh-2rem)] w-full max-w-6xl items-center justify-center sm:min-h-[calc(100svh-3rem)]">
-        <div className="grid w-full overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-[0_24px_80px_-42px_rgba(15,23,42,0.7)] lg:grid-cols-[1.08fr_0.92fr]">
+        <div className="grid w-full max-w-[480px] overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-[0_24px_80px_-42px_rgba(15,23,42,0.7)] md:max-w-5xl md:grid-cols-[0.95fr_1.05fr] lg:max-w-6xl lg:grid-cols-[1.08fr_0.92fr]">
           <LoginBrandPanel />
           <LoginFormPanel
             formError={formError}

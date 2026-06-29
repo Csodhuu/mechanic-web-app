@@ -2,7 +2,13 @@
 
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { apiClient } from "@/lib/authClient";
 import { getCookie } from "cookies-next";
@@ -255,6 +261,9 @@ export function OrderItemsSection({
             <DialogTitle className="break-words text-base">
               {catalogType === "service" ? "Үйлчилгээ сонгох" : "Бараа сонгох"}
             </DialogTitle>
+            <DialogDescription>
+              Захиалгад нэмэх {catalogType === "service" ? "үйлчилгээ" : "бараа"} сонгоно.
+            </DialogDescription>
           </DialogHeader>
 
           <div className="relative">

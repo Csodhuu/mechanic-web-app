@@ -1,4 +1,10 @@
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 import { cn } from "@/lib/utils";
 import { CalendarDays, UserRound } from "lucide-react";
 
@@ -23,6 +29,9 @@ export function InspectionDetailDialog({ item, onOpenChange }: InspectionDetailD
           <DialogHeader>
             <div className="border-b border-slate-100 p-4 pb-3">
               <DialogTitle>{item.inspection.licensePlate} - Анхан үзлэг</DialogTitle>
+              <DialogDescription>
+                Анхан үзлэгийн тэмдэглэл, checklist-ийн бүлэг болон хариунууд.
+              </DialogDescription>
               <div className="mt-2 flex flex-wrap gap-x-4 gap-y-1 text-xs text-slate-500">
                 <span className="inline-flex items-center gap-1">
                   <UserRound className="size-3.5" />

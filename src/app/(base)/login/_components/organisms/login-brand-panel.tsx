@@ -3,7 +3,7 @@ import Image from "next/image";
 
 export function LoginBrandPanel() {
   return (
-    <section className="relative min-h-[340px] overflow-hidden bg-[#111827] p-6 text-white sm:p-8 lg:min-h-[640px] lg:p-10">
+    <section className="relative hidden min-h-[560px] overflow-hidden bg-[#111827] p-6 text-white md:block lg:min-h-[640px] lg:p-10">
       <div className="absolute inset-0 opacity-[0.18] [background-image:linear-gradient(rgba(255,255,255,0.08)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.08)_1px,transparent_1px)] [background-size:36px_36px]" />
       <Image
         src="/onlylogo.png"
@@ -43,7 +43,7 @@ export function LoginBrandPanel() {
 
         <div className="mt-10 grid gap-2">
           {[
-            { icon: ShieldCheck, label: "01", value: "Хяналт руу шилжүүлэх" },
+            { icon: ShieldCheck, label: "01", value: "Ажил үүсгэх" },
             { icon: ClipboardCheck, label: "02", value: "Checklist бөглөх" },
             { icon: Wrench, label: "03", value: "Засвар үйлчилгээ эхлүүлэх" },
           ].map((item) => {

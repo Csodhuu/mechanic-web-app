@@ -16,12 +16,12 @@ export default function TabsButton() {
         <div>
           <p className="text-sm font-semibold text-slate-950">Шинэ ажил бүртгэх</p>
           <p className="mt-0.5 text-sm text-slate-500">
-            Улсын дугаараар машин сонгоод checklist-ийн өмнөх хяналт руу шилжүүлнэ.
+            Улсын дугаараар машин сонгоод шинэ ажил үүсгэнэ.
           </p>
         </div>
         <Button type="button" size="sm" onClick={() => setOpen(true)}>
           <ClipboardPlus className="size-4" />
-          Хяналт руу шилжүүлэх
+          Ажил үүсгэх
         </Button>
 
         <ServiceOrderDialog

@@ -1,4 +1,10 @@
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 
 import {
   DetailDialogType,
@@ -34,6 +40,9 @@ export function OrderDetailDialog({
                 ? "Автомашины дэлгэрэнгүй"
                 : "Харилцагчийн дэлгэрэнгүй"}
           </DialogTitle>
+          <DialogDescription>
+            Захиалга, автомашин болон харилцагчийн бүртгэлийн мэдээлэл.
+          </DialogDescription>
         </DialogHeader>
 
         {detailDialog === "order" && (

@@ -1,6 +1,7 @@
 "use client";
 
 import { apiClient } from "@/lib/authClient";
+import { PaginationControls } from "@/components/ui/pagination-controls";
 import { getCookie } from "cookies-next";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { useCallback, useEffect, useMemo, useState } from "react";
@@ -11,6 +12,8 @@ import { ControlHeader } from "./_components/organisms/control-header";
 import { ControlOrderList } from "./_components/organisms/control-order-list";
 import { ControlTabs } from "./_components/organisms/control-tabs";
 import { OrderItem, OrderState } from "./_types/control";
+
+const PAGE_SIZE = 25;
 
 function getHeaders() {
   const token = getCookie("token");
@@ -30,6 +33,9 @@ export default function Control() {
 
   const [activeState, setActiveState] = useState<OrderState>(initialState);
   const [orders, setOrders] = useState<OrderItem[]>([]);
+  const [page, setPage] = useState(1);
+  const [activeTotalCount, setActiveTotalCount] = useState(0);
+  const [activeTotalPage, setActiveTotalPage] = useState(1);
   const [counts, setCounts] = useState<Record<OrderState, number>>({
     CREATED: 0,
     PROGRESSING: 0,
@@ -44,6 +50,7 @@ export default function Control() {
   const handleTabChange = useCallback(
     (nextState: OrderState) => {
       setActiveState(nextState);
+      setPage(1);
 
       const params = new URLSearchParams(searchParams.toString());
       if (nextState === "CREATED") {
@@ -71,7 +78,7 @@ export default function Control() {
 
       const searchValue = search.trim();
       const queryBase = {
-        pagination: { page: 1, size: 25 },
+        pagination: { page, size: PAGE_SIZE },
         ...(searchValue ? { licensePlate: searchValue } : {}),
       };
 
@@ -104,13 +111,15 @@ export default function Control() {
         COMPLETE: completeRes.data?.totalCount ?? 0,
       });
       setOrders(activeRes.data?.result ?? []);
+      setActiveTotalCount(activeRes.data?.totalCount ?? 0);
+      setActiveTotalPage(activeRes.data?.totalPage ?? 1);
     } catch (fetchError) {
       console.error("Failed to fetch control orders:", fetchError);
       setError("Засвар үйлчилгээний ажлуудыг уншихад алдаа гарлаа.");
     } finally {
       setLoading(false);
     }
-  }, [activeState, search]);
+  }, [activeState, page, search]);
 
   useEffect(() => {
     const timeoutId = window.setTimeout(() => void loadData(), search.trim() ? 300 : 0);
@@ -194,7 +203,13 @@ export default function Control() {
       />
 
       <ControlTabs activeState={activeState} counts={counts} onChange={handleTabChange} />
-      <ControlSearch value={search} onChange={setSearch} />
+      <ControlSearch
+        value={search}
+        onChange={(value) => {
+          setPage(1);
+          setSearch(value);
+        }}
+      />
 
       {error && (
         <div className="mt-3 rounded-[15px] border border-red-100 bg-red-50 p-4 text-sm font-medium text-red-700">
@@ -211,6 +226,18 @@ export default function Control() {
         onStartControl={(item) => void startControl(item)}
         onCompleteControl={(item) => void completeControl(item)}
       />
+
+      {!error && (
+        <PaginationControls
+          disabled={loading}
+          page={page}
+          pageSize={PAGE_SIZE}
+          totalCount={activeTotalCount}
+          totalPage={activeTotalPage}
+          visibleCount={orders.length}
+          onPageChange={setPage}
+        />
+      )}
     </div>
   );
 }

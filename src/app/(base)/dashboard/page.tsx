@@ -188,8 +188,8 @@ export default function Dashboard() {
           <div className="mt-4 grid gap-3 sm:grid-cols-3">
             {[
               {
-                title: "Хяналт руу шилжүүлэх",
-                detail: "Улсын дугаараар машин сонгоод checklist-ийн өмнөх хяналт руу оруулна.",
+                title: "Ажил үүсгэх",
+                detail: "Улсын дугаараар машин сонгоод checklist бөглөх ажлыг эхлүүлнэ.",
                 icon: Wrench,
                 onClick: () => router.push("/jobs"),
               },
@@ -231,12 +231,12 @@ export default function Dashboard() {
           </p>
           <h2 className="mt-2 text-base font-semibold sm:text-lg">Одоогийн ажлын тойм</h2>
           <p className="mt-1 text-sm leading-6 text-slate-300">
-            Өнөөдрийн урсгал: хяналт -&gt; checklist -&gt; засвар -&gt; дуусгах.
+            Өнөөдрийн урсгал: ажил үүсгэх -&gt; checklist -&gt; засвар -&gt; дуусгах.
           </p>
 
           <div className="mt-4 space-y-3">
             {[
-              { label: "Хяналт руу", value: "Checklist-ийн өмнө машин шилжүүлнэ" },
+              { label: "Ажил үүсгэх", value: "Улсын дугаараар машин сонгож checklist эхлүүлнэ" },
               { label: "Checklist", value: "Хяналт дээр үзлэг бөглөнө" },
               { label: "Засвар руу", value: "Checklist-ийн дараа үйлчилгээ эхлүүлнэ" },
               { label: "Түүх рүү", value: "Дууссан ажлыг архивлана" },

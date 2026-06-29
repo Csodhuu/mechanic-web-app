@@ -30,12 +30,12 @@ const navItems = [
     icon: History,
     match: (pathname: string) => pathname.startsWith("/history"),
   },
-  {
-    href: "/fleet-inspection",
-    label: "Fleet",
-    icon: Truck,
-    match: (pathname: string) => pathname.startsWith("/fleet-inspection"),
-  },
+  // {
+  //   href: "/fleet-inspection",
+  //   label: "Fleet",
+  //   icon: Truck,
+  //   match: (pathname: string) => pathname.startsWith("/fleet-inspection"),
+  // },
   {
     href: "/profile",
     label: "Профайл",

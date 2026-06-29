@@ -2,6 +2,7 @@
 
 import { CpOrderQuery } from "@/app/(base)/jobs/_types/cp-order";
 import { EmptyState, PageShell } from "@/components/page-shell";
+import { PaginationControls } from "@/components/ui/pagination-controls";
 import { apiClient } from "@/lib/authClient";
 import { getCookie } from "cookies-next";
 import { History as HistoryIcon } from "lucide-react";
@@ -11,9 +12,12 @@ import { HistoryList } from "./_components/organisms/history-list";
 import { HistorySummary } from "./_components/organisms/history-summary";
 import { groupByCompletedDate } from "./_types/history";
 
+const PAGE_SIZE = 25;
+
 export default function History() {
   const router = useRouter();
   const [data, setData] = useState<CpOrderQuery | null>();
+  const [page, setPage] = useState(1);
   const [isLoading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -43,7 +47,7 @@ export default function History() {
         const res = await apiClient.api.crm["cp-order"].get({
           query: {
             state: "COMPLETE",
-            pagination: { page: 1, size: 25 },
+            pagination: { page, size: PAGE_SIZE },
           },
           headers: {
             Authorization: `Bearer ${token}`,
@@ -64,7 +68,7 @@ export default function History() {
     return () => {
       isMounted = false;
     };
-  }, []);
+  }, [page]);
 
   return (
     <PageShell
@@ -86,7 +90,20 @@ export default function History() {
         />
       )}
 
-      {!isLoading && !error && <HistoryList groups={groupedHistories} onOpen={openDetail} />}
+      {!isLoading && !error && (
+        <>
+          <HistoryList groups={groupedHistories} onOpen={openDetail} />
+          <PaginationControls
+            disabled={isLoading}
+            page={page}
+            pageSize={PAGE_SIZE}
+            totalCount={data?.totalCount ?? orders.length}
+            totalPage={data?.totalPage}
+            visibleCount={orders.length}
+            onPageChange={setPage}
+          />
+        </>
+      )}
     </PageShell>
   );
 }

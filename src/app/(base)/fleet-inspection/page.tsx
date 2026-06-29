@@ -11,6 +11,7 @@ import {
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { PaginationControls } from "@/components/ui/pagination-controls";
 import { apiClient } from "@/lib/authClient";
 import { cn } from "@/lib/utils";
 import { getCookie } from "cookies-next";
@@ -56,14 +57,18 @@ const createStateOptions: { label: string; value: CreateState }[] = [
   { label: "Явагдаж буй", value: "IN_PROGRESS" },
 ];
 
+const PAGE_SIZE = 25;
+
 export default function FleetInspectionPage() {
   const [items, setItems] = useState<FleetInspectionItem[]>([]);
   const [templates, setTemplates] = useState<FleetInspectionTemplate[]>([]);
   const [machines, setMachines] = useState<FleetMachine[]>([]);
   const [total, setTotal] = useState(0);
+  const [totalPage, setTotalPage] = useState(1);
   const [stateFilter, setStateFilter] = useState<FleetInspectionState | "ALL">("ALL");
   const [resultFilter, setResultFilter] = useState<FleetInspectionResult | "ALL">("ALL");
   const [search, setSearch] = useState("");
+  const [page, setPage] = useState(1);
   const [selected, setSelected] = useState<FleetInspectionItem | null>(null);
   const [loading, setLoading] = useState(true);
   const [optionsLoading, setOptionsLoading] = useState(true);
@@ -84,7 +89,7 @@ export default function FleetInspectionPage() {
       if (!token) throw new Error("Authentication token is missing");
 
       const query: FleetInspectionQueryParams = {
-        pagination: { page: 1, size: 50 },
+        pagination: { page, size: PAGE_SIZE },
       };
       if (stateFilter !== "ALL") query.state = stateFilter;
       if (resultFilter !== "ALL") query.stateResult = resultFilter;
@@ -98,13 +103,14 @@ export default function FleetInspectionPage() {
 
       setItems(response.data.result);
       setTotal(response.data.totalCount);
+      setTotalPage(response.data.totalPage);
     } catch (cause) {
       console.error("Failed to fetch fleet inspections:", cause);
       setError("Fleet inspection жагсаалт авахад алдаа гарлаа.");
     } finally {
       setLoading(false);
     }
-  }, [resultFilter, stateFilter]);
+  }, [page, resultFilter, stateFilter]);
 
   const loadOptions = useCallback(async () => {
     try {
@@ -345,7 +351,10 @@ export default function FleetInspectionPage() {
             <Search className="pointer-events-none absolute top-1/2 left-3 size-4 -translate-y-1/2 text-slate-400" />
             <Input
               value={search}
-              onChange={(event) => setSearch(event.target.value)}
+              onChange={(event) => {
+                setPage(1);
+                setSearch(event.target.value);
+              }}
               className="pr-9 pl-9"
               placeholder="Улсын дугаар, asset, VIN, template"
             />
@@ -353,7 +362,10 @@ export default function FleetInspectionPage() {
               <button
                 type="button"
                 aria-label="Хайлтыг арилгах"
-                onClick={() => setSearch("")}
+                onClick={() => {
+                  setPage(1);
+                  setSearch("");
+                }}
                 className="absolute top-1/2 right-2 flex size-6 -translate-y-1/2 items-center justify-center rounded-md text-slate-400 hover:bg-slate-100 hover:text-slate-700"
               >
                 <X className="size-4" />
@@ -366,13 +378,19 @@ export default function FleetInspectionPage() {
           label="Төлөв"
           options={fleetInspectionStateFilters}
           value={stateFilter}
-          onChange={setStateFilter}
+          onChange={(value) => {
+            setPage(1);
+            setStateFilter(value);
+          }}
         />
         <FilterRow
           label="Үр дүн"
           options={fleetInspectionResultFilters}
           value={resultFilter}
-          onChange={setResultFilter}
+          onChange={(value) => {
+            setPage(1);
+            setResultFilter(value);
+          }}
         />
       </section>
 
@@ -393,6 +411,18 @@ export default function FleetInspectionPage() {
             <FleetInspectionRow key={item.inspection.id} item={item} onSelect={setSelected} />
           ))}
         </section>
+      )}
+
+      {!loading && !error && (
+        <PaginationControls
+          disabled={loading}
+          page={page}
+          pageSize={PAGE_SIZE}
+          totalCount={total}
+          totalPage={totalPage}
+          visibleCount={items.length}
+          onPageChange={setPage}
+        />
       )}
 
       <FleetInspectionDetailDialog

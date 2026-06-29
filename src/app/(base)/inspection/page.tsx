@@ -2,6 +2,7 @@
 
 import { EmptyState, MetricCard, PageShell } from "@/components/page-shell";
 import { Button } from "@/components/ui/button";
+import { PaginationControls } from "@/components/ui/pagination-controls";
 import { apiClient } from "@/lib/authClient";
 import { cn } from "@/lib/utils";
 import { getCookie } from "cookies-next";
@@ -13,11 +14,15 @@ import { InspectionFilters } from "./_components/molecules/inspection-filters";
 import { InspectionList } from "./_components/organisms/inspection-list";
 import { InspectionItem, Status } from "./_types/inspection";
 
+const PAGE_SIZE = 25;
+
 export default function InspectionPage() {
   const [items, setItems] = useState<InspectionItem[]>([]);
   const [total, setTotal] = useState(0);
+  const [totalPage, setTotalPage] = useState(1);
   const [filter, setFilter] = useState<Status | "ALL">("ALL");
   const [search, setSearch] = useState("");
+  const [page, setPage] = useState(1);
   const [selected, setSelected] = useState<InspectionItem | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -49,7 +54,7 @@ export default function InspectionPage() {
 
       const response = await apiClient.api.crm.inspection.get({
         query: {
-          pagination: { page: 1, size: 50 },
+          pagination: { page, size: PAGE_SIZE },
           ...(filter !== "ALL" ? { status: filter } : {}),
           ...(search.trim() ? { licensePlate: search.trim() } : {}),
         },
@@ -60,13 +65,14 @@ export default function InspectionPage() {
 
       setItems(response.data.result);
       setTotal(response.data.totalCount);
+      setTotalPage(response.data.totalPage);
     } catch (cause) {
       console.error("Failed to fetch CRM inspections:", cause);
       setError("Анхан үзлэгийн жагсаалт авахад алдаа гарлаа.");
     } finally {
       setLoading(false);
     }
-  }, [filter, search]);
+  }, [filter, page, search]);
 
   useEffect(() => {
     const timeoutId = window.setTimeout(() => void load(), search.trim() ? 300 : 0);
@@ -118,8 +124,14 @@ export default function InspectionPage() {
       <InspectionFilters
         filter={filter}
         search={search}
-        onFilterChange={setFilter}
-        onSearchChange={setSearch}
+        onFilterChange={(value) => {
+          setPage(1);
+          setFilter(value);
+        }}
+        onSearchChange={(value) => {
+          setPage(1);
+          setSearch(value);
+        }}
       />
 
       {error && <EmptyState title="Мэдээлэл авах боломжгүй" description={error} />}
@@ -134,7 +146,18 @@ export default function InspectionPage() {
       )}
 
       {!loading && !error && items.length > 0 && (
-        <InspectionList items={items} onSelect={setSelected} />
+        <>
+          <InspectionList items={items} onSelect={setSelected} />
+          <PaginationControls
+            disabled={loading}
+            page={page}
+            pageSize={PAGE_SIZE}
+            totalCount={total}
+            totalPage={totalPage}
+            visibleCount={items.length}
+            onPageChange={setPage}
+          />
+        </>
       )}
 
       <InspectionDetailDialog item={selected} onOpenChange={(open) => !open && setSelected(null)} />

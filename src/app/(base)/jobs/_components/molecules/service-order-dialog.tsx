@@ -1,7 +1,13 @@
 "use client";
 
 import { Button } from "@/components/ui/button";
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { apiClient } from "@/lib/authClient";
 import { useRouter } from "next/navigation";
@@ -56,7 +62,7 @@ export function ServiceOrderDialog({ open, onOpenChange, onCreated }: Props) {
     }
   };
 
-  const transferToInspection = () => {
+  const createJob = () => {
     const value = licensePlate.trim();
     if (!vehicle || !value) {
       toast.error("Эхлээд улсын дугаараар машиныг шалгана уу.");
@@ -75,7 +81,10 @@ export function ServiceOrderDialog({ open, onOpenChange, onCreated }: Props) {
     <Dialog open={open} onOpenChange={handleInternalOpenChange}>
       <DialogContent className="gap-3 p-4 sm:max-w-[440px] sm:p-5">
         <DialogHeader>
-          <DialogTitle className="text-base font-semibold">Анхан үзлэгийн машин сонгох</DialogTitle>
+          <DialogTitle className="text-base font-semibold">Ажил үүсгэх машин сонгох</DialogTitle>
+          <DialogDescription>
+            Улсын дугаараар машин хайж шинэ ажил үүсгэнэ.
+          </DialogDescription>
         </DialogHeader>
 
         <div className="flex gap-2">
@@ -120,10 +129,10 @@ export function ServiceOrderDialog({ open, onOpenChange, onCreated }: Props) {
           type="button"
           size="sm"
           className="w-full text-xs"
-          onClick={transferToInspection}
+          onClick={createJob}
           disabled={!vehicle || isBusy}
         >
-          Хяналт руу шилжүүлэх
+          Ажил үүсгэх
         </Button>
       </DialogContent>
     </Dialog>
