@@ -56,7 +56,7 @@ export function BottomNav() {
       aria-label="Mobile navigation"
       className="fixed inset-x-0 bottom-0 z-50 border-t border-slate-200 bg-white/95 shadow-[0_-12px_40px_-30px_rgba(15,23,42,0.5)] backdrop-blur xl:hidden"
     >
-      <div className="mx-auto grid h-[76px] w-full max-w-[560px] grid-cols-6 pb-[env(safe-area-inset-bottom)]">
+      <div className="mx-auto grid h-[76px] w-full max-w-[560px] grid-cols-5 pb-[env(safe-area-inset-bottom)]">
         {navItems.map((item) => {
           const Icon = item.icon;
           const isActive = item.match(pathname);
