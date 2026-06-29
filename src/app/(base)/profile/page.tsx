@@ -56,13 +56,9 @@ export default function Profile() {
       description="Нэвтэрсэн ажилтны эрх, салбар, холбоо барих мэдээлэл."
       icon={<UserRound className="size-5" />}
     >
-      {isLoading && (
-        <EmptyState title="Уншиж байна" description="Хувийн мэдээлэл татаж байна..." />
-      )}
+      {isLoading && <EmptyState title="Уншиж байна" description="Хувийн мэдээлэл татаж байна..." />}
 
-      {!isLoading && error && (
-        <EmptyState title="Мэдээлэл авах боломжгүй" description={error} />
-      )}
+      {!isLoading && error && <EmptyState title="Мэдээлэл авах боломжгүй" description={error} />}
 
       {!isLoading && user && <ProfileContent user={user} />}
     </PageShell>

@@ -25,7 +25,7 @@ export default function ServiceOrderDetail() {
   const [error, setError] = useState<string | null>(null);
   const [refreshKey, setRefreshKey] = useState(0);
   const [detailDialog, setDetailDialog] = useState<DetailDialogType | null>(null);
-  const [isHandingOff, setIsHandingOff] = useState(false);
+  const [isStartingService, setIsStartingService] = useState(false);
 
   const vehicleName = useMemo(() => {
     const name = [data?.make?.name, data?.model?.name].filter(Boolean).join(" ");
@@ -37,11 +37,11 @@ export default function ServiceOrderDetail() {
     return name || "Харилцагчийн нэргүй";
   }, [data?.customer?.firstname, data?.customer?.lastname]);
 
-  const handOffToControl = async () => {
+  const startRepairService = async () => {
     if (!data) return;
 
     try {
-      setIsHandingOff(true);
+      setIsStartingService(true);
 
       const token = getCookie("token");
       if (!token) {
@@ -63,13 +63,13 @@ export default function ServiceOrderDetail() {
 
       if (res.error || !res.data) throw res.error;
 
-      toast.success("Хяналт руу шилжлээ.");
+      toast.success("Засвар үйлчилгээ эхэллээ.");
       router.push("/control?state=PROGRESSING");
     } catch (transferError) {
-      console.error("Failed to hand off order to control:", transferError);
-      toast.error("Хяналт руу шилжүүлэхэд алдаа гарлаа.");
+      console.error("Failed to start repair service:", transferError);
+      toast.error("Засвар үйлчилгээ эхлүүлэхэд алдаа гарлаа.");
     } finally {
-      setIsHandingOff(false);
+      setIsStartingService(false);
     }
   };
 
@@ -120,7 +120,13 @@ export default function ServiceOrderDetail() {
   return (
     <main className="mx-auto w-full max-w-[1120px] space-y-4 px-3 pb-[calc(6rem+env(safe-area-inset-bottom))] pt-3 sm:px-6 sm:pt-4 lg:px-8">
       <div className="flex items-center gap-3">
-        <Button type="button" variant="outline" size="icon" aria-label="Буцах" onClick={() => router.back()}>
+        <Button
+          type="button"
+          variant="outline"
+          size="icon"
+          aria-label="Буцах"
+          onClick={() => router.back()}
+        >
           <ArrowLeft className="h-4 w-4" />
         </Button>
         <div className="min-w-0">
@@ -147,9 +153,9 @@ export default function ServiceOrderDetail() {
         <>
           <OrderHeroCard
             data={data}
-            isHandingOff={isHandingOff}
+            isStartingService={isStartingService}
             vehicleName={vehicleName}
-            onHandOff={() => void handOffToControl()}
+            onStartService={() => void startRepairService()}
           />
 
           <div className="grid grid-cols-2 gap-3">

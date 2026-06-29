@@ -28,7 +28,11 @@ export default function InspectionPage() {
       visible: items.length,
       checked: items.reduce(
         (sum, item) =>
-          sum + (item.inspection.inspection?.reduce((groupSum, group) => groupSum + group.values.length, 0) ?? 0),
+          sum +
+          (item.inspection.inspection?.reduce(
+            (groupSum, group) => groupSum + group.values.length,
+            0
+          ) ?? 0),
         0
       ),
     }),
@@ -120,10 +124,7 @@ export default function InspectionPage() {
 
       {error && <EmptyState title="Мэдээлэл авах боломжгүй" description={error} />}
       {loading && (
-        <EmptyState
-          title="Уншиж байна"
-          description="Анхан үзлэгийн жагсаалт татаж байна..."
-        />
+        <EmptyState title="Уншиж байна" description="Анхан үзлэгийн жагсаалт татаж байна..." />
       )}
       {!loading && !error && items.length === 0 && (
         <EmptyState

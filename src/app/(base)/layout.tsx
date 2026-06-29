@@ -3,7 +3,6 @@ import { BottomNav } from "@/components/navigation/bottom-nav";
 import { ThemeProvider } from "@/components/theme-provider";
 import WithAuthClient from "@/components/with-auth/with-auth";
 import { ReactNode, Suspense } from "react";
-import { Toaster } from "sonner";
 
 type RootLayoutProps = {
   children: ReactNode;
@@ -21,7 +20,6 @@ function AppWithMe({ children }: { children: ReactNode }) {
           <div className="mx-auto max-w-full">
             <WithAuthClient>
               <Suspense>{children}</Suspense>
-              <Toaster richColors position="top-center" />
             </WithAuthClient>
           </div>
         </div>

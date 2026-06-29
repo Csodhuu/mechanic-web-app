@@ -1,7 +1,7 @@
 "use client";
 
 import { cn } from "@/lib/utils";
-import { ClipboardCheck, ClipboardList, History, House, UserRound } from "lucide-react";
+import { ClipboardCheck, ClipboardList, History, House, Truck, UserRound } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 
@@ -31,6 +31,12 @@ const navItems = [
     match: (pathname: string) => pathname.startsWith("/history"),
   },
   {
+    href: "/fleet-inspection",
+    label: "Fleet",
+    icon: Truck,
+    match: (pathname: string) => pathname.startsWith("/fleet-inspection"),
+  },
+  {
     href: "/profile",
     label: "Профайл",
     icon: UserRound,
@@ -50,7 +56,7 @@ export function BottomNav() {
       aria-label="Mobile navigation"
       className="fixed inset-x-0 bottom-0 z-50 border-t border-slate-200 bg-white/95 shadow-[0_-12px_40px_-30px_rgba(15,23,42,0.5)] backdrop-blur xl:hidden"
     >
-      <div className="mx-auto grid h-[76px] w-full max-w-[520px] grid-cols-5 pb-[env(safe-area-inset-bottom)]">
+      <div className="mx-auto grid h-[76px] w-full max-w-[560px] grid-cols-6 pb-[env(safe-area-inset-bottom)]">
         {navItems.map((item) => {
           const Icon = item.icon;
           const isActive = item.match(pathname);
@@ -72,7 +78,9 @@ export function BottomNav() {
               >
                 <Icon className="size-5" strokeWidth={isActive ? 2.3 : 1.9} />
               </span>
-              <span className={cn("text-[11px] font-medium leading-none", isActive && "font-semibold")}>
+              <span
+                className={cn("text-[11px] font-medium leading-none", isActive && "font-semibold")}
+              >
                 {item.label}
               </span>
             </Link>

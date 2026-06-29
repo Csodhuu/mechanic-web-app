@@ -1,8 +1,6 @@
 import { apiClient } from "@/lib/authClient";
 
-export type MeQuery = NonNullable<
-  Awaited<ReturnType<typeof apiClient.api.user.me.get>>["data"]
->;
+export type MeQuery = NonNullable<Awaited<ReturnType<typeof apiClient.api.user.me.get>>["data"]>;
 
 export const kindLabel: Record<string, string> = {
   ADMIN: "Админ",

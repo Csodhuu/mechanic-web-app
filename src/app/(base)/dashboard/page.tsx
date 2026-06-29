@@ -25,12 +25,16 @@ type OrderItem = CpOrderQuery["result"][number];
 
 const stateLabel: Record<OrderItem["order"]["state"], string> = {
   CREATED: "Шинэ",
-  PROGRESSING: "Хийгдэж байна",
+  PROGRESSING: "Засвар явагдаж байна",
   COMPLETE: "Дууссан",
 };
 
 function getCustomerName(item: OrderItem) {
-  return [item.customer?.lastname, item.customer?.firstname].filter(Boolean).join(" ") || item.customer?.phoneNumber || "-";
+  return (
+    [item.customer?.lastname, item.customer?.firstname].filter(Boolean).join(" ") ||
+    item.customer?.phoneNumber ||
+    "-"
+  );
 }
 
 function getVehicleName(item: OrderItem) {
@@ -105,7 +109,10 @@ export default function Dashboard() {
             ...(createdRes.data?.result ?? []),
             ...(completeRes.data?.result ?? []),
           ]
-            .filter((item, index, all) => all.findIndex((other) => other.order.id === item.order.id) === index)
+            .filter(
+              (item, index, all) =>
+                all.findIndex((other) => other.order.id === item.order.id) === index
+            )
             .slice(0, 6);
 
           setOrders(recent);
@@ -134,7 +141,7 @@ export default function Dashboard() {
     <PageShell
       eyebrow="Dashboard"
       title={greeting}
-      description="Өнөөдрийн үзлэг, засвар, хяналтын ажлуудаа нэг дор хяна."
+      description="Өнөөдрийн хяналт, checklist, засварын ажлуудаа нэг дор хяна."
       action={
         <Button type="button" variant="outline" onClick={() => router.push("/jobs")}>
           <ClipboardList className="size-4" />
@@ -152,9 +159,9 @@ export default function Dashboard() {
           icon={<CarFront className="size-5" />}
         />
         <MetricCard
-          label="Хяналтанд буй"
+          label="Засвар явагдаж буй"
           value={String(totals.PROGRESSING)}
-          description="Одоогоор идэвхтэй ажиллаж буй"
+          description="Одоогоор засварлаж буй"
           tone="blue"
           icon={<ShieldCheck className="size-5" />}
         />
@@ -172,21 +179,23 @@ export default function Dashboard() {
           <div className="flex items-center justify-between gap-3">
             <div>
               <h2 className="text-base font-semibold text-slate-950">Түргэн үйлдэл</h2>
-              <p className="mt-0.5 text-sm text-slate-500">Ихэнх workflow-ийг эндээс шууд эхлүүлнэ.</p>
+              <p className="mt-0.5 text-sm text-slate-500">
+                Ихэнх workflow-ийг эндээс шууд эхлүүлнэ.
+              </p>
             </div>
           </div>
 
           <div className="mt-4 grid gap-3 sm:grid-cols-3">
             {[
               {
-                title: "Анхан үзлэг",
-                detail: "Улсын дугаараар машин сонгоод үзлэг эхлүүлнэ.",
+                title: "Хяналт руу шилжүүлэх",
+                detail: "Улсын дугаараар машин сонгоод checklist-ийн өмнөх хяналт руу оруулна.",
                 icon: Wrench,
                 onClick: () => router.push("/jobs"),
               },
               {
-                title: "Хяналт",
-                detail: "Шилжсэн ажлуудыг шалгаж, дуусгасан гэж тэмдэглэнэ.",
+                title: "Засвар үйлчилгээ",
+                detail: "Эхлэхэд бэлэн болон явагдаж буй ажлуудыг хяна.",
                 icon: ShieldCheck,
                 onClick: () => router.push("/control"),
               },
@@ -222,13 +231,14 @@ export default function Dashboard() {
           </p>
           <h2 className="mt-2 text-base font-semibold sm:text-lg">Одоогийн ажлын тойм</h2>
           <p className="mt-1 text-sm leading-6 text-slate-300">
-            Өнөөдрийн урсгал: үзлэг -&gt; хяналт -&gt; дуусгах.
+            Өнөөдрийн урсгал: хяналт -&gt; checklist -&gt; засвар -&gt; дуусгах.
           </p>
 
           <div className="mt-4 space-y-3">
             {[
-              { label: "Үзлэг рүү", value: "Шинэ машин бүртгэнэ" },
-              { label: "Хяналт руу", value: "Шалгалтын дараах шилжилт" },
+              { label: "Хяналт руу", value: "Checklist-ийн өмнө машин шилжүүлнэ" },
+              { label: "Checklist", value: "Хяналт дээр үзлэг бөглөнө" },
+              { label: "Засвар руу", value: "Checklist-ийн дараа үйлчилгээ эхлүүлнэ" },
               { label: "Түүх рүү", value: "Дууссан ажлыг архивлана" },
             ].map((item) => (
               <div key={item.label} className="rounded-2xl border border-white/10 bg-white/5 p-3">
@@ -246,14 +256,20 @@ export default function Dashboard() {
             <h2 className="text-base font-semibold text-slate-950">Сүүлийн ажлууд</h2>
             <p className="mt-0.5 text-sm text-slate-500">Хамгийн сүүлд орсон order-ууд.</p>
           </div>
-          <Button type="button" variant="ghost" onClick={() => router.push("/service-order-detail")}>
+          <Button
+            type="button"
+            variant="ghost"
+            onClick={() => router.push("/jobs")}
+          >
             Бүгд
             <ArrowRight className="size-4" />
           </Button>
         </div>
 
         {loading && (
-          <div className="px-4 py-10 text-center text-sm text-slate-500">Мэдээлэл уншиж байна...</div>
+          <div className="px-4 py-10 text-center text-sm text-slate-500">
+            Мэдээлэл уншиж байна...
+          </div>
         )}
 
         {!loading && error && (
@@ -277,7 +293,9 @@ export default function Dashboard() {
               <button
                 key={item.order.id}
                 type="button"
-                onClick={() => router.push(`/service-order-detail?id=${encodeURIComponent(item.order.id)}`)}
+                onClick={() =>
+                  router.push(`/service-order-detail?id=${encodeURIComponent(item.order.id)}`)
+                }
                 className="flex w-full items-start gap-3 px-4 py-3 text-left transition hover:bg-slate-50"
               >
                 <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-blue-50 text-blue-600">

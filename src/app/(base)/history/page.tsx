@@ -75,12 +75,14 @@ export default function History() {
     >
       <HistorySummary totalCount={data?.totalCount ?? orders.length} visibleCount={orders.length} />
 
-      {isLoading && <EmptyState title="Уншиж байна" description="Дууссан ажлуудыг татаж байна..." />}
+      {isLoading && (
+        <EmptyState title="Уншиж байна" description="Дууссан ажлуудыг татаж байна..." />
+      )}
       {!isLoading && error && <EmptyState title="Мэдээлэл авах боломжгүй" description={error} />}
       {!isLoading && !error && orders.length === 0 && (
         <EmptyState
           title="Түүх хоосон байна"
-          description="Хяналт дууссан service order энд харагдана."
+          description="Засвар үйлчилгээ дууссан service order энд харагдана."
         />
       )}
 

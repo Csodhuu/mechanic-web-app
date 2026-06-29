@@ -27,7 +27,9 @@ export function HistoryOrderRow({
       </span>
       <span className="min-w-0">
         <span className="flex items-center gap-2">
-          <span className="truncate text-sm font-semibold text-slate-950">{item.order.orderId}</span>
+          <span className="truncate text-sm font-semibold text-slate-950">
+            {item.order.orderId}
+          </span>
           <span className="hidden shrink-0 rounded-full border border-emerald-200 bg-emerald-50 px-2 py-0.5 text-[11px] font-semibold text-emerald-700 sm:inline-flex">
             Дууссан
           </span>

@@ -6,7 +6,7 @@ export type DetailDialogType = "order" | "vehicle" | "customer";
 
 export const stateLabel: Record<OrderDetail["order"]["state"], string> = {
   CREATED: "Үүссэн",
-  PROGRESSING: "Хийгдэж байна",
+  PROGRESSING: "Засвар явагдаж байна",
   COMPLETE: "Дууссан",
 };
 

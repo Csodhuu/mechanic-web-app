@@ -43,7 +43,10 @@ export function OrderDetailDialog({
             <DetailRow label="Төрөл" value={data.order.type} />
             <DetailRow label="Үүссэн огноо" value={formatOrderDate(data.order.createdAt)} />
             <DetailRow label="Дууссан огноо" value={formatOrderDate(data.order.timeCompleted)} />
-            <DetailRow label="Дараагийн үйлчилгээ" value={formatOrderDate(data.order.nextServiceDate)} />
+            <DetailRow
+              label="Дараагийн үйлчилгээ"
+              value={formatOrderDate(data.order.nextServiceDate)}
+            />
             <DetailRow label="Тайлбар" value={data.order.description} />
             <DetailRow label="Шинэчлэгдсэн" value={formatOrderDate(data.order.updatedAt)} />
           </div>

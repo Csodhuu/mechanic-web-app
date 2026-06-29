@@ -31,9 +31,9 @@ export function ControlOrderCard({
   const StateIcon = stateBadge.icon;
   const actionLabel =
     item.order.state === "CREATED"
-      ? "Хяналт эхлүүлэх"
+      ? "Засвар эхлүүлэх"
       : item.order.state === "PROGRESSING"
-        ? "Дуусгах"
+        ? "Засвар дуусгах"
         : "Дууссан";
 
   return (
@@ -95,7 +95,7 @@ export function ControlOrderCard({
             disabled={mutating}
             onClick={() => onStartControl(item)}
           >
-            {mutating ? "Шилжиж байна..." : actionLabel}
+            {mutating ? "Эхлүүлж байна..." : actionLabel}
           </Button>
         )}
         {item.order.state === "PROGRESSING" && (

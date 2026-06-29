@@ -5,9 +5,9 @@ export type OrderItem = CpOrderQuery["result"][number];
 export type OrderState = OrderItem["order"]["state"];
 
 export const controlTabs: { value: OrderState; label: string; detail: string }[] = [
-  { value: "CREATED", label: "Хүлээгдэж буй", detail: "Хяналт руу шилжүүлэхэд бэлэн" },
-  { value: "PROGRESSING", label: "Хяналтанд буй", detail: "Одоогоор хяналт хийж байна" },
-  { value: "COMPLETE", label: "Дууссан", detail: "Хяналт дууссан ажлууд" },
+  { value: "CREATED", label: "Эхлэхэд бэлэн", detail: "Засвар үйлчилгээ эхлүүлэхэд бэлэн" },
+  { value: "PROGRESSING", label: "Засвар явагдаж буй", detail: "Одоогоор засварлаж байна" },
+  { value: "COMPLETE", label: "Дууссан", detail: "Засвар дууссан ажлууд" },
 ];
 
 export const stateStyle: Record<
@@ -15,12 +15,12 @@ export const stateStyle: Record<
   { label: string; className: string; icon: typeof ShieldCheck }
 > = {
   CREATED: {
-    label: "Хүлээгдэж буй",
+    label: "Эхлэхэд бэлэн",
     className: "border-amber-200 bg-amber-50 text-amber-700",
     icon: Clock3,
   },
   PROGRESSING: {
-    label: "Хяналтанд буй",
+    label: "Засвар явагдаж буй",
     className: "border-blue-200 bg-blue-50 text-blue-700",
     icon: ShieldCheck,
   },

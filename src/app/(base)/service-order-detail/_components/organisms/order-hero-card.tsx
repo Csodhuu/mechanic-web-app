@@ -6,12 +6,17 @@ import { OrderDetail, stateLabel } from "../../_types/service-order-detail";
 
 type OrderHeroCardProps = {
   data: OrderDetail;
-  isHandingOff: boolean;
+  isStartingService: boolean;
   vehicleName: string;
-  onHandOff: () => void;
+  onStartService: () => void;
 };
 
-export function OrderHeroCard({ data, isHandingOff, vehicleName, onHandOff }: OrderHeroCardProps) {
+export function OrderHeroCard({
+  data,
+  isStartingService,
+  vehicleName,
+  onStartService,
+}: OrderHeroCardProps) {
   return (
     <Card className="overflow-hidden rounded-[24px] border border-slate-200 bg-white p-0 shadow-sm">
       <div className="bg-slate-950 p-4 text-white">
@@ -31,10 +36,10 @@ export function OrderHeroCard({ data, isHandingOff, vehicleName, onHandOff }: Or
             <Button
               type="button"
               className="w-full bg-white text-slate-950 hover:bg-slate-100 sm:w-auto"
-              disabled={isHandingOff}
-              onClick={onHandOff}
+              disabled={isStartingService}
+              onClick={onStartService}
             >
-              {isHandingOff ? "Шилжиж байна..." : "Хяналт руу шилжүүлэх"}
+              {isStartingService ? "Эхлүүлж байна..." : "Засвар үйлчилгээ эхлүүлэх"}
             </Button>
           </div>
         )}

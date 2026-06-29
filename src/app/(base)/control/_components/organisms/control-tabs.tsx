@@ -22,7 +22,9 @@ export function ControlTabs({ activeState, counts, onChange }: ControlTabsProps)
               onClick={() => onChange(tab.value)}
               className={cn(
                 "rounded-xl border px-2 py-2 text-left transition",
-                isActive ? "border-blue-200 bg-blue-50" : "border-slate-200 bg-white hover:bg-slate-50"
+                isActive
+                  ? "border-blue-200 bg-blue-50"
+                  : "border-slate-200 bg-white hover:bg-slate-50"
               )}
             >
               <p
@@ -36,9 +38,7 @@ export function ControlTabs({ activeState, counts, onChange }: ControlTabsProps)
               <p className="mt-1 text-base font-bold leading-5 text-[#101735] sm:text-[18px]">
                 {counts[tab.value]}
               </p>
-              <p className="mt-1 line-clamp-2 text-[10px] leading-4 text-slate-500">
-                {tab.detail}
-              </p>
+              <p className="mt-1 line-clamp-2 text-[10px] leading-4 text-slate-500">{tab.detail}</p>
             </button>
           );
         })}

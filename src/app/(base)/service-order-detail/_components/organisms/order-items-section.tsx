@@ -13,7 +13,9 @@ import { toast } from "sonner";
 type OrderItems = NonNullable<
   Awaited<ReturnType<(typeof apiClient.api.crm)["cp-order"]["item"]["get"]>>["data"]
 >;
-type CatalogProduct = NonNullable<Awaited<ReturnType<typeof apiClient.api.warehouse.product.get>>["data"]>["result"][number];
+type CatalogProduct = NonNullable<
+  Awaited<ReturnType<typeof apiClient.api.warehouse.product.get>>["data"]
+>["result"][number];
 type CatalogService = NonNullable<
   Awaited<ReturnType<(typeof apiClient.api.company)["service-kind"]["get"]>>["data"]
 >["result"][number];
@@ -25,7 +27,13 @@ type CatalogSelection = {
   price: number;
 };
 
-export function OrderItemsSection({ orderId, onItemsChanged }: { orderId: string; onItemsChanged: () => void }) {
+export function OrderItemsSection({
+  orderId,
+  onItemsChanged,
+}: {
+  orderId: string;
+  onItemsChanged: () => void;
+}) {
   const [items, setItems] = useState<OrderItems>([]);
   const [products, setProducts] = useState<CatalogProduct[]>([]);
   const [services, setServices] = useState<CatalogService[]>([]);
@@ -193,17 +201,30 @@ export function OrderItemsSection({ orderId, onItemsChanged }: { orderId: string
 
       {items.length === 0 ? (
         <div className="grid grid-cols-2 gap-2">
-          <EmptyAction icon={Wrench} title="Үйлчилгээ нэмэх" detail="Ажил, үйлчилгээ сонгох" onClick={() => openCatalog("service")} />
-          <EmptyAction icon={Package} title="Бараа нэмэх" detail="Сэлбэг, бараа сонгох" onClick={() => openCatalog("product")} />
+          <EmptyAction
+            icon={Wrench}
+            title="Үйлчилгээ нэмэх"
+            detail="Ажил, үйлчилгээ сонгох"
+            onClick={() => openCatalog("service")}
+          />
+          <EmptyAction
+            icon={Package}
+            title="Бараа нэмэх"
+            detail="Сэлбэг, бараа сонгох"
+            onClick={() => openCatalog("product")}
+          />
         </div>
       ) : (
         <div className="divide-y divide-slate-100 rounded-xl border border-slate-100">
           {items.map((item) => {
             const isService = Boolean(item.service_kind);
-            const name = item.cp_order_item.name ?? item.service_kind?.name ?? item.product?.name ?? "Нэргүй";
+            const name =
+              item.cp_order_item.name ?? item.service_kind?.name ?? item.product?.name ?? "Нэргүй";
             return (
               <div key={item.cp_order_item.id} className="flex items-center gap-3 px-3 py-2.5">
-                <span className={`flex size-8 items-center justify-center rounded-lg ${isService ? "bg-violet-50 text-violet-600" : "bg-amber-50 text-amber-600"}`}>
+                <span
+                  className={`flex size-8 items-center justify-center rounded-lg ${isService ? "bg-violet-50 text-violet-600" : "bg-amber-50 text-amber-600"}`}
+                >
                   {isService ? <Wrench className="size-4" /> : <Package className="size-4" />}
                 </span>
                 <div className="min-w-0 flex-1">
@@ -218,7 +239,9 @@ export function OrderItemsSection({ orderId, onItemsChanged }: { orderId: string
                     <Trash2 className="size-3.5" />
                     Устгах
                   </button>
-                  <p className="text-xs text-slate-500">Тоо хэмжээ: {item.cp_order_item.quantity}</p>
+                  <p className="text-xs text-slate-500">
+                    Тоо хэмжээ: {item.cp_order_item.quantity}
+                  </p>
                 </div>
               </div>
             );
@@ -240,13 +263,17 @@ export function OrderItemsSection({ orderId, onItemsChanged }: { orderId: string
               value={search}
               onChange={(event) => setSearch(event.target.value)}
               className="h-9 pl-9 text-sm"
-              placeholder={catalogType === "service" ? "Үйлчилгээний нэрээр хайх" : "Барааны нэрээр хайх"}
+              placeholder={
+                catalogType === "service" ? "Үйлчилгээний нэрээр хайх" : "Барааны нэрээр хайх"
+              }
             />
           </div>
 
           <div className="max-h-52 overflow-y-auto rounded-lg border border-slate-200">
             {isLoading && <p className="p-4 text-center text-sm text-slate-500">Уншиж байна...</p>}
-            {!isLoading && catalog.length === 0 && <p className="p-4 text-center text-sm text-slate-500">Илэрц олдсонгүй.</p>}
+            {!isLoading && catalog.length === 0 && (
+              <p className="p-4 text-center text-sm text-slate-500">Илэрц олдсонгүй.</p>
+            )}
             {catalog.map((item) => (
               <button
                 key={item.id}
@@ -255,7 +282,9 @@ export function OrderItemsSection({ orderId, onItemsChanged }: { orderId: string
                 className={`flex min-w-0 w-full items-center gap-3 border-b border-slate-100 px-3 py-2.5 text-left last:border-0 ${selected?.id === item.id ? "bg-blue-50" : "hover:bg-slate-50"}`}
               >
                 <span className="min-w-0 flex-1 overflow-hidden">
-                  <span className="line-clamp-2 block break-words text-sm font-medium text-slate-900">{item.name}</span>
+                  <span className="line-clamp-2 block break-words text-sm font-medium text-slate-900">
+                    {item.name}
+                  </span>
                 </span>
                 {selected?.id === item.id && <Check className="size-4 text-blue-600" />}
               </button>
@@ -264,12 +293,27 @@ export function OrderItemsSection({ orderId, onItemsChanged }: { orderId: string
 
           <div className="flex items-center gap-3 rounded-lg bg-slate-50 p-3">
             <div className="min-w-0 flex-1 overflow-hidden">
-              <p className="line-clamp-2 break-words text-sm font-medium text-slate-900">{selected?.name ?? "Сонголт хийнэ үү"}</p>
+              <p className="line-clamp-2 break-words text-sm font-medium text-slate-900">
+                {selected?.name ?? "Сонголт хийнэ үү"}
+              </p>
             </div>
-            <Input type="number" min="1" value={quantity} onChange={(event) => setQuantity(event.target.value)} className="h-9 w-20 text-center text-sm" aria-label="Тоо хэмжээ" />
+            <Input
+              type="number"
+              min="1"
+              value={quantity}
+              onChange={(event) => setQuantity(event.target.value)}
+              className="h-9 w-20 text-center text-sm"
+              aria-label="Тоо хэмжээ"
+            />
           </div>
 
-          <Button type="button" size="sm" className="w-full" disabled={!selected || isSaving} onClick={() => void addItem()}>
+          <Button
+            type="button"
+            size="sm"
+            className="w-full"
+            disabled={!selected || isSaving}
+            onClick={() => void addItem()}
+          >
             {isSaving ? "Нэмж байна..." : "Захиалгад нэмэх"}
           </Button>
         </DialogContent>
@@ -278,18 +322,44 @@ export function OrderItemsSection({ orderId, onItemsChanged }: { orderId: string
   );
 }
 
-function ActionButton({ icon: Icon, label, onClick }: { icon: typeof Wrench; label: string; onClick: () => void }) {
+function ActionButton({
+  icon: Icon,
+  label,
+  onClick,
+}: {
+  icon: typeof Wrench;
+  label: string;
+  onClick: () => void;
+}) {
   return (
-    <button type="button" onClick={onClick} className="flex h-8 items-center gap-1 rounded-lg border border-slate-200 px-2 text-xs font-semibold text-slate-700 transition hover:border-blue-300 hover:bg-blue-50 hover:text-blue-700">
+    <button
+      type="button"
+      onClick={onClick}
+      className="flex h-8 items-center gap-1 rounded-lg border border-slate-200 px-2 text-xs font-semibold text-slate-700 transition hover:border-blue-300 hover:bg-blue-50 hover:text-blue-700"
+    >
       <Icon className="size-3.5" />
       {label}
     </button>
   );
 }
 
-function EmptyAction({ icon: Icon, title, detail, onClick }: { icon: typeof Wrench; title: string; detail: string; onClick: () => void }) {
+function EmptyAction({
+  icon: Icon,
+  title,
+  detail,
+  onClick,
+}: {
+  icon: typeof Wrench;
+  title: string;
+  detail: string;
+  onClick: () => void;
+}) {
   return (
-    <button type="button" onClick={onClick} className="rounded-xl border border-dashed border-slate-200 p-3 text-left transition hover:border-blue-300 hover:bg-blue-50/40">
+    <button
+      type="button"
+      onClick={onClick}
+      className="rounded-xl border border-dashed border-slate-200 p-3 text-left transition hover:border-blue-300 hover:bg-blue-50/40"
+    >
       <span className="mb-2 flex size-8 items-center justify-center rounded-lg bg-blue-50 text-blue-600">
         <Icon className="size-4" />
       </span>

@@ -8,7 +8,7 @@ const isNonEmptyString = (value: unknown): value is string =>
 
 export function normalizePaginatedResponse<T extends { result?: unknown[] }>(
   value: unknown,
-  fallback: Partial<T> = {},
+  fallback: Partial<T> = {}
 ): T {
   if (Array.isArray(value)) {
     return {
@@ -28,7 +28,7 @@ export function normalizePaginatedResponse<T extends { result?: unknown[] }>(
 
 export function getApiErrorMessage(
   error: unknown,
-  fallback = "Серверийн алдаа гарлаа. Дахин оролдоно уу.",
+  fallback = "Серверийн алдаа гарлаа. Дахин оролдоно уу."
 ) {
   const candidates: unknown[] = [];
 

@@ -21,10 +21,10 @@ export function ControlHeader({ loading, onBack, onRefresh }: ControlHeaderProps
         </button>
         <div className="min-w-0 text-center">
           <h1 className="truncate text-lg font-bold leading-6 text-[#101735] sm:text-[20px]">
-            Хяналтын инженер
+            Засвар үйлчилгээ
           </h1>
           <p className="truncate text-[13px] font-medium text-slate-500">
-            Хяналтанд шилжсэн ажлууд
+            Эхлэхэд бэлэн болон явагдаж буй ажлууд
           </p>
         </div>
         <button

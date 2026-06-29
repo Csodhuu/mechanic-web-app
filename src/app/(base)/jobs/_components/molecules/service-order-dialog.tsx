@@ -56,7 +56,7 @@ export function ServiceOrderDialog({ open, onOpenChange, onCreated }: Props) {
     }
   };
 
-  const startInspection = () => {
+  const transferToInspection = () => {
     const value = licensePlate.trim();
     if (!vehicle || !value) {
       toast.error("Эхлээд улсын дугаараар машиныг шалгана уу.");
@@ -102,7 +102,10 @@ export function ServiceOrderDialog({ open, onOpenChange, onCreated }: Props) {
             <p className="mb-2 text-xs font-semibold text-slate-900">Машины мэдээлэл</p>
             <dl className="grid grid-cols-2 gap-x-3 gap-y-1.5 text-xs">
               <VehicleDetail label="Улсын дугаар" value={vehicle.plate_no} />
-              <VehicleDetail label="Марк, модель" value={[vehicle.mark_name, vehicle.model_name].filter(Boolean).join(" ")} />
+              <VehicleDetail
+                label="Марк, модель"
+                value={[vehicle.mark_name, vehicle.model_name].filter(Boolean).join(" ")}
+              />
               <VehicleDetail label="Арлын дугаар" value={vehicle.cabin_no} />
               <VehicleDetail label="Үйлдвэрлэсэн он" value={vehicle.build_year} />
               <VehicleDetail label="Өнгө" value={vehicle.color_name} />
@@ -117,10 +120,10 @@ export function ServiceOrderDialog({ open, onOpenChange, onCreated }: Props) {
           type="button"
           size="sm"
           className="w-full text-xs"
-          onClick={startInspection}
+          onClick={transferToInspection}
           disabled={!vehicle || isBusy}
         >
-          Анхан үзлэг эхлүүлэх
+          Хяналт руу шилжүүлэх
         </Button>
       </DialogContent>
     </Dialog>

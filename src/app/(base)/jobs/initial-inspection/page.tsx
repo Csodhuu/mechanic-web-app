@@ -29,7 +29,9 @@ export default function InitialInspectionPage() {
       .get({ query: { licensePlate } })
       .then((response) => {
         if (response.data) {
-          setVehicleName([response.data.mark_name, response.data.model_name].filter(Boolean).join(" "));
+          setVehicleName(
+            [response.data.mark_name, response.data.model_name].filter(Boolean).join(" ")
+          );
         }
       })
       .catch((error) => console.error("Failed to load selected vehicle:", error));
@@ -83,13 +85,16 @@ export default function InitialInspectionPage() {
       );
       if (inspectionResponse.error || !inspectionResponse.data) throw inspectionResponse.error;
 
-      const serviceOrderResponse = await apiClient.api.crm.inspection({ id: inspectionResponse.data.id })[
-        "service-order"
-      ].post({}, { headers });
-      if (serviceOrderResponse.error || !serviceOrderResponse.data) throw serviceOrderResponse.error;
+      const serviceOrderResponse = await apiClient.api.crm
+        .inspection({ id: inspectionResponse.data.id })
+        ["service-order"].post({}, { headers });
+      if (serviceOrderResponse.error || !serviceOrderResponse.data)
+        throw serviceOrderResponse.error;
 
-      toast.success("Үзлэг баталгаажлаа. Захиалга үүсгэгдлээ.");
-      router.replace(`/service-order-detail?id=${encodeURIComponent(serviceOrderResponse.data.cpOrderId)}`);
+      toast.success("Үзлэг баталгаажлаа. Засварын захиалга нээгдлээ.");
+      router.replace(
+        `/service-order-detail?id=${encodeURIComponent(serviceOrderResponse.data.cpOrderId)}`
+      );
     } catch (error) {
       console.error("Failed to create service order from inspection:", error);
       toast.error("Үзлэгээс захиалга үүсгэхэд алдаа гарлаа.");
@@ -102,9 +107,15 @@ export default function InitialInspectionPage() {
     <PageShell
       eyebrow="Jobs / Анхан үзлэг"
       title="Анхан үзлэг"
-      description="Сонгосон машин дээр ерөнхий болон техникийн checklist бөглөж, хяналт руу шилжүүлэх service order үүсгэнэ."
+      description="Хяналтанд шилжсэн машин дээр checklist бөглөж, дараа нь засвар үйлчилгээ эхлүүлнэ."
       action={
-        <Button type="button" variant="outline" size="icon" aria-label="Буцах" onClick={() => router.back()}>
+        <Button
+          type="button"
+          variant="outline"
+          size="icon"
+          aria-label="Буцах"
+          onClick={() => router.back()}
+        >
           <ArrowLeft className="size-4" />
         </Button>
       }

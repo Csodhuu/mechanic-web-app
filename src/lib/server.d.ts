@@ -273,7 +273,7 @@ export declare const app: Elysia<
               : Code,
           >(
             code: Code,
-            response?: T,
+            response?: T
           ) => import("elysia").ElysiaCustomStatusResponse<
             Code,
             T,
@@ -405,11 +405,7 @@ export declare const app: Elysia<
               : Code
           >;
         }) => Promise<
-          | import("elysia").ElysiaCustomStatusResponse<
-              "Unauthorized",
-              "Токен олдсонгүй",
-              401
-            >
+          | import("elysia").ElysiaCustomStatusResponse<"Unauthorized", "Токен олдсонгүй", 401>
           | import("elysia").ElysiaCustomStatusResponse<
               "Not Found",
               "Байгууллагын мэдээлэл олдсонгүй.",
@@ -441,9 +437,7 @@ export declare const app: Elysia<
             }
         >;
       };
-      readonly userKind: (
-        input: "ADMIN" | "COMPANY_ADMIN" | "CUSTOMER" | "INSPECTION",
-      ) => {
+      readonly userKind: (input: "ADMIN" | "COMPANY_ADMIN" | "CUSTOMER" | "INSPECTION") => {
         readonly resolve: ({
           request: { headers },
         }: {
@@ -594,7 +588,7 @@ export declare const app: Elysia<
               : Code,
           >(
             code: Code,
-            response?: T,
+            response?: T
           ) => import("elysia").ElysiaCustomStatusResponse<
             Code,
             T,
@@ -726,11 +720,7 @@ export declare const app: Elysia<
               : Code
           >;
         }) => Promise<
-          | import("elysia").ElysiaCustomStatusResponse<
-              "Unauthorized",
-              "Токен олдсонгүй",
-              401
-            >
+          | import("elysia").ElysiaCustomStatusResponse<"Unauthorized", "Токен олдсонгүй", 401>
           | import("elysia").ElysiaCustomStatusResponse<
               "Not Found",
               "Байгууллагын мэдээлэл олдсонгүй.",
@@ -746,11 +736,7 @@ export declare const app: Elysia<
               "Системийн төлбөр хийгдээгүй байна. 88046194",
               402
             >
-          | import("elysia").ElysiaCustomStatusResponse<
-              "Forbidden",
-              "Хандах эрхгүй байна.",
-              403
-            >
+          | import("elysia").ElysiaCustomStatusResponse<"Forbidden", "Хандах эрхгүй байна.", 403>
           | {
               user: import("./lib/auth").User;
               session: {
@@ -770,7 +756,7 @@ export declare const app: Elysia<
       readonly permission: (
         input:
           | import("./lib/permissions").PermissionCode
-          | import("./lib/permissions").PermissionCode[],
+          | import("./lib/permissions").PermissionCode[]
       ) => {
         readonly resolve: ({
           request: { headers },
@@ -922,7 +908,7 @@ export declare const app: Elysia<
               : Code,
           >(
             code: Code,
-            response?: T,
+            response?: T
           ) => import("elysia").ElysiaCustomStatusResponse<
             Code,
             T,
@@ -1054,11 +1040,7 @@ export declare const app: Elysia<
               : Code
           >;
         }) => Promise<
-          | import("elysia").ElysiaCustomStatusResponse<
-              "Unauthorized",
-              "Токен олдсонгүй",
-              401
-            >
+          | import("elysia").ElysiaCustomStatusResponse<"Unauthorized", "Токен олдсонгүй", 401>
           | import("elysia").ElysiaCustomStatusResponse<
               "Not Found",
               "Байгууллагын мэдээлэл олдсонгүй.",
@@ -1074,11 +1056,7 @@ export declare const app: Elysia<
               "Системийн төлбөр хийгдээгүй байна. 88046194",
               402
             >
-          | import("elysia").ElysiaCustomStatusResponse<
-              "Forbidden",
-              "Хандах эрхгүй байна.",
-              403
-            >
+          | import("elysia").ElysiaCustomStatusResponse<"Forbidden", "Хандах эрхгүй байна.", 403>
           | {
               user: import("./lib/auth").User;
               session: {
@@ -1167,9 +1145,7 @@ export declare const app: Elysia<
               path: string;
             };
             401: "Токен олдсонгүй";
-            404:
-              | "Байгууллагын мэдээлэл олдсонгүй."
-              | "Салбарын мэдээлэл олдсонгүй.";
+            404: "Байгууллагын мэдээлэл олдсонгүй." | "Салбарын мэдээлэл олдсонгүй.";
             402: "Системийн төлбөр хийгдээгүй байна. 88046194";
             422: {
               type: "validation";
@@ -1199,9 +1175,7 @@ export declare const app: Elysia<
                 path: string;
               };
               401: "Токен олдсонгүй";
-              404:
-                | "Байгууллагын мэдээлэл олдсонгүй."
-                | "Салбарын мэдээлэл олдсонгүй.";
+              404: "Байгууллагын мэдээлэл олдсонгүй." | "Салбарын мэдээлэл олдсонгүй.";
               402: "Системийн төлбөр хийгдээгүй байна. 88046194";
               422: {
                 type: "validation";
@@ -1314,9 +1288,7 @@ export declare const app: Elysia<
                 >[];
               };
               401: "Токен олдсонгүй";
-              404:
-                | "Байгууллагын мэдээлэл олдсонгүй."
-                | "Салбарын мэдээлэл олдсонгүй.";
+              404: "Байгууллагын мэдээлэл олдсонгүй." | "Салбарын мэдээлэл олдсонгүй.";
               402: "Системийн төлбөр хийгдээгүй байна. 88046194";
               422: {
                 type: "validation";
@@ -1360,9 +1332,7 @@ export declare const app: Elysia<
                 btRequestItemId: string;
               };
               401: "Токен олдсонгүй";
-              404:
-                | "Байгууллагын мэдээлэл олдсонгүй."
-                | "Салбарын мэдээлэл олдсонгүй.";
+              404: "Байгууллагын мэдээлэл олдсонгүй." | "Салбарын мэдээлэл олдсонгүй.";
               402: "Системийн төлбөр хийгдээгүй байна. 88046194";
               422: {
                 type: "validation";
@@ -1389,9 +1359,7 @@ export declare const app: Elysia<
               headers: {};
               response: {
                 401: "Токен олдсонгүй";
-                404:
-                  | "Байгууллагын мэдээлэл олдсонгүй."
-                  | "Салбарын мэдээлэл олдсонгүй.";
+                404: "Байгууллагын мэдээлэл олдсонгүй." | "Салбарын мэдээлэл олдсонгүй.";
                 402: "Системийн төлбөр хийгдээгүй байна. 88046194";
                 400: {
                   readonly message: "Сагсны мэдээлэл таарахгүй байна.";
@@ -1443,9 +1411,7 @@ export declare const app: Elysia<
                   oldId: number | null;
                 };
                 401: "Токен олдсонгүй";
-                404:
-                  | "Байгууллагын мэдээлэл олдсонгүй."
-                  | "Салбарын мэдээлэл олдсонгүй.";
+                404: "Байгууллагын мэдээлэл олдсонгүй." | "Салбарын мэдээлэл олдсонгүй.";
                 402: "Системийн төлбөр хийгдээгүй байна. 88046194";
                 422: {
                   type: "validation";
@@ -1472,9 +1438,7 @@ export declare const app: Elysia<
               headers: {};
               response: {
                 401: "Токен олдсонгүй";
-                404:
-                  | "Байгууллагын мэдээлэл олдсонгүй."
-                  | "Салбарын мэдээлэл олдсонгүй.";
+                404: "Байгууллагын мэдээлэл олдсонгүй." | "Салбарын мэдээлэл олдсонгүй.";
                 402: "Системийн төлбөр хийгдээгүй байна. 88046194";
                 422: {
                   type: "validation";
@@ -1533,9 +1497,7 @@ export declare const app: Elysia<
                 >[];
               };
               401: "Токен олдсонгүй";
-              404:
-                | "Байгууллагын мэдээлэл олдсонгүй."
-                | "Салбарын мэдээлэл олдсонгүй.";
+              404: "Байгууллагын мэдээлэл олдсонгүй." | "Салбарын мэдээлэл олдсонгүй.";
               402: "Системийн төлбөр хийгдээгүй байна. 88046194";
               422: {
                 type: "validation";
@@ -1580,9 +1542,7 @@ export declare const app: Elysia<
                 currency: string;
               };
               401: "Токен олдсонгүй";
-              404:
-                | "Байгууллагын мэдээлэл олдсонгүй."
-                | "Салбарын мэдээлэл олдсонгүй.";
+              404: "Байгууллагын мэдээлэл олдсонгүй." | "Салбарын мэдээлэл олдсонгүй.";
               402: "Системийн төлбөр хийгдээгүй байна. 88046194";
               422: {
                 type: "validation";
@@ -1631,9 +1591,7 @@ export declare const app: Elysia<
                   oldId: number | null;
                 };
                 401: "Токен олдсонгүй";
-                404:
-                  | "Байгууллагын мэдээлэл олдсонгүй."
-                  | "Салбарын мэдээлэл олдсонгүй.";
+                404: "Байгууллагын мэдээлэл олдсонгүй." | "Салбарын мэдээлэл олдсонгүй.";
                 402: "Системийн төлбөр хийгдээгүй байна. 88046194";
                 422: {
                   type: "validation";
@@ -1660,9 +1618,7 @@ export declare const app: Elysia<
               headers: {};
               response: {
                 401: "Токен олдсонгүй";
-                404:
-                  | "Байгууллагын мэдээлэл олдсонгүй."
-                  | "Салбарын мэдээлэл олдсонгүй.";
+                404: "Байгууллагын мэдээлэл олдсонгүй." | "Салбарын мэдээлэл олдсонгүй.";
                 402: "Системийн төлбөр хийгдээгүй байна. 88046194";
                 422: {
                   type: "validation";
@@ -1751,9 +1707,7 @@ export declare const app: Elysia<
                 >[];
               };
               401: "Токен олдсонгүй";
-              404:
-                | "Байгууллагын мэдээлэл олдсонгүй."
-                | "Салбарын мэдээлэл олдсонгүй.";
+              404: "Байгууллагын мэдээлэл олдсонгүй." | "Салбарын мэдээлэл олдсонгүй.";
               402: "Системийн төлбөр хийгдээгүй байна. 88046194";
               422: {
                 type: "validation";
@@ -1836,9 +1790,7 @@ export declare const app: Elysia<
                 timeCancelled: string | null;
               };
               401: "Токен олдсонгүй";
-              404:
-                | "Байгууллагын мэдээлэл олдсонгүй."
-                | "Салбарын мэдээлэл олдсонгүй.";
+              404: "Байгууллагын мэдээлэл олдсонгүй." | "Салбарын мэдээлэл олдсонгүй.";
               402: "Системийн төлбөр хийгдээгүй байна. 88046194";
               422: {
                 type: "validation";
@@ -1865,9 +1817,7 @@ export declare const app: Elysia<
                 headers: {};
                 response: {
                   401: "Токен олдсонгүй";
-                  404:
-                    | "Байгууллагын мэдээлэл олдсонгүй."
-                    | "Салбарын мэдээлэл олдсонгүй.";
+                  404: "Байгууллагын мэдээлэл олдсонгүй." | "Салбарын мэдээлэл олдсонгүй.";
                   402: "Системийн төлбөр хийгдээгүй байна. 88046194";
                   422: {
                     type: "validation";
@@ -1898,9 +1848,7 @@ export declare const app: Elysia<
                 headers: {};
                 response: {
                   401: "Токен олдсонгүй";
-                  404:
-                    | "Байгууллагын мэдээлэл олдсонгүй."
-                    | "Салбарын мэдээлэл олдсонгүй.";
+                  404: "Байгууллагын мэдээлэл олдсонгүй." | "Салбарын мэдээлэл олдсонгүй.";
                   402: "Системийн төлбөр хийгдээгүй байна. 88046194";
                   422: {
                     type: "validation";
@@ -1988,9 +1936,7 @@ export declare const app: Elysia<
                   oldId: number | null;
                 };
                 401: "Токен олдсонгүй";
-                404:
-                  | "Байгууллагын мэдээлэл олдсонгүй."
-                  | "Салбарын мэдээлэл олдсонгүй.";
+                404: "Байгууллагын мэдээлэл олдсонгүй." | "Салбарын мэдээлэл олдсонгүй.";
                 402: "Системийн төлбөр хийгдээгүй байна. 88046194";
                 422: {
                   type: "validation";
@@ -2017,9 +1963,7 @@ export declare const app: Elysia<
               headers: {};
               response: {
                 401: "Токен олдсонгүй";
-                404:
-                  | "Байгууллагын мэдээлэл олдсонгүй."
-                  | "Салбарын мэдээлэл олдсонгүй.";
+                404: "Байгууллагын мэдээлэл олдсонгүй." | "Салбарын мэдээлэл олдсонгүй.";
                 402: "Системийн төлбөр хийгдээгүй байна. 88046194";
                 422: {
                   type: "validation";
@@ -2112,9 +2056,7 @@ export declare const app: Elysia<
                 >[];
               };
               401: "Токен олдсонгүй";
-              404:
-                | "Байгууллагын мэдээлэл олдсонгүй."
-                | "Салбарын мэдээлэл олдсонгүй.";
+              404: "Байгууллагын мэдээлэл олдсонгүй." | "Салбарын мэдээлэл олдсонгүй.";
               402: "Системийн төлбөр хийгдээгүй байна. 88046194";
               422: {
                 type: "validation";
@@ -2179,9 +2121,7 @@ export declare const app: Elysia<
                 priceUnit: number;
               };
               401: "Токен олдсонгүй";
-              404:
-                | "Байгууллагын мэдээлэл олдсонгүй."
-                | "Салбарын мэдээлэл олдсонгүй.";
+              404: "Байгууллагын мэдээлэл олдсонгүй." | "Салбарын мэдээлэл олдсонгүй.";
               402: "Системийн төлбөр хийгдээгүй байна. 88046194";
               422: {
                 type: "validation";
@@ -2249,9 +2189,7 @@ export declare const app: Elysia<
                   oldId: number | null;
                 };
                 401: "Токен олдсонгүй";
-                404:
-                  | "Байгууллагын мэдээлэл олдсонгүй."
-                  | "Салбарын мэдээлэл олдсонгүй.";
+                404: "Байгууллагын мэдээлэл олдсонгүй." | "Салбарын мэдээлэл олдсонгүй.";
                 402: "Системийн төлбөр хийгдээгүй байна. 88046194";
                 422: {
                   type: "validation";
@@ -2278,9 +2216,7 @@ export declare const app: Elysia<
               headers: {};
               response: {
                 401: "Токен олдсонгүй";
-                404:
-                  | "Байгууллагын мэдээлэл олдсонгүй."
-                  | "Салбарын мэдээлэл олдсонгүй.";
+                404: "Байгууллагын мэдээлэл олдсонгүй." | "Салбарын мэдээлэл олдсонгүй.";
                 402: "Системийн төлбөр хийгдээгүй байна. 88046194";
                 422: {
                   type: "validation";
@@ -2355,9 +2291,7 @@ export declare const app: Elysia<
                 >[];
               };
               401: "Токен олдсонгүй";
-              404:
-                | "Байгууллагын мэдээлэл олдсонгүй."
-                | "Салбарын мэдээлэл олдсонгүй.";
+              404: "Байгууллагын мэдээлэл олдсонгүй." | "Салбарын мэдээлэл олдсонгүй.";
               402: "Системийн төлбөр хийгдээгүй байна. 88046194";
               422: {
                 type: "validation";
@@ -2420,9 +2354,7 @@ export declare const app: Elysia<
                 timeApproved: string | null;
               };
               401: "Токен олдсонгүй";
-              404:
-                | "Байгууллагын мэдээлэл олдсонгүй."
-                | "Салбарын мэдээлэл олдсонгүй.";
+              404: "Байгууллагын мэдээлэл олдсонгүй." | "Салбарын мэдээлэл олдсонгүй.";
               402: "Системийн төлбөр хийгдээгүй байна. 88046194";
               422: {
                 type: "validation";
@@ -2488,9 +2420,7 @@ export declare const app: Elysia<
                   oldId: number | null;
                 };
                 401: "Токен олдсонгүй";
-                404:
-                  | "Байгууллагын мэдээлэл олдсонгүй."
-                  | "Салбарын мэдээлэл олдсонгүй.";
+                404: "Байгууллагын мэдээлэл олдсонгүй." | "Салбарын мэдээлэл олдсонгүй.";
                 402: "Системийн төлбөр хийгдээгүй байна. 88046194";
                 422: {
                   type: "validation";
@@ -2517,9 +2447,7 @@ export declare const app: Elysia<
               headers: {};
               response: {
                 401: "Токен олдсонгүй";
-                404:
-                  | "Байгууллагын мэдээлэл олдсонгүй."
-                  | "Салбарын мэдээлэл олдсонгүй.";
+                404: "Байгууллагын мэдээлэл олдсонгүй." | "Салбарын мэдээлэл олдсонгүй.";
                 402: "Системийн төлбөр хийгдээгүй байна. 88046194";
                 422: {
                   type: "validation";
@@ -2579,9 +2507,7 @@ export declare const app: Elysia<
                 >[];
               };
               401: "Токен олдсонгүй";
-              404:
-                | "Байгууллагын мэдээлэл олдсонгүй."
-                | "Салбарын мэдээлэл олдсонгүй.";
+              404: "Байгууллагын мэдээлэл олдсонгүй." | "Салбарын мэдээлэл олдсонгүй.";
               402: "Системийн төлбөр хийгдээгүй байна. 88046194";
               422: {
                 type: "validation";
@@ -2631,9 +2557,7 @@ export declare const app: Elysia<
                 btOrderReqId: string;
               };
               401: "Токен олдсонгүй";
-              404:
-                | "Байгууллагын мэдээлэл олдсонгүй."
-                | "Салбарын мэдээлэл олдсонгүй.";
+              404: "Байгууллагын мэдээлэл олдсонгүй." | "Салбарын мэдээлэл олдсонгүй.";
               402: "Системийн төлбөр хийгдээгүй байна. 88046194";
               422: {
                 type: "validation";
@@ -2686,9 +2610,7 @@ export declare const app: Elysia<
                   oldId: number | null;
                 };
                 401: "Токен олдсонгүй";
-                404:
-                  | "Байгууллагын мэдээлэл олдсонгүй."
-                  | "Салбарын мэдээлэл олдсонгүй.";
+                404: "Байгууллагын мэдээлэл олдсонгүй." | "Салбарын мэдээлэл олдсонгүй.";
                 402: "Системийн төлбөр хийгдээгүй байна. 88046194";
                 422: {
                   type: "validation";
@@ -2715,9 +2637,7 @@ export declare const app: Elysia<
               headers: {};
               response: {
                 401: "Токен олдсонгүй";
-                404:
-                  | "Байгууллагын мэдээлэл олдсонгүй."
-                  | "Салбарын мэдээлэл олдсонгүй.";
+                404: "Байгууллагын мэдээлэл олдсонгүй." | "Салбарын мэдээлэл олдсонгүй.";
                 402: "Системийн төлбөр хийгдээгүй байна. 88046194";
                 422: {
                   type: "validation";
@@ -2745,12 +2665,7 @@ export declare const app: Elysia<
               query: {
                 id?: string | undefined;
                 productId?: string | undefined;
-                status?:
-                  | "CANCELLED"
-                  | "PENDING"
-                  | "APPROVED"
-                  | "REJECTED"
-                  | undefined;
+                status?: "CANCELLED" | "PENDING" | "APPROVED" | "REJECTED" | undefined;
                 requestId?: string | undefined;
                 type?: "WAREHOUSE" | "ORDER" | undefined;
                 pagination: {
@@ -2768,11 +2683,7 @@ export declare const app: Elysia<
                       item: {
                         requestId: string;
                         productId: string;
-                        status:
-                          | "CANCELLED"
-                          | "PENDING"
-                          | "APPROVED"
-                          | "REJECTED";
+                        status: "CANCELLED" | "PENDING" | "APPROVED" | "REJECTED";
                         type: "WAREHOUSE" | "ORDER";
                         unit: "MOQ" | "PACKAGE";
                         quantity: number;
@@ -2806,9 +2717,7 @@ export declare const app: Elysia<
                   >[];
                 };
                 401: "Токен олдсонгүй";
-                404:
-                  | "Байгууллагын мэдээлэл олдсонгүй."
-                  | "Салбарын мэдээлэл олдсонгүй.";
+                404: "Байгууллагын мэдээлэл олдсонгүй." | "Салбарын мэдээлэл олдсонгүй.";
                 402: "Системийн төлбөр хийгдээгүй байна. 88046194";
                 422: {
                   type: "validation";
@@ -2828,12 +2737,7 @@ export declare const app: Elysia<
               body: {
                 oldId?: number | null | undefined;
                 quantity?: number | undefined;
-                status?:
-                  | "CANCELLED"
-                  | "PENDING"
-                  | "APPROVED"
-                  | "REJECTED"
-                  | undefined;
+                status?: "CANCELLED" | "PENDING" | "APPROVED" | "REJECTED" | undefined;
                 unit?: "MOQ" | "PACKAGE" | undefined;
                 productId: string;
                 price: number;
@@ -2889,12 +2793,7 @@ export declare const app: Elysia<
                   price?: number | undefined;
                   currency?: string | undefined;
                   quantity?: number | undefined;
-                  status?:
-                    | "CANCELLED"
-                    | "PENDING"
-                    | "APPROVED"
-                    | "REJECTED"
-                    | undefined;
+                  status?: "CANCELLED" | "PENDING" | "APPROVED" | "REJECTED" | undefined;
                   requestId?: string | undefined;
                   type?: "WAREHOUSE" | "ORDER" | undefined;
                   unit?: "MOQ" | "PACKAGE" | undefined;
@@ -2921,9 +2820,7 @@ export declare const app: Elysia<
                     oldId: number | null;
                   };
                   401: "Токен олдсонгүй";
-                  404:
-                    | "Байгууллагын мэдээлэл олдсонгүй."
-                    | "Салбарын мэдээлэл олдсонгүй.";
+                  404: "Байгууллагын мэдээлэл олдсонгүй." | "Салбарын мэдээлэл олдсонгүй.";
                   402: "Системийн төлбөр хийгдээгүй байна. 88046194";
                   422: {
                     type: "validation";
@@ -2950,9 +2847,7 @@ export declare const app: Elysia<
                 headers: {};
                 response: {
                   401: "Токен олдсонгүй";
-                  404:
-                    | "Байгууллагын мэдээлэл олдсонгүй."
-                    | "Салбарын мэдээлэл олдсонгүй.";
+                  404: "Байгууллагын мэдээлэл олдсонгүй." | "Салбарын мэдээлэл олдсонгүй.";
                   402: "Системийн төлбөр хийгдээгүй байна. 88046194";
                   422: {
                     type: "validation";
@@ -2978,13 +2873,7 @@ export declare const app: Elysia<
             query: {
               id?: string | undefined;
               companyId?: string | undefined;
-              status?:
-                | "DRAFT"
-                | "CANCELLED"
-                | "SUBMITTED"
-                | "APPROVED"
-                | "REJECTED"
-                | undefined;
+              status?: "DRAFT" | "CANCELLED" | "SUBMITTED" | "APPROVED" | "REJECTED" | undefined;
               pagination: {
                 size: number;
                 page: number;
@@ -2999,12 +2888,7 @@ export declare const app: Elysia<
                   {
                     request: {
                       companyId: string;
-                      status:
-                        | "DRAFT"
-                        | "CANCELLED"
-                        | "SUBMITTED"
-                        | "APPROVED"
-                        | "REJECTED";
+                      status: "DRAFT" | "CANCELLED" | "SUBMITTED" | "APPROVED" | "REJECTED";
                       id: string;
                       createdAt: string;
                       updatedAt: string;
@@ -3051,9 +2935,7 @@ export declare const app: Elysia<
                 >[];
               };
               401: "Токен олдсонгүй";
-              404:
-                | "Байгууллагын мэдээлэл олдсонгүй."
-                | "Салбарын мэдээлэл олдсонгүй.";
+              404: "Байгууллагын мэдээлэл олдсонгүй." | "Салбарын мэдээлэл олдсонгүй.";
               402: "Системийн төлбөр хийгдээгүй байна. 88046194";
               422: {
                 type: "validation";
@@ -3082,17 +2964,10 @@ export declare const app: Elysia<
                 updatedAt: string;
                 deletedAt: string | null;
                 oldId: number | null;
-                status:
-                  | "DRAFT"
-                  | "CANCELLED"
-                  | "SUBMITTED"
-                  | "APPROVED"
-                  | "REJECTED";
+                status: "DRAFT" | "CANCELLED" | "SUBMITTED" | "APPROVED" | "REJECTED";
               };
               401: "Токен олдсонгүй";
-              404:
-                | "Байгууллагын мэдээлэл олдсонгүй."
-                | "Салбарын мэдээлэл олдсонгүй.";
+              404: "Байгууллагын мэдээлэл олдсонгүй." | "Салбарын мэдээлэл олдсонгүй.";
               402: "Системийн төлбөр хийгдээгүй байна. 88046194";
             };
           };
@@ -3102,13 +2977,7 @@ export declare const app: Elysia<
           ":id": {
             put: {
               body: {
-                status?:
-                  | "DRAFT"
-                  | "CANCELLED"
-                  | "SUBMITTED"
-                  | "APPROVED"
-                  | "REJECTED"
-                  | undefined;
+                status?: "DRAFT" | "CANCELLED" | "SUBMITTED" | "APPROVED" | "REJECTED" | undefined;
               };
               params: {
                 id: string;
@@ -3118,12 +2987,7 @@ export declare const app: Elysia<
               response: {
                 200: {
                   companyId: string;
-                  status:
-                    | "DRAFT"
-                    | "CANCELLED"
-                    | "SUBMITTED"
-                    | "APPROVED"
-                    | "REJECTED";
+                  status: "DRAFT" | "CANCELLED" | "SUBMITTED" | "APPROVED" | "REJECTED";
                   id: string;
                   createdAt: string;
                   updatedAt: string;
@@ -3131,9 +2995,7 @@ export declare const app: Elysia<
                   oldId: number | null;
                 };
                 401: "Токен олдсонгүй";
-                404:
-                  | "Байгууллагын мэдээлэл олдсонгүй."
-                  | "Салбарын мэдээлэл олдсонгүй.";
+                404: "Байгууллагын мэдээлэл олдсонгүй." | "Салбарын мэдээлэл олдсонгүй.";
                 402: "Системийн төлбөр хийгдээгүй байна. 88046194";
                 400: "Зөвхөн баталгаажуулах эрхтэй.";
                 422: {
@@ -3161,9 +3023,7 @@ export declare const app: Elysia<
               headers: {};
               response: {
                 401: "Токен олдсонгүй";
-                404:
-                  | "Байгууллагын мэдээлэл олдсонгүй."
-                  | "Салбарын мэдээлэл олдсонгүй.";
+                404: "Байгууллагын мэдээлэл олдсонгүй." | "Салбарын мэдээлэл олдсонгүй.";
                 402: "Системийн төлбөр хийгдээгүй байна. 88046194";
                 422: {
                   type: "validation";
@@ -3235,9 +3095,7 @@ export declare const app: Elysia<
                 >[];
               };
               401: "Токен олдсонгүй";
-              404:
-                | "Байгууллагын мэдээлэл олдсонгүй."
-                | "Салбарын мэдээлэл олдсонгүй.";
+              404: "Байгууллагын мэдээлэл олдсонгүй." | "Салбарын мэдээлэл олдсонгүй.";
               402: "Системийн төлбөр хийгдээгүй байна. 88046194";
               422: {
                 type: "validation";
@@ -3296,9 +3154,7 @@ export declare const app: Elysia<
                 paymentDate: string | null;
               };
               401: "Токен олдсонгүй";
-              404:
-                | "Байгууллагын мэдээлэл олдсонгүй."
-                | "Салбарын мэдээлэл олдсонгүй.";
+              404: "Байгууллагын мэдээлэл олдсонгүй." | "Салбарын мэдээлэл олдсонгүй.";
               402: "Системийн төлбөр хийгдээгүй байна. 88046194";
               422: {
                 type: "validation";
@@ -3360,9 +3216,7 @@ export declare const app: Elysia<
                   oldId: number | null;
                 };
                 401: "Токен олдсонгүй";
-                404:
-                  | "Байгууллагын мэдээлэл олдсонгүй."
-                  | "Салбарын мэдээлэл олдсонгүй.";
+                404: "Байгууллагын мэдээлэл олдсонгүй." | "Салбарын мэдээлэл олдсонгүй.";
                 402: "Системийн төлбөр хийгдээгүй байна. 88046194";
                 422: {
                   type: "validation";
@@ -3389,9 +3243,7 @@ export declare const app: Elysia<
               headers: {};
               response: {
                 401: "Токен олдсонгүй";
-                404:
-                  | "Байгууллагын мэдээлэл олдсонгүй."
-                  | "Салбарын мэдээлэл олдсонгүй.";
+                404: "Байгууллагын мэдээлэл олдсонгүй." | "Салбарын мэдээлэл олдсонгүй.";
                 402: "Системийн төлбөр хийгдээгүй байна. 88046194";
                 422: {
                   type: "validation";
@@ -3416,13 +3268,7 @@ export declare const app: Elysia<
             body: {};
             params: {};
             query: {
-              state?:
-                | "PENDING"
-                | "COMPLETED"
-                | "FAILED"
-                | "REFUNDED"
-                | "REVERSED"
-                | undefined;
+              state?: "PENDING" | "COMPLETED" | "FAILED" | "REFUNDED" | "REVERSED" | undefined;
               id?: string | undefined;
               btInvoiceId?: string | undefined;
               pagination: {
@@ -3443,12 +3289,7 @@ export declare const app: Elysia<
                     paymentMethod: string;
                     paymentChannel: string;
                     currency: string | null;
-                    state:
-                      | "PENDING"
-                      | "COMPLETED"
-                      | "FAILED"
-                      | "REFUNDED"
-                      | "REVERSED";
+                    state: "PENDING" | "COMPLETED" | "FAILED" | "REFUNDED" | "REVERSED";
                     note: string | null;
                     id: string;
                     createdAt: string;
@@ -3460,9 +3301,7 @@ export declare const app: Elysia<
                 >[];
               };
               401: "Токен олдсонгүй";
-              404:
-                | "Байгууллагын мэдээлэл олдсонгүй."
-                | "Салбарын мэдээлэл олдсонгүй.";
+              404: "Байгууллагын мэдээлэл олдсонгүй." | "Салбарын мэдээлэл олдсонгүй.";
               402: "Системийн төлбөр хийгдээгүй байна. 88046194";
               422: {
                 type: "validation";
@@ -3480,13 +3319,7 @@ export declare const app: Elysia<
         payment: {
           post: {
             body: {
-              state?:
-                | "PENDING"
-                | "COMPLETED"
-                | "FAILED"
-                | "REFUNDED"
-                | "REVERSED"
-                | undefined;
+              state?: "PENDING" | "COMPLETED" | "FAILED" | "REFUNDED" | "REVERSED" | undefined;
               oldId?: number | null | undefined;
               currency?: string | null | undefined;
               note?: string | null | undefined;
@@ -3500,12 +3333,7 @@ export declare const app: Elysia<
             headers: {};
             response: {
               200: {
-                state:
-                  | "PENDING"
-                  | "COMPLETED"
-                  | "FAILED"
-                  | "REFUNDED"
-                  | "REVERSED";
+                state: "PENDING" | "COMPLETED" | "FAILED" | "REFUNDED" | "REVERSED";
                 id: string;
                 createdAt: string;
                 updatedAt: string;
@@ -3519,9 +3347,7 @@ export declare const app: Elysia<
                 note: string | null;
               };
               401: "Токен олдсонгүй";
-              404:
-                | "Байгууллагын мэдээлэл олдсонгүй."
-                | "Салбарын мэдээлэл олдсонгүй.";
+              404: "Байгууллагын мэдээлэл олдсонгүй." | "Салбарын мэдээлэл олдсонгүй.";
               402: "Системийн төлбөр хийгдээгүй байна. 88046194";
               422: {
                 type: "validation";
@@ -3540,13 +3366,7 @@ export declare const app: Elysia<
           ":id": {
             put: {
               body: {
-                state?:
-                  | "PENDING"
-                  | "COMPLETED"
-                  | "FAILED"
-                  | "REFUNDED"
-                  | "REVERSED"
-                  | undefined;
+                state?: "PENDING" | "COMPLETED" | "FAILED" | "REFUNDED" | "REVERSED" | undefined;
                 oldId?: number | null | undefined;
                 currency?: string | null | undefined;
                 btInvoiceId?: string | undefined;
@@ -3567,12 +3387,7 @@ export declare const app: Elysia<
                   paymentMethod: string;
                   paymentChannel: string;
                   currency: string | null;
-                  state:
-                    | "PENDING"
-                    | "COMPLETED"
-                    | "FAILED"
-                    | "REFUNDED"
-                    | "REVERSED";
+                  state: "PENDING" | "COMPLETED" | "FAILED" | "REFUNDED" | "REVERSED";
                   note: string | null;
                   id: string;
                   createdAt: string;
@@ -3581,9 +3396,7 @@ export declare const app: Elysia<
                   oldId: number | null;
                 };
                 401: "Токен олдсонгүй";
-                404:
-                  | "Байгууллагын мэдээлэл олдсонгүй."
-                  | "Салбарын мэдээлэл олдсонгүй.";
+                404: "Байгууллагын мэдээлэл олдсонгүй." | "Салбарын мэдээлэл олдсонгүй.";
                 402: "Системийн төлбөр хийгдээгүй байна. 88046194";
                 422: {
                   type: "validation";
@@ -3610,9 +3423,7 @@ export declare const app: Elysia<
               headers: {};
               response: {
                 401: "Токен олдсонгүй";
-                404:
-                  | "Байгууллагын мэдээлэл олдсонгүй."
-                  | "Салбарын мэдээлэл олдсонгүй.";
+                404: "Байгууллагын мэдээлэл олдсонгүй." | "Салбарын мэдээлэл олдсонгүй.";
                 402: "Системийн төлбөр хийгдээгүй байна. 88046194";
                 422: {
                   type: "validation";
@@ -3714,9 +3525,7 @@ export declare const app: Elysia<
                 >[];
               };
               401: "Токен олдсонгүй";
-              404:
-                | "Байгууллагын мэдээлэл олдсонгүй."
-                | "Салбарын мэдээлэл олдсонгүй.";
+              404: "Байгууллагын мэдээлэл олдсонгүй." | "Салбарын мэдээлэл олдсонгүй.";
               402: "Системийн төлбөр хийгдээгүй байна. 88046194";
               422: {
                 type: "validation";
@@ -3790,9 +3599,7 @@ export declare const app: Elysia<
                 quantityUnit: number;
               };
               401: "Токен олдсонгүй";
-              404:
-                | "Байгууллагын мэдээлэл олдсонгүй."
-                | "Салбарын мэдээлэл олдсонгүй.";
+              404: "Байгууллагын мэдээлэл олдсонгүй." | "Салбарын мэдээлэл олдсонгүй.";
               402: "Системийн төлбөр хийгдээгүй байна. 88046194";
               422: {
                 type: "validation";
@@ -3848,9 +3655,7 @@ export declare const app: Elysia<
                   unknown
                 >;
                 401: "Токен олдсонгүй";
-                404:
-                  | "Байгууллагын мэдээлэл олдсонгүй."
-                  | "Салбарын мэдээлэл олдсонгүй.";
+                404: "Байгууллагын мэдээлэл олдсонгүй." | "Салбарын мэдээлэл олдсонгүй.";
                 402: "Системийн төлбөр хийгдээгүй байна. 88046194";
                 422: {
                   type: "validation";
@@ -3895,9 +3700,7 @@ export declare const app: Elysia<
               response: {
                 200: Response;
                 401: "Токен олдсонгүй";
-                404:
-                  | "Байгууллагын мэдээлэл олдсонгүй."
-                  | "Салбарын мэдээлэл олдсонгүй.";
+                404: "Байгууллагын мэдээлэл олдсонгүй." | "Салбарын мэдээлэл олдсонгүй.";
                 402: "Системийн төлбөр хийгдээгүй байна. 88046194";
                 204: "Бараа олдсонгүй.";
                 422: {
@@ -3927,9 +3730,7 @@ export declare const app: Elysia<
                 headers: {};
                 response: {
                   401: "Токен олдсонгүй";
-                  404:
-                    | "Байгууллагын мэдээлэл олдсонгүй."
-                    | "Салбарын мэдээлэл олдсонгүй.";
+                  404: "Байгууллагын мэдээлэл олдсонгүй." | "Салбарын мэдээлэл олдсонгүй.";
                   402: "Системийн төлбөр хийгдээгүй байна. 88046194";
                   422: {
                     type: "validation";
@@ -4091,9 +3892,7 @@ export declare const app: Elysia<
                 }[];
               };
               401: "Токен олдсонгүй";
-              404:
-                | "Байгууллагын мэдээлэл олдсонгүй."
-                | "Салбарын мэдээлэл олдсонгүй.";
+              404: "Байгууллагын мэдээлэл олдсонгүй." | "Салбарын мэдээлэл олдсонгүй.";
               402: "Системийн төлбөр хийгдээгүй байна. 88046194";
               422: {
                 type: "validation";
@@ -4132,9 +3931,7 @@ export declare const app: Elysia<
                 description: string | null;
               };
               401: "Токен олдсонгүй";
-              404:
-                | "Байгууллагын мэдээлэл олдсонгүй."
-                | "Салбарын мэдээлэл олдсонгүй.";
+              404: "Байгууллагын мэдээлэл олдсонгүй." | "Салбарын мэдээлэл олдсонгүй.";
               402: "Системийн төлбөр хийгдээгүй байна. 88046194";
               403: "Хандах эрхгүй байна.";
               422: {
@@ -4207,9 +4004,7 @@ export declare const app: Elysia<
               headers: {};
               response: {
                 401: "Токен олдсонгүй";
-                404:
-                  | "Байгууллагын мэдээлэл олдсонгүй."
-                  | "Салбарын мэдээлэл олдсонгүй.";
+                404: "Байгууллагын мэдээлэл олдсонгүй." | "Салбарын мэдээлэл олдсонгүй.";
                 402: "Системийн төлбөр хийгдээгүй байна. 88046194";
                 403: "Хандах эрхгүй байна.";
                 422: {
@@ -4336,9 +4131,7 @@ export declare const app: Elysia<
                 >[];
               };
               401: "Токен олдсонгүй";
-              404:
-                | "Байгууллагын мэдээлэл олдсонгүй."
-                | "Салбарын мэдээлэл олдсонгүй.";
+              404: "Байгууллагын мэдээлэл олдсонгүй." | "Салбарын мэдээлэл олдсонгүй.";
               402: "Системийн төлбөр хийгдээгүй байна. 88046194";
               403: "Хандах эрхгүй байна.";
               422: {
@@ -4364,9 +4157,7 @@ export declare const app: Elysia<
               response: {
                 200: number;
                 401: "Токен олдсонгүй";
-                404:
-                  | "Байгууллагын мэдээлэл олдсонгүй."
-                  | "Салбарын мэдээлэл олдсонгүй.";
+                404: "Байгууллагын мэдээлэл олдсонгүй." | "Салбарын мэдээлэл олдсонгүй.";
                 402: "Системийн төлбөр хийгдээгүй байна. 88046194";
                 403: "Хандах эрхгүй байна.";
               };
@@ -4409,9 +4200,7 @@ export declare const app: Elysia<
                 isOrdered: boolean;
               };
               401: "Токен олдсонгүй";
-              404:
-                | "Байгууллагын мэдээлэл олдсонгүй."
-                | "Салбарын мэдээлэл олдсонгүй.";
+              404: "Байгууллагын мэдээлэл олдсонгүй." | "Салбарын мэдээлэл олдсонгүй.";
               402: "Системийн төлбөр хийгдээгүй байна. 88046194";
               403: "Хандах эрхгүй байна.";
               409: string;
@@ -4479,9 +4268,7 @@ export declare const app: Elysia<
                   unknown
                 >;
                 401: "Токен олдсонгүй";
-                404:
-                  | "Байгууллагын мэдээлэл олдсонгүй."
-                  | "Салбарын мэдээлэл олдсонгүй.";
+                404: "Байгууллагын мэдээлэл олдсонгүй." | "Салбарын мэдээлэл олдсонгүй.";
                 402: "Системийн төлбөр хийгдээгүй байна. 88046194";
                 403: "Хандах эрхгүй байна.";
                 422: {
@@ -4605,11 +4392,7 @@ export declare const app: Elysia<
                       } | null;
                       user: {
                         name: string;
-                        kind:
-                          | "ADMIN"
-                          | "COMPANY_ADMIN"
-                          | "CUSTOMER"
-                          | "INSPECTION";
+                        kind: "ADMIN" | "COMPANY_ADMIN" | "CUSTOMER" | "INSPECTION";
                       } | null;
                       itemId: string;
                       productId: string | null;
@@ -4643,9 +4426,7 @@ export declare const app: Elysia<
                   >[];
                 };
                 401: "Токен олдсонгүй";
-                404:
-                  | "Байгууллагын мэдээлэл олдсонгүй."
-                  | "Салбарын мэдээлэл олдсонгүй.";
+                404: "Байгууллагын мэдээлэл олдсонгүй." | "Салбарын мэдээлэл олдсонгүй.";
                 402: "Системийн төлбөр хийгдээгүй байна. 88046194";
                 403: "Хандах эрхгүй байна.";
                 422: {
@@ -4712,9 +4493,7 @@ export declare const app: Elysia<
                   | "Салбарын мэдээлэл олдсонгүй."
                   | "Агуулахын бараа олдсонгүй.";
                 402: "Системийн төлбөр хийгдээгүй байна. 88046194";
-                400:
-                  | "Ажилтны мэдээлэл шаардлагатай."
-                  | "Барааны үлдэгдэл хүрэлцэхгүй байна.";
+                400: "Ажилтны мэдээлэл шаардлагатай." | "Барааны үлдэгдэл хүрэлцэхгүй байна.";
                 403: "Хандах эрхгүй байна.";
                 422: {
                   type: "validation";
@@ -4739,9 +4518,7 @@ export declare const app: Elysia<
               headers: {};
               response: {
                 401: "Токен олдсонгүй";
-                404:
-                  | "Байгууллагын мэдээлэл олдсонгүй."
-                  | "Салбарын мэдээлэл олдсонгүй.";
+                404: "Байгууллагын мэдээлэл олдсонгүй." | "Салбарын мэдээлэл олдсонгүй.";
                 402: "Системийн төлбөр хийгдээгүй байна. 88046194";
                 403: "Хандах эрхгүй байна.";
               };
@@ -4854,9 +4631,7 @@ export declare const app: Elysia<
               headers: {};
               response: {
                 401: "Токен олдсонгүй";
-                404:
-                  | "Байгууллагын мэдээлэл олдсонгүй."
-                  | "Салбарын мэдээлэл олдсонгүй.";
+                404: "Байгууллагын мэдээлэл олдсонгүй." | "Салбарын мэдээлэл олдсонгүй.";
                 402: "Системийн төлбөр хийгдээгүй байна. 88046194";
                 403: "Хандах эрхгүй байна.";
                 422: {
@@ -4940,9 +4715,7 @@ export declare const app: Elysia<
                 >[];
               };
               401: "Токен олдсонгүй";
-              404:
-                | "Байгууллагын мэдээлэл олдсонгүй."
-                | "Салбарын мэдээлэл олдсонгүй.";
+              404: "Байгууллагын мэдээлэл олдсонгүй." | "Салбарын мэдээлэл олдсонгүй.";
               402: "Системийн төлбөр хийгдээгүй байна. 88046194";
               403: "Хандах эрхгүй байна.";
               422: {
@@ -5030,9 +4803,7 @@ export declare const app: Elysia<
                 isFranchise: boolean;
               };
               401: "Токен олдсонгүй";
-              404:
-                | "Байгууллагын мэдээлэл олдсонгүй."
-                | "Салбарын мэдээлэл олдсонгүй.";
+              404: "Байгууллагын мэдээлэл олдсонгүй." | "Салбарын мэдээлэл олдсонгүй.";
               402: "Системийн төлбөр хийгдээгүй байна. 88046194";
               403: "Хандах эрхгүй байна.";
               422: {
@@ -5240,9 +5011,7 @@ export declare const app: Elysia<
                 >[];
               };
               401: "Токен олдсонгүй";
-              404:
-                | "Байгууллагын мэдээлэл олдсонгүй."
-                | "Салбарын мэдээлэл олдсонгүй.";
+              404: "Байгууллагын мэдээлэл олдсонгүй." | "Салбарын мэдээлэл олдсонгүй.";
               402: "Системийн төлбөр хийгдээгүй байна. 88046194";
               403: "Хандах эрхгүй байна.";
               422: {
@@ -5300,9 +5069,7 @@ export declare const app: Elysia<
                   >[];
                 };
                 401: "Токен олдсонгүй";
-                404:
-                  | "Байгууллагын мэдээлэл олдсонгүй."
-                  | "Салбарын мэдээлэл олдсонгүй.";
+                404: "Байгууллагын мэдээлэл олдсонгүй." | "Салбарын мэдээлэл олдсонгүй.";
                 402: "Системийн төлбөр хийгдээгүй байна. 88046194";
               };
             };
@@ -5360,9 +5127,7 @@ export declare const app: Elysia<
                 merchantId: string;
               };
               401: "Токен олдсонгүй";
-              404:
-                | "Байгууллагын мэдээлэл олдсонгүй."
-                | "Салбарын мэдээлэл олдсонгүй.";
+              404: "Байгууллагын мэдээлэл олдсонгүй." | "Салбарын мэдээлэл олдсонгүй.";
               402: "Системийн төлбөр хийгдээгүй байна. 88046194";
               403: "Хандах эрхгүй байна.";
               422: {
@@ -5513,9 +5278,7 @@ export declare const app: Elysia<
                 >[];
               };
               401: "Токен олдсонгүй";
-              404:
-                | "Байгууллагын мэдээлэл олдсонгүй."
-                | "Салбарын мэдээлэл олдсонгүй.";
+              404: "Байгууллагын мэдээлэл олдсонгүй." | "Салбарын мэдээлэл олдсонгүй.";
               402: "Системийн төлбөр хийгдээгүй байна. 88046194";
               422: {
                 type: "validation";
@@ -5553,9 +5316,7 @@ export declare const app: Elysia<
                 rowCount: number;
               };
               401: "Токен олдсонгүй";
-              404:
-                | "Байгууллагын мэдээлэл олдсонгүй."
-                | "Салбарын мэдээлэл олдсонгүй.";
+              404: "Байгууллагын мэдээлэл олдсонгүй." | "Салбарын мэдээлэл олдсонгүй.";
               402: "Системийн төлбөр хийгдээгүй байна. 88046194";
               422: {
                 type: "validation";
@@ -5700,9 +5461,7 @@ export declare const app: Elysia<
                 >[];
               };
               401: "Токен олдсонгүй";
-              404:
-                | "Байгууллагын мэдээлэл олдсонгүй."
-                | "Салбарын мэдээлэл олдсонгүй.";
+              404: "Байгууллагын мэдээлэл олдсонгүй." | "Салбарын мэдээлэл олдсонгүй.";
               402: "Системийн төлбөр хийгдээгүй байна. 88046194";
               422: {
                 type: "validation";
@@ -5747,9 +5506,7 @@ export declare const app: Elysia<
                 serviceKindId: string | null;
               };
               401: "Токен олдсонгүй";
-              404:
-                | "Байгууллагын мэдээлэл олдсонгүй."
-                | "Салбарын мэдээлэл олдсонгүй.";
+              404: "Байгууллагын мэдээлэл олдсонгүй." | "Салбарын мэдээлэл олдсонгүй.";
               402: "Системийн төлбөр хийгдээгүй байна. 88046194";
               422: {
                 type: "validation";
@@ -5777,9 +5534,7 @@ export declare const app: Elysia<
                 headers: {};
                 response: {
                   401: "Токен олдсонгүй";
-                  404:
-                    | "Байгууллагын мэдээлэл олдсонгүй."
-                    | "Салбарын мэдээлэл олдсонгүй.";
+                  404: "Байгууллагын мэдээлэл олдсонгүй." | "Салбарын мэдээлэл олдсонгүй.";
                   402: "Системийн төлбөр хийгдээгүй байна. 88046194";
                   403: "Хандах эрхгүй байна.";
                   422: {
@@ -5860,9 +5615,7 @@ export declare const app: Elysia<
               headers: {};
               response: {
                 401: "Токен олдсонгүй";
-                404:
-                  | "Байгууллагын мэдээлэл олдсонгүй."
-                  | "Салбарын мэдээлэл олдсонгүй.";
+                404: "Байгууллагын мэдээлэл олдсонгүй." | "Салбарын мэдээлэл олдсонгүй.";
                 402: "Системийн төлбөр хийгдээгүй байна. 88046194";
                 422: {
                   type: "validation";
@@ -5917,9 +5670,7 @@ export declare const app: Elysia<
                 }[];
               };
               401: "Токен олдсонгүй";
-              404:
-                | "Байгууллагын мэдээлэл олдсонгүй."
-                | "Салбарын мэдээлэл олдсонгүй.";
+              404: "Байгууллагын мэдээлэл олдсонгүй." | "Салбарын мэдээлэл олдсонгүй.";
               402: "Системийн төлбөр хийгдээгүй байна. 88046194";
               422: {
                 type: "validation";
@@ -5967,9 +5718,7 @@ export declare const app: Elysia<
                 lastname: string;
               };
               401: "Токен олдсонгүй";
-              404:
-                | "Байгууллагын мэдээлэл олдсонгүй."
-                | "Салбарын мэдээлэл олдсонгүй.";
+              404: "Байгууллагын мэдээлэл олдсонгүй." | "Салбарын мэдээлэл олдсонгүй.";
               402: "Системийн төлбөр хийгдээгүй байна. 88046194";
               422: {
                 type: "validation";
@@ -6050,9 +5799,7 @@ export declare const app: Elysia<
               headers: {};
               response: {
                 401: "Токен олдсонгүй";
-                404:
-                  | "Байгууллагын мэдээлэл олдсонгүй."
-                  | "Салбарын мэдээлэл олдсонгүй.";
+                404: "Байгууллагын мэдээлэл олдсонгүй." | "Салбарын мэдээлэл олдсонгүй.";
                 402: "Системийн төлбөр хийгдээгүй байна. 88046194";
                 422: {
                   type: "validation";
@@ -6110,9 +5857,7 @@ export declare const app: Elysia<
                 >[];
               };
               401: "Токен олдсонгүй";
-              404:
-                | "Байгууллагын мэдээлэл олдсонгүй."
-                | "Салбарын мэдээлэл олдсонгүй.";
+              404: "Байгууллагын мэдээлэл олдсонгүй." | "Салбарын мэдээлэл олдсонгүй.";
               402: "Системийн төлбөр хийгдээгүй байна. 88046194";
               422: {
                 type: "validation";
@@ -6309,9 +6054,7 @@ export declare const app: Elysia<
                 >[];
               };
               401: "Токен олдсонгүй";
-              404:
-                | "Байгууллагын мэдээлэл олдсонгүй."
-                | "Салбарын мэдээлэл олдсонгүй.";
+              404: "Байгууллагын мэдээлэл олдсонгүй." | "Салбарын мэдээлэл олдсонгүй.";
               402: "Системийн төлбөр хийгдээгүй байна. 88046194";
               422: {
                 type: "validation";
@@ -6507,9 +6250,7 @@ export declare const app: Elysia<
                 >[];
               };
               401: "Токен олдсонгүй";
-              404:
-                | "Байгууллагын мэдээлэл олдсонгүй."
-                | "Салбарын мэдээлэл олдсонгүй.";
+              404: "Байгууллагын мэдээлэл олдсонгүй." | "Салбарын мэдээлэл олдсонгүй.";
               402: "Системийн төлбөр хийгдээгүй байна. 88046194";
               422: {
                 type: "validation";
@@ -6551,9 +6292,7 @@ export declare const app: Elysia<
                 bank: string;
               };
               401: "Токен олдсонгүй";
-              404:
-                | "Байгууллагын мэдээлэл олдсонгүй."
-                | "Салбарын мэдээлэл олдсонгүй.";
+              404: "Байгууллагын мэдээлэл олдсонгүй." | "Салбарын мэдээлэл олдсонгүй.";
               402: "Системийн төлбөр хийгдээгүй байна. 88046194";
               403: "Хандах эрхгүй байна.";
               422: {
@@ -6699,9 +6438,7 @@ export declare const app: Elysia<
                 >[];
               };
               401: "Токен олдсонгүй";
-              404:
-                | "Байгууллагын мэдээлэл олдсонгүй."
-                | "Салбарын мэдээлэл олдсонгүй.";
+              404: "Байгууллагын мэдээлэл олдсонгүй." | "Салбарын мэдээлэл олдсонгүй.";
               402: "Системийн төлбөр хийгдээгүй байна. 88046194";
               422: {
                 type: "validation";
@@ -6745,9 +6482,7 @@ export declare const app: Elysia<
                 active: boolean;
               };
               401: "Токен олдсонгүй";
-              404:
-                | "Байгууллагын мэдээлэл олдсонгүй."
-                | "Салбарын мэдээлэл олдсонгүй.";
+              404: "Байгууллагын мэдээлэл олдсонгүй." | "Салбарын мэдээлэл олдсонгүй.";
               402: "Системийн төлбөр хийгдээгүй байна. 88046194";
               403: "Хандах эрхгүй байна.";
               422: {
@@ -6826,9 +6561,7 @@ export declare const app: Elysia<
               headers: {};
               response: {
                 401: "Токен олдсонгүй";
-                404:
-                  | "Байгууллагын мэдээлэл олдсонгүй."
-                  | "Салбарын мэдээлэл олдсонгүй.";
+                404: "Байгууллагын мэдээлэл олдсонгүй." | "Салбарын мэдээлэл олдсонгүй.";
                 402: "Системийн төлбөр хийгдээгүй байна. 88046194";
                 403: "Хандах эрхгүй байна.";
                 422: {
@@ -6895,9 +6628,7 @@ export declare const app: Elysia<
                   >[];
                 };
                 401: "Токен олдсонгүй";
-                404:
-                  | "Байгууллагын мэдээлэл олдсонгүй."
-                  | "Салбарын мэдээлэл олдсонгүй.";
+                404: "Байгууллагын мэдээлэл олдсонгүй." | "Салбарын мэдээлэл олдсонгүй.";
                 402: "Системийн төлбөр хийгдээгүй байна. 88046194";
                 422: {
                   type: "validation";
@@ -7191,9 +6922,7 @@ export declare const app: Elysia<
                 >[];
               };
               401: "Токен олдсонгүй";
-              404:
-                | "Байгууллагын мэдээлэл олдсонгүй."
-                | "Салбарын мэдээлэл олдсонгүй.";
+              404: "Байгууллагын мэдээлэл олдсонгүй." | "Салбарын мэдээлэл олдсонгүй.";
               402: "Системийн төлбөр хийгдээгүй байна. 88046194";
               422: {
                 type: "validation";
@@ -7247,9 +6976,7 @@ export declare const app: Elysia<
                   | "Салбарын мэдээлэл олдсонгүй."
                   | "Төлбөрийн төлөвлөгөө олдсонгүй.";
                 402: "Системийн төлбөр хийгдээгүй байна. 88046194";
-                403:
-                  | "Хандах эрхгүй байна."
-                  | "Төлбөрийн баримт үүсгэх эрхгүй байна.";
+                403: "Хандах эрхгүй байна." | "Төлбөрийн баримт үүсгэх эрхгүй байна.";
                 422: {
                   type: "validation";
                   on: string;
@@ -7271,12 +6998,7 @@ export declare const app: Elysia<
                 companyId?: string | undefined;
                 oldId?: number | null | undefined;
                 note?: string | null | undefined;
-                status?:
-                  | "CANCELLED"
-                  | "PENDING"
-                  | "PAID"
-                  | "OVERDUE"
-                  | undefined;
+                status?: "CANCELLED" | "PENDING" | "PAID" | "OVERDUE" | undefined;
                 basePrice?: number | undefined;
                 billingPlanId?: string | undefined;
                 periodStart?: string | undefined;
@@ -7342,9 +7064,7 @@ export declare const app: Elysia<
               headers: {};
               response: {
                 401: "Токен олдсонгүй";
-                404:
-                  | "Байгууллагын мэдээлэл олдсонгүй."
-                  | "Салбарын мэдээлэл олдсонгүй.";
+                404: "Байгууллагын мэдээлэл олдсонгүй." | "Салбарын мэдээлэл олдсонгүй.";
                 402: "Системийн төлбөр хийгдээгүй байна. 88046194";
                 403: "Хандах эрхгүй байна.";
                 422: {
@@ -7379,9 +7099,7 @@ export declare const app: Elysia<
               requiresAdmin?: boolean;
             }[];
             401: "Токен олдсонгүй";
-            404:
-              | "Байгууллагын мэдээлэл олдсонгүй."
-              | "Салбарын мэдээлэл олдсонгүй.";
+            404: "Байгууллагын мэдээлэл олдсонгүй." | "Салбарын мэдээлэл олдсонгүй.";
             402: "Системийн төлбөр хийгдээгүй байна. 88046194";
             403: "Хандах эрхгүй байна.";
           };
@@ -7399,9 +7117,7 @@ export declare const app: Elysia<
           headers: {};
           response: {
             401: "Токен олдсонгүй";
-            404:
-              | "Байгууллагын мэдээлэл олдсонгүй."
-              | "Салбарын мэдээлэл олдсонгүй.";
+            404: "Байгууллагын мэдээлэл олдсонгүй." | "Салбарын мэдээлэл олдсонгүй.";
             402: "Системийн төлбөр хийгдээгүй байна. 88046194";
             403: "Хандах эрхгүй байна.";
             422: {
@@ -7449,9 +7165,7 @@ export declare const app: Elysia<
                 }[];
               };
               401: "Токен олдсонгүй";
-              404:
-                | "Байгууллагын мэдээлэл олдсонгүй."
-                | "Салбарын мэдээлэл олдсонгүй.";
+              404: "Байгууллагын мэдээлэл олдсонгүй." | "Салбарын мэдээлэл олдсонгүй.";
               402: "Системийн төлбөр хийгдээгүй байна. 88046194";
               403: "Хандах эрхгүй байна.";
               422: {
@@ -7490,9 +7204,7 @@ export declare const app: Elysia<
                 permissions: string[];
               };
               401: "Токен олдсонгүй";
-              404:
-                | "Байгууллагын мэдээлэл олдсонгүй."
-                | "Салбарын мэдээлэл олдсонгүй.";
+              404: "Байгууллагын мэдээлэл олдсонгүй." | "Салбарын мэдээлэл олдсонгүй.";
               402: "Системийн төлбөр хийгдээгүй байна. 88046194";
               403: "Хандах эрхгүй байна.";
               422: {
@@ -7627,9 +7339,7 @@ export declare const app: Elysia<
               }[];
             };
             401: "Токен олдсонгүй";
-            404:
-              | "Байгууллагын мэдээлэл олдсонгүй."
-              | "Салбарын мэдээлэл олдсонгүй.";
+            404: "Байгууллагын мэдээлэл олдсонгүй." | "Салбарын мэдээлэл олдсонгүй.";
             402: "Системийн төлбөр хийгдээгүй байна. 88046194";
             403: "Хандах эрхгүй байна.";
             422: {
@@ -7655,9 +7365,7 @@ export declare const app: Elysia<
             response: {
               200: import("./lib/auth").User;
               401: "Токен олдсонгүй";
-              404:
-                | "Байгууллагын мэдээлэл олдсонгүй."
-                | "Салбарын мэдээлэл олдсонгүй.";
+              404: "Байгууллагын мэдээлэл олдсонгүй." | "Салбарын мэдээлэл олдсонгүй.";
               402: "Системийн төлбөр хийгдээгүй байна. 88046194";
             };
           };
@@ -7668,12 +7376,7 @@ export declare const app: Elysia<
         post: {
           body: {
             branchId?: string | undefined;
-            kind?:
-              | "ADMIN"
-              | "COMPANY_ADMIN"
-              | "CUSTOMER"
-              | "INSPECTION"
-              | undefined;
+            kind?: "ADMIN" | "COMPANY_ADMIN" | "CUSTOMER" | "INSPECTION" | undefined;
             employeeId?: string | null | undefined;
             password?: string | undefined;
             merchantId?: string | undefined;
@@ -7695,9 +7398,7 @@ export declare const app: Elysia<
               updatedAt: Date;
             };
             401: "Токен олдсонгүй";
-            404:
-              | "Байгууллагын мэдээлэл олдсонгүй."
-              | "Салбарын мэдээлэл олдсонгүй.";
+            404: "Байгууллагын мэдээлэл олдсонгүй." | "Салбарын мэдээлэл олдсонгүй.";
             402: "Системийн төлбөр хийгдээгүй байна. 88046194";
             400: string;
             403: "Хандах эрхгүй байна.";
@@ -7722,12 +7423,7 @@ export declare const app: Elysia<
               id?: string | undefined;
               branchId?: string | undefined;
               companyId?: string | undefined;
-              kind?:
-                | "ADMIN"
-                | "COMPANY_ADMIN"
-                | "CUSTOMER"
-                | "INSPECTION"
-                | undefined;
+              kind?: "ADMIN" | "COMPANY_ADMIN" | "CUSTOMER" | "INSPECTION" | undefined;
               employeeId?: string | null | undefined;
               name?: string | undefined;
               email?: string | undefined;
@@ -7766,9 +7462,7 @@ export declare const app: Elysia<
                 banExpires: Date | null;
               };
               401: "Токен олдсонгүй";
-              404:
-                | "Байгууллагын мэдээлэл олдсонгүй."
-                | "Салбарын мэдээлэл олдсонгүй.";
+              404: "Байгууллагын мэдээлэл олдсонгүй." | "Салбарын мэдээлэл олдсонгүй.";
               402: "Системийн төлбөр хийгдээгүй байна. 88046194";
               403: "Хандах эрхгүй байна.";
               422: {
@@ -7816,9 +7510,7 @@ export declare const app: Elysia<
                     oldId: number | null;
                   }[];
                   401: "Токен олдсонгүй";
-                  404:
-                    | "Байгууллагын мэдээлэл олдсонгүй."
-                    | "Салбарын мэдээлэл олдсонгүй.";
+                  404: "Байгууллагын мэдээлэл олдсонгүй." | "Салбарын мэдээлэл олдсонгүй.";
                   402: "Системийн төлбөр хийгдээгүй байна. 88046194";
                   422: {
                     type: "validation";
@@ -7856,9 +7548,7 @@ export declare const app: Elysia<
                     cpOrderItemId: string;
                   };
                   401: "Токен олдсонгүй";
-                  404:
-                    | "Байгууллагын мэдээлэл олдсонгүй."
-                    | "Салбарын мэдээлэл олдсонгүй.";
+                  404: "Байгууллагын мэдээлэл олдсонгүй." | "Салбарын мэдээлэл олдсонгүй.";
                   402: "Системийн төлбөр хийгдээгүй байна. 88046194";
                   400: "Энэ үйлчилгээнд ажилтан аль хэдийн хуваарилагдсан байна.";
                   422: {
@@ -8093,9 +7783,7 @@ export declare const app: Elysia<
                   }[];
                 })[];
                 401: "Токен олдсонгүй";
-                404:
-                  | "Байгууллагын мэдээлэл олдсонгүй."
-                  | "Салбарын мэдээлэл олдсонгүй.";
+                404: "Байгууллагын мэдээлэл олдсонгүй." | "Салбарын мэдээлэл олдсонгүй.";
                 402: "Системийн төлбөр хийгдээгүй байна. 88046194";
                 422: {
                   type: "validation";
@@ -8343,9 +8031,7 @@ export declare const app: Elysia<
                   pocketOrderNumber: string | null;
                 };
                 401: "Токен олдсонгүй";
-                404:
-                  | "Байгууллагын мэдээлэл олдсонгүй."
-                  | "Салбарын мэдээлэл олдсонгүй.";
+                404: "Байгууллагын мэдээлэл олдсонгүй." | "Салбарын мэдээлэл олдсонгүй.";
                 402: "Системийн төлбөр хийгдээгүй байна. 88046194";
                 422: {
                   type: "validation";
@@ -8403,9 +8089,7 @@ export declare const app: Elysia<
                 headers: {};
                 response: {
                   401: "Токен олдсонгүй";
-                  404:
-                    | "Байгууллагын мэдээлэл олдсонгүй."
-                    | "Салбарын мэдээлэл олдсонгүй.";
+                  404: "Байгууллагын мэдээлэл олдсонгүй." | "Салбарын мэдээлэл олдсонгүй.";
                   402: "Системийн төлбөр хийгдээгүй байна. 88046194";
                   422: {
                     type: "validation";
@@ -8500,9 +8184,7 @@ export declare const app: Elysia<
                   query: {};
                   headers: {};
                   response: {
-                    404:
-                      | "Төлбөрийн тохиргоо олдсонгүй."
-                      | "Төлбөрийн мэдээлэл олдсонгүй.";
+                    404: "Төлбөрийн тохиргоо олдсонгүй." | "Төлбөрийн мэдээлэл олдсонгүй.";
                     400: string;
                     422: {
                       type: "validation";
@@ -8645,9 +8327,7 @@ export declare const app: Elysia<
                   query: {};
                   headers: {};
                   response: {
-                    404:
-                      | "Төлбөрийн тохиргоо олдсонгүй."
-                      | "Төлбөрийн мэдээлэл олдсонгүй.";
+                    404: "Төлбөрийн тохиргоо олдсонгүй." | "Төлбөрийн мэдээлэл олдсонгүй.";
                     400: string;
                     422: {
                       type: "validation";
@@ -8676,9 +8356,7 @@ export declare const app: Elysia<
                   query: {};
                   headers: {};
                   response: {
-                    404:
-                      | "Төлбөрийн тохиргоо олдсонгүй."
-                      | "Төлбөрийн мэдээлэл олдсонгүй.";
+                    404: "Төлбөрийн тохиргоо олдсонгүй." | "Төлбөрийн мэдээлэл олдсонгүй.";
                     400: string;
                     422: {
                       type: "validation";
@@ -8945,9 +8623,7 @@ export declare const app: Elysia<
                     totalAmount: string | number;
                   };
                   401: "Токен олдсонгүй";
-                  404:
-                    | "Байгууллагын мэдээлэл олдсонгүй."
-                    | "Салбарын мэдээлэл олдсонгүй.";
+                  404: "Байгууллагын мэдээлэл олдсонгүй." | "Салбарын мэдээлэл олдсонгүй.";
                   402: "Системийн төлбөр хийгдээгүй байна. 88046194";
                   403: "Хандах эрхгүй байна.";
                   422: {
@@ -9048,9 +8724,7 @@ export declare const app: Elysia<
                     } | null;
                   }[];
                   401: "Токен олдсонгүй";
-                  404:
-                    | "Байгууллагын мэдээлэл олдсонгүй."
-                    | "Салбарын мэдээлэл олдсонгүй.";
+                  404: "Байгууллагын мэдээлэл олдсонгүй." | "Салбарын мэдээлэл олдсонгүй.";
                   402: "Системийн төлбөр хийгдээгүй байна. 88046194";
                   403: "Хандах эрхгүй байна.";
                 };
@@ -9113,9 +8787,7 @@ export declare const app: Elysia<
                     refreshExpiresIn: number | null;
                   };
                   401: "Токен олдсонгүй";
-                  404:
-                    | "Байгууллагын мэдээлэл олдсонгүй."
-                    | "Салбарын мэдээлэл олдсонгүй.";
+                  404: "Байгууллагын мэдээлэл олдсонгүй." | "Салбарын мэдээлэл олдсонгүй.";
                   402: "Системийн төлбөр хийгдээгүй байна. 88046194";
                   403: "Хандах эрхгүй байна.";
                   422: {
@@ -9144,9 +8816,7 @@ export declare const app: Elysia<
                   headers: {};
                   response: {
                     401: "Токен олдсонгүй";
-                    404:
-                      | "Байгууллагын мэдээлэл олдсонгүй."
-                      | "Салбарын мэдээлэл олдсонгүй.";
+                    404: "Байгууллагын мэдээлэл олдсонгүй." | "Салбарын мэдээлэл олдсонгүй.";
                     402: "Системийн төлбөр хийгдээгүй байна. 88046194";
                     403: "Хандах эрхгүй байна.";
                     422: {
@@ -9290,9 +8960,7 @@ export declare const app: Elysia<
                 }[];
               };
               401: "Токен олдсонгүй";
-              404:
-                | "Байгууллагын мэдээлэл олдсонгүй."
-                | "Салбарын мэдээлэл олдсонгүй.";
+              404: "Байгууллагын мэдээлэл олдсонгүй." | "Салбарын мэдээлэл олдсонгүй.";
               402: "Системийн төлбөр хийгдээгүй байна. 88046194";
               422: {
                 type: "validation";
@@ -9418,9 +9086,7 @@ export declare const app: Elysia<
                 }[];
               };
               401: "Токен олдсонгүй";
-              404:
-                | "Байгууллагын мэдээлэл олдсонгүй."
-                | "Салбарын мэдээлэл олдсонгүй.";
+              404: "Байгууллагын мэдээлэл олдсонгүй." | "Салбарын мэдээлэл олдсонгүй.";
               402: "Системийн төлбөр хийгдээгүй байна. 88046194";
               400:
                 | "Машины дугаар болон VIN хоёроос нэгийг нь оруулна уу."
@@ -9472,9 +9138,7 @@ export declare const app: Elysia<
                   repeatedCheckList: unknown;
                 };
                 401: "Токен олдсонгүй";
-                404:
-                  | "Байгууллагын мэдээлэл олдсонгүй."
-                  | "Салбарын мэдээлэл олдсонгүй.";
+                404: "Байгууллагын мэдээлэл олдсонгүй." | "Салбарын мэдээлэл олдсонгүй.";
                 402: "Системийн төлбөр хийгдээгүй байна. 88046194";
                 422: {
                   type: "validation";
@@ -9619,9 +9283,7 @@ export declare const app: Elysia<
               headers: {};
               response: {
                 401: "Токен олдсонгүй";
-                404:
-                  | "Байгууллагын мэдээлэл олдсонгүй."
-                  | "Салбарын мэдээлэл олдсонгүй.";
+                404: "Байгууллагын мэдээлэл олдсонгүй." | "Салбарын мэдээлэл олдсонгүй.";
                 402: "Системийн төлбөр хийгдээгүй байна. 88046194";
               };
             };
@@ -9824,9 +9486,7 @@ export declare const app: Elysia<
                     }[];
                   };
                   401: "Токен олдсонгүй";
-                  404:
-                    | "Байгууллагын мэдээлэл олдсонгүй."
-                    | "Салбарын мэдээлэл олдсонгүй.";
+                  404: "Байгууллагын мэдээлэл олдсонгүй." | "Салбарын мэдээлэл олдсонгүй.";
                   402: "Системийн төлбөр хийгдээгүй байна. 88046194";
                   422: {
                     type: "validation";
@@ -9886,9 +9546,7 @@ export declare const app: Elysia<
                   oldId: number | null;
                 }[];
                 401: "Токен олдсонгүй";
-                404:
-                  | "Байгууллагын мэдээлэл олдсонгүй."
-                  | "Салбарын мэдээлэл олдсонгүй.";
+                404: "Байгууллагын мэдээлэл олдсонгүй." | "Салбарын мэдээлэл олдсонгүй.";
                 402: "Системийн төлбөр хийгдээгүй байна. 88046194";
                 422: {
                   type: "validation";
@@ -9930,9 +9588,7 @@ export declare const app: Elysia<
                   kindId: string;
                 };
                 401: "Токен олдсонгүй";
-                404:
-                  | "Байгууллагын мэдээлэл олдсонгүй."
-                  | "Салбарын мэдээлэл олдсонгүй.";
+                404: "Байгууллагын мэдээлэл олдсонгүй." | "Салбарын мэдээлэл олдсонгүй.";
                 402: "Системийн төлбөр хийгдээгүй байна. 88046194";
                 422: {
                   type: "validation";
@@ -9963,9 +9619,7 @@ export declare const app: Elysia<
                 headers: {};
                 response: {
                   401: "Токен олдсонгүй";
-                  404:
-                    | "Байгууллагын мэдээлэл олдсонгүй."
-                    | "Салбарын мэдээлэл олдсонгүй.";
+                  404: "Байгууллагын мэдээлэл олдсонгүй." | "Салбарын мэдээлэл олдсонгүй.";
                   402: "Системийн төлбөр хийгдээгүй байна. 88046194";
                   400: "Үйлчилгээ оруулах мэдээлэл байхгүй байна.";
                   422: {
@@ -10042,9 +9696,7 @@ export declare const app: Elysia<
                 headers: {};
                 response: {
                   401: "Токен олдсонгүй";
-                  404:
-                    | "Байгууллагын мэдээлэл олдсонгүй."
-                    | "Салбарын мэдээлэл олдсонгүй.";
+                  404: "Байгууллагын мэдээлэл олдсонгүй." | "Салбарын мэдээлэл олдсонгүй.";
                   402: "Системийн төлбөр хийгдээгүй байна. 88046194";
                   422: {
                     type: "validation";
@@ -10114,9 +9766,7 @@ export declare const app: Elysia<
                   oldId: number | null;
                 }[];
                 401: "Токен олдсонгүй";
-                404:
-                  | "Байгууллагын мэдээлэл олдсонгүй."
-                  | "Салбарын мэдээлэл олдсонгүй.";
+                404: "Байгууллагын мэдээлэл олдсонгүй." | "Салбарын мэдээлэл олдсонгүй.";
                 402: "Системийн төлбөр хийгдээгүй байна. 88046194";
                 422: {
                   type: "validation";
@@ -10157,9 +9807,7 @@ export declare const app: Elysia<
                   companyProductId: string;
                 };
                 401: "Токен олдсонгүй";
-                404:
-                  | "Байгууллагын мэдээлэл олдсонгүй."
-                  | "Салбарын мэдээлэл олдсонгүй.";
+                404: "Байгууллагын мэдээлэл олдсонгүй." | "Салбарын мэдээлэл олдсонгүй.";
                 402: "Системийн төлбөр хийгдээгүй байна. 88046194";
                 422: {
                   type: "validation";
@@ -10189,9 +9837,7 @@ export declare const app: Elysia<
                 headers: {};
                 response: {
                   401: "Токен олдсонгүй";
-                  404:
-                    | "Байгууллагын мэдээлэл олдсонгүй."
-                    | "Салбарын мэдээлэл олдсонгүй.";
+                  404: "Байгууллагын мэдээлэл олдсонгүй." | "Салбарын мэдээлэл олдсонгүй.";
                   402: "Системийн төлбөр хийгдээгүй байна. 88046194";
                   400: "Бүтээгдэхүүн оруулах мэдээлэл байхгүй байна.";
                   422: {
@@ -10268,9 +9914,7 @@ export declare const app: Elysia<
                 headers: {};
                 response: {
                   401: "Токен олдсонгүй";
-                  404:
-                    | "Байгууллагын мэдээлэл олдсонгүй."
-                    | "Салбарын мэдээлэл олдсонгүй.";
+                  404: "Байгууллагын мэдээлэл олдсонгүй." | "Салбарын мэдээлэл олдсонгүй.";
                   402: "Системийн төлбөр хийгдээгүй байна. 88046194";
                   422: {
                     type: "validation";
@@ -10344,9 +9988,7 @@ export declare const app: Elysia<
                 }[];
               };
               401: "Токен олдсонгүй";
-              404:
-                | "Байгууллагын мэдээлэл олдсонгүй."
-                | "Салбарын мэдээлэл олдсонгүй.";
+              404: "Байгууллагын мэдээлэл олдсонгүй." | "Салбарын мэдээлэл олдсонгүй.";
               402: "Системийн төлбөр хийгдээгүй байна. 88046194";
               422: {
                 type: "validation";
@@ -10387,9 +10029,7 @@ export declare const app: Elysia<
                 companyBranchId: string | null;
               };
               401: "Токен олдсонгүй";
-              404:
-                | "Байгууллагын мэдээлэл олдсонгүй."
-                | "Салбарын мэдээлэл олдсонгүй.";
+              404: "Байгууллагын мэдээлэл олдсонгүй." | "Салбарын мэдээлэл олдсонгүй.";
               402: "Системийн төлбөр хийгдээгүй байна. 88046194";
               422: {
                 type: "validation";
@@ -10463,9 +10103,7 @@ export declare const app: Elysia<
               headers: {};
               response: {
                 401: "Токен олдсонгүй";
-                404:
-                  | "Байгууллагын мэдээлэл олдсонгүй."
-                  | "Салбарын мэдээлэл олдсонгүй.";
+                404: "Байгууллагын мэдээлэл олдсонгүй." | "Салбарын мэдээлэл олдсонгүй.";
                 402: "Системийн төлбөр хийгдээгүй байна. 88046194";
                 422: {
                   type: "validation";
@@ -10660,9 +10298,7 @@ export declare const app: Elysia<
                   }[];
                 };
                 401: "Токен олдсонгүй";
-                404:
-                  | "Байгууллагын мэдээлэл олдсонгүй."
-                  | "Салбарын мэдээлэл олдсонгүй.";
+                404: "Байгууллагын мэдээлэл олдсонгүй." | "Салбарын мэдээлэл олдсонгүй.";
                 402: "Системийн төлбөр хийгдээгүй байна. 88046194";
                 422: {
                   type: "validation";
@@ -10718,9 +10354,7 @@ export declare const app: Elysia<
                   vehicleKindId: string;
                 };
                 401: "Токен олдсонгүй";
-                404:
-                  | "Байгууллагын мэдээлэл олдсонгүй."
-                  | "Салбарын мэдээлэл олдсонгүй.";
+                404: "Байгууллагын мэдээлэл олдсонгүй." | "Салбарын мэдээлэл олдсонгүй.";
                 402: "Системийн төлбөр хийгдээгүй байна. 88046194";
                 400:
                   | "Машины дугаар болон VIN хоёроос нэгийг нь оруулна уу."
@@ -11048,9 +10682,7 @@ export declare const app: Elysia<
                 }[];
               };
               401: "Токен олдсонгүй";
-              404:
-                | "Байгууллагын мэдээлэл олдсонгүй."
-                | "Салбарын мэдээлэл олдсонгүй.";
+              404: "Байгууллагын мэдээлэл олдсонгүй." | "Салбарын мэдээлэл олдсонгүй.";
               402: "Системийн төлбөр хийгдээгүй байна. 88046194";
               422: {
                 type: "validation";
@@ -11094,9 +10726,7 @@ export declare const app: Elysia<
                 regNum: string | null;
               };
               401: "Токен олдсонгүй";
-              404:
-                | "Байгууллагын мэдээлэл олдсонгүй."
-                | "Салбарын мэдээлэл олдсонгүй.";
+              404: "Байгууллагын мэдээлэл олдсонгүй." | "Салбарын мэдээлэл олдсонгүй.";
               402: "Системийн төлбөр хийгдээгүй байна. 88046194";
               422: {
                 type: "validation";
@@ -11179,9 +10809,7 @@ export declare const app: Elysia<
                 response: {
                   200: number;
                   401: "Токен олдсонгүй";
-                  404:
-                    | "Байгууллагын мэдээлэл олдсонгүй."
-                    | "Салбарын мэдээлэл олдсонгүй.";
+                  404: "Байгууллагын мэдээлэл олдсонгүй." | "Салбарын мэдээлэл олдсонгүй.";
                   402: "Системийн төлбөр хийгдээгүй байна. 88046194";
                   403: "Хандах эрхгүй байна.";
                 };
@@ -11199,9 +10827,7 @@ export declare const app: Elysia<
                 response: {
                   200: number;
                   401: "Токен олдсонгүй";
-                  404:
-                    | "Байгууллагын мэдээлэл олдсонгүй."
-                    | "Салбарын мэдээлэл олдсонгүй.";
+                  404: "Байгууллагын мэдээлэл олдсонгүй." | "Салбарын мэдээлэл олдсонгүй.";
                   402: "Системийн төлбөр хийгдээгүй байна. 88046194";
                   403: "Хандах эрхгүй байна.";
                 };
@@ -11219,9 +10845,7 @@ export declare const app: Elysia<
                 response: {
                   200: number;
                   401: "Токен олдсонгүй";
-                  404:
-                    | "Байгууллагын мэдээлэл олдсонгүй."
-                    | "Салбарын мэдээлэл олдсонгүй.";
+                  404: "Байгууллагын мэдээлэл олдсонгүй." | "Салбарын мэдээлэл олдсонгүй.";
                   402: "Системийн төлбөр хийгдээгүй байна. 88046194";
                   403: "Хандах эрхгүй байна.";
                 };
@@ -11252,9 +10876,7 @@ export declare const app: Elysia<
                 response: {
                   200: number;
                   401: "Токен олдсонгүй";
-                  404:
-                    | "Байгууллагын мэдээлэл олдсонгүй."
-                    | "Салбарын мэдээлэл олдсонгүй.";
+                  404: "Байгууллагын мэдээлэл олдсонгүй." | "Салбарын мэдээлэл олдсонгүй.";
                   402: "Системийн төлбөр хийгдээгүй байна. 88046194";
                   403: "Хандах эрхгүй байна.";
                   422: {
@@ -11284,9 +10906,7 @@ export declare const app: Elysia<
                     count: number;
                   }[];
                   401: "Токен олдсонгүй";
-                  404:
-                    | "Байгууллагын мэдээлэл олдсонгүй."
-                    | "Салбарын мэдээлэл олдсонгүй.";
+                  404: "Байгууллагын мэдээлэл олдсонгүй." | "Салбарын мэдээлэл олдсонгүй.";
                   402: "Системийн төлбөр хийгдээгүй байна. 88046194";
                   403: "Хандах эрхгүй байна.";
                 };
@@ -11310,9 +10930,7 @@ export declare const app: Elysia<
                     month: string;
                   }[];
                   401: "Токен олдсонгүй";
-                  404:
-                    | "Байгууллагын мэдээлэл олдсонгүй."
-                    | "Салбарын мэдээлэл олдсонгүй.";
+                  404: "Байгууллагын мэдээлэл олдсонгүй." | "Салбарын мэдээлэл олдсонгүй.";
                   402: "Системийн төлбөр хийгдээгүй байна. 88046194";
                   403: "Хандах эрхгүй байна.";
                   422: {
@@ -11342,9 +10960,7 @@ export declare const app: Elysia<
                     month: string;
                   }[];
                   401: "Токен олдсонгүй";
-                  404:
-                    | "Байгууллагын мэдээлэл олдсонгүй."
-                    | "Салбарын мэдээлэл олдсонгүй.";
+                  404: "Байгууллагын мэдээлэл олдсонгүй." | "Салбарын мэдээлэл олдсонгүй.";
                   402: "Системийн төлбөр хийгдээгүй байна. 88046194";
                   403: "Хандах эрхгүй байна.";
                 };
@@ -11368,9 +10984,7 @@ export declare const app: Elysia<
                   month: string;
                 }[];
                 401: "Токен олдсонгүй";
-                404:
-                  | "Байгууллагын мэдээлэл олдсонгүй."
-                  | "Салбарын мэдээлэл олдсонгүй.";
+                404: "Байгууллагын мэдээлэл олдсонгүй." | "Салбарын мэдээлэл олдсонгүй.";
                 402: "Системийн төлбөр хийгдээгүй байна. 88046194";
                 422: {
                   type: "validation";
@@ -11401,9 +11015,7 @@ export declare const app: Elysia<
                   month: string;
                 }[];
                 401: "Токен олдсонгүй";
-                404:
-                  | "Байгууллагын мэдээлэл олдсонгүй."
-                  | "Салбарын мэдээлэл олдсонгүй.";
+                404: "Байгууллагын мэдээлэл олдсонгүй." | "Салбарын мэдээлэл олдсонгүй.";
                 402: "Системийн төлбөр хийгдээгүй байна. 88046194";
                 422: {
                   type: "validation";
@@ -11434,9 +11046,7 @@ export declare const app: Elysia<
                   month: string;
                 }[];
                 401: "Токен олдсонгүй";
-                404:
-                  | "Байгууллагын мэдээлэл олдсонгүй."
-                  | "Салбарын мэдээлэл олдсонгүй.";
+                404: "Байгууллагын мэдээлэл олдсонгүй." | "Салбарын мэдээлэл олдсонгүй.";
                 402: "Системийн төлбөр хийгдээгүй байна. 88046194";
                 422: {
                   type: "validation";
@@ -11467,9 +11077,7 @@ export declare const app: Elysia<
                   month: string;
                 }[];
                 401: "Токен олдсонгүй";
-                404:
-                  | "Байгууллагын мэдээлэл олдсонгүй."
-                  | "Салбарын мэдээлэл олдсонгүй.";
+                404: "Байгууллагын мэдээлэл олдсонгүй." | "Салбарын мэдээлэл олдсонгүй.";
                 402: "Системийн төлбөр хийгдээгүй байна. 88046194";
                 422: {
                   type: "validation";
@@ -11504,9 +11112,7 @@ export declare const app: Elysia<
                   };
                 }[];
                 401: "Токен олдсонгүй";
-                404:
-                  | "Байгууллагын мэдээлэл олдсонгүй."
-                  | "Салбарын мэдээлэл олдсонгүй.";
+                404: "Байгууллагын мэдээлэл олдсонгүй." | "Салбарын мэдээлэл олдсонгүй.";
                 402: "Системийн төлбөр хийгдээгүй байна. 88046194";
                 422: {
                   type: "validation";
@@ -11540,9 +11146,7 @@ export declare const app: Elysia<
                   };
                 }[];
                 401: "Токен олдсонгүй";
-                404:
-                  | "Байгууллагын мэдээлэл олдсонгүй."
-                  | "Салбарын мэдээлэл олдсонгүй.";
+                404: "Байгууллагын мэдээлэл олдсонгүй." | "Салбарын мэдээлэл олдсонгүй.";
                 402: "Системийн төлбөр хийгдээгүй байна. 88046194";
                 422: {
                   type: "validation";
@@ -11576,9 +11180,7 @@ export declare const app: Elysia<
                   };
                 }[];
                 401: "Токен олдсонгүй";
-                404:
-                  | "Байгууллагын мэдээлэл олдсонгүй."
-                  | "Салбарын мэдээлэл олдсонгүй.";
+                404: "Байгууллагын мэдээлэл олдсонгүй." | "Салбарын мэдээлэл олдсонгүй.";
                 402: "Системийн төлбөр хийгдээгүй байна. 88046194";
                 422: {
                   type: "validation";
@@ -11609,9 +11211,7 @@ export declare const app: Elysia<
                   date: string;
                 }[];
                 401: "Токен олдсонгүй";
-                404:
-                  | "Байгууллагын мэдээлэл олдсонгүй."
-                  | "Салбарын мэдээлэл олдсонгүй.";
+                404: "Байгууллагын мэдээлэл олдсонгүй." | "Салбарын мэдээлэл олдсонгүй.";
                 402: "Системийн төлбөр хийгдээгүй байна. 88046194";
                 422: {
                   type: "validation";
@@ -11682,9 +11282,7 @@ export declare const app: Elysia<
                 }[];
               };
               401: "Токен олдсонгүй";
-              404:
-                | "Байгууллагын мэдээлэл олдсонгүй."
-                | "Салбарын мэдээлэл олдсонгүй.";
+              404: "Байгууллагын мэдээлэл олдсонгүй." | "Салбарын мэдээлэл олдсонгүй.";
               402: "Системийн төлбөр хийгдээгүй байна. 88046194";
               422: {
                 type: "validation";
@@ -11730,9 +11328,7 @@ export declare const app: Elysia<
                 discountType: "PERCENTAGE" | "FIXED";
               };
               401: "Токен олдсонгүй";
-              404:
-                | "Байгууллагын мэдээлэл олдсонгүй."
-                | "Салбарын мэдээлэл олдсонгүй.";
+              404: "Байгууллагын мэдээлэл олдсонгүй." | "Салбарын мэдээлэл олдсонгүй.";
               402: "Системийн төлбөр хийгдээгүй байна. 88046194";
               422: {
                 type: "validation";
@@ -12100,9 +11696,7 @@ export declare const app: Elysia<
                   priceAfterDiscount: number;
                 };
                 401: "Токен олдсонгүй";
-                404:
-                  | "Байгууллагын мэдээлэл олдсонгүй."
-                  | "Салбарын мэдээлэл олдсонгүй.";
+                404: "Байгууллагын мэдээлэл олдсонгүй." | "Салбарын мэдээлэл олдсонгүй.";
                 402: "Системийн төлбөр хийгдээгүй байна. 88046194";
                 400: "Хэрэглэгчийн ажилтан ID олдсонгүй.";
                 422: {
@@ -12349,9 +11943,7 @@ export declare const app: Elysia<
                 }[];
               };
               401: "Токен олдсонгүй";
-              404:
-                | "Байгууллагын мэдээлэл олдсонгүй."
-                | "Салбарын мэдээлэл олдсонгүй.";
+              404: "Байгууллагын мэдээлэл олдсонгүй." | "Салбарын мэдээлэл олдсонгүй.";
               402: "Системийн төлбөр хийгдээгүй байна. 88046194";
               422: {
                 type: "validation";
@@ -12413,9 +12005,7 @@ export declare const app: Elysia<
                 rank: string | null;
               };
               401: "Токен олдсонгүй";
-              404:
-                | "Байгууллагын мэдээлэл олдсонгүй."
-                | "Салбарын мэдээлэл олдсонгүй.";
+              404: "Байгууллагын мэдээлэл олдсонгүй." | "Салбарын мэдээлэл олдсонгүй.";
               402: "Системийн төлбөр хийгдээгүй байна. 88046194";
               400:
                 | "Машины дугаар болон VIN хоёроос нэгийг нь оруулна уу."
@@ -12486,9 +12076,7 @@ export declare const app: Elysia<
                   }[];
                 };
                 401: "Токен олдсонгүй";
-                404:
-                  | "Байгууллагын мэдээлэл олдсонгүй."
-                  | "Салбарын мэдээлэл олдсонгүй.";
+                404: "Байгууллагын мэдээлэл олдсонгүй." | "Салбарын мэдээлэл олдсонгүй.";
                 402: "Системийн төлбөр хийгдээгүй байна. 88046194";
                 403: "Хандах эрхгүй байна.";
                 422: {
@@ -12701,9 +12289,7 @@ export declare const app: Elysia<
                   oldId: number | null;
                 };
                 401: "Токен олдсонгүй";
-                404:
-                  | "Байгууллагын мэдээлэл олдсонгүй."
-                  | "Салбарын мэдээлэл олдсонгүй.";
+                404: "Байгууллагын мэдээлэл олдсонгүй." | "Салбарын мэдээлэл олдсонгүй.";
                 402: "Системийн төлбөр хийгдээгүй байна. 88046194";
                 422: {
                   type: "validation";
@@ -12864,9 +12450,7 @@ export declare const app: Elysia<
                   paidAmount: number;
                 }[];
                 401: "Токен олдсонгүй";
-                404:
-                  | "Байгууллагын мэдээлэл олдсонгүй."
-                  | "Салбарын мэдээлэл олдсонгүй.";
+                404: "Байгууллагын мэдээлэл олдсонгүй." | "Салбарын мэдээлэл олдсонгүй.";
                 402: "Системийн төлбөр хийгдээгүй байна. 88046194";
                 422: {
                   type: "validation";
@@ -12906,9 +12490,7 @@ export declare const app: Elysia<
                     ordersCancelled: number;
                   };
                   401: "Токен олдсонгүй";
-                  404:
-                    | "Байгууллагын мэдээлэл олдсонгүй."
-                    | "Салбарын мэдээлэл олдсонгүй.";
+                  404: "Байгууллагын мэдээлэл олдсонгүй." | "Салбарын мэдээлэл олдсонгүй.";
                   402: "Системийн төлбөр хийгдээгүй байна. 88046194";
                   422: {
                     type: "validation";
@@ -12946,9 +12528,7 @@ export declare const app: Elysia<
                     period: string;
                   }[];
                   401: "Токен олдсонгүй";
-                  404:
-                    | "Байгууллагын мэдээлэл олдсонгүй."
-                    | "Салбарын мэдээлэл олдсонгүй.";
+                  404: "Байгууллагын мэдээлэл олдсонгүй." | "Салбарын мэдээлэл олдсонгүй.";
                   402: "Системийн төлбөр хийгдээгүй байна. 88046194";
                   422: {
                     type: "validation";
@@ -12991,9 +12571,7 @@ export declare const app: Elysia<
                     totalCommission: number;
                   }[];
                   401: "Токен олдсонгүй";
-                  404:
-                    | "Байгууллагын мэдээлэл олдсонгүй."
-                    | "Салбарын мэдээлэл олдсонгүй.";
+                  404: "Байгууллагын мэдээлэл олдсонгүй." | "Салбарын мэдээлэл олдсонгүй.";
                   402: "Системийн төлбөр хийгдээгүй байна. 88046194";
                   422: {
                     type: "validation";
@@ -13097,9 +12675,7 @@ export declare const app: Elysia<
                   } | null;
                 }[];
                 401: "Токен олдсонгүй";
-                404:
-                  | "Байгууллагын мэдээлэл олдсонгүй."
-                  | "Салбарын мэдээлэл олдсонгүй.";
+                404: "Байгууллагын мэдээлэл олдсонгүй." | "Салбарын мэдээлэл олдсонгүй.";
                 402: "Системийн төлбөр хийгдээгүй байна. 88046194";
                 422: {
                   type: "validation";
@@ -13134,9 +12710,7 @@ export declare const app: Elysia<
                 response: {
                   200: string;
                   401: "Токен олдсонгүй";
-                  404:
-                    | "Байгууллагын мэдээлэл олдсонгүй."
-                    | "Салбарын мэдээлэл олдсонгүй.";
+                  404: "Байгууллагын мэдээлэл олдсонгүй." | "Салбарын мэдээлэл олдсонгүй.";
                   402: "Системийн төлбөр хийгдээгүй байна. 88046194";
                   422: {
                     type: "validation";
@@ -13169,9 +12743,7 @@ export declare const app: Elysia<
                   response: {
                     200: string;
                     401: "Токен олдсонгүй";
-                    404:
-                      | "Байгууллагын мэдээлэл олдсонгүй."
-                      | "Салбарын мэдээлэл олдсонгүй.";
+                    404: "Байгууллагын мэдээлэл олдсонгүй." | "Салбарын мэдээлэл олдсонгүй.";
                     402: "Системийн төлбөр хийгдээгүй байна. 88046194";
                     422: {
                       type: "validation";
@@ -13206,9 +12778,7 @@ export declare const app: Elysia<
                   response: {
                     200: string;
                     401: "Токен олдсонгүй";
-                    404:
-                      | "Байгууллагын мэдээлэл олдсонгүй."
-                      | "Салбарын мэдээлэл олдсонгүй.";
+                    404: "Байгууллагын мэдээлэл олдсонгүй." | "Салбарын мэдээлэл олдсонгүй.";
                     402: "Системийн төлбөр хийгдээгүй байна. 88046194";
                     422: {
                       type: "validation";
@@ -13246,9 +12816,7 @@ export declare const app: Elysia<
                   response: {
                     200: string;
                     401: "Токен олдсонгүй";
-                    404:
-                      | "Байгууллагын мэдээлэл олдсонгүй."
-                      | "Салбарын мэдээлэл олдсонгүй.";
+                    404: "Байгууллагын мэдээлэл олдсонгүй." | "Салбарын мэдээлэл олдсонгүй.";
                     402: "Системийн төлбөр хийгдээгүй байна. 88046194";
                     422: {
                       type: "validation";
@@ -13285,9 +12853,7 @@ export declare const app: Elysia<
                 response: {
                   200: string;
                   401: "Токен олдсонгүй";
-                  404:
-                    | "Байгууллагын мэдээлэл олдсонгүй."
-                    | "Салбарын мэдээлэл олдсонгүй.";
+                  404: "Байгууллагын мэдээлэл олдсонгүй." | "Салбарын мэдээлэл олдсонгүй.";
                   402: "Системийн төлбөр хийгдээгүй байна. 88046194";
                   422: {
                     type: "validation";
@@ -13353,9 +12919,7 @@ export declare const app: Elysia<
                   >[];
                 };
                 401: "Токен олдсонгүй";
-                404:
-                  | "Байгууллагын мэдээлэл олдсонгүй."
-                  | "Салбарын мэдээлэл олдсонгүй.";
+                404: "Байгууллагын мэдээлэл олдсонгүй." | "Салбарын мэдээлэл олдсонгүй.";
                 402: "Системийн төлбөр хийгдээгүй байна. 88046194";
                 422: {
                   type: "validation";
@@ -13408,9 +12972,7 @@ export declare const app: Elysia<
                 }[];
               };
               401: "Токен олдсонгүй";
-              404:
-                | "Байгууллагын мэдээлэл олдсонгүй."
-                | "Салбарын мэдээлэл олдсонгүй.";
+              404: "Байгууллагын мэдээлэл олдсонгүй." | "Салбарын мэдээлэл олдсонгүй.";
               402: "Системийн төлбөр хийгдээгүй байна. 88046194";
               422: {
                 type: "validation";
@@ -13450,9 +13012,7 @@ export declare const app: Elysia<
                 address: string | null;
               };
               401: "Токен олдсонгүй";
-              404:
-                | "Байгууллагын мэдээлэл олдсонгүй."
-                | "Салбарын мэдээлэл олдсонгүй.";
+              404: "Байгууллагын мэдээлэл олдсонгүй." | "Салбарын мэдээлэл олдсонгүй.";
               402: "Системийн төлбөр хийгдээгүй байна. 88046194";
               403: "Хандах эрхгүй байна.";
               422: {
@@ -13527,9 +13087,7 @@ export declare const app: Elysia<
               headers: {};
               response: {
                 401: "Токен олдсонгүй";
-                404:
-                  | "Байгууллагын мэдээлэл олдсонгүй."
-                  | "Салбарын мэдээлэл олдсонгүй.";
+                404: "Байгууллагын мэдээлэл олдсонгүй." | "Салбарын мэдээлэл олдсонгүй.";
                 402: "Системийн төлбөр хийгдээгүй байна. 88046194";
                 403: "Хандах эрхгүй байна.";
                 422: {
@@ -13604,9 +13162,7 @@ export declare const app: Elysia<
                 >[];
               };
               401: "Токен олдсонгүй";
-              404:
-                | "Байгууллагын мэдээлэл олдсонгүй."
-                | "Салбарын мэдээлэл олдсонгүй.";
+              404: "Байгууллагын мэдээлэл олдсонгүй." | "Салбарын мэдээлэл олдсонгүй.";
               402: "Системийн төлбөр хийгдээгүй байна. 88046194";
               422: {
                 type: "validation";
@@ -13652,9 +13208,7 @@ export declare const app: Elysia<
                 imagePath: string | null;
               };
               401: "Токен олдсонгүй";
-              404:
-                | "Байгууллагын мэдээлэл олдсонгүй."
-                | "Салбарын мэдээлэл олдсонгүй.";
+              404: "Байгууллагын мэдээлэл олдсонгүй." | "Салбарын мэдээлэл олдсонгүй.";
               402: "Системийн төлбөр хийгдээгүй байна. 88046194";
               403: "Хандах эрхгүй байна.";
               422: {
@@ -13761,9 +13315,7 @@ export declare const app: Elysia<
                 >[];
               };
               401: "Токен олдсонгүй";
-              404:
-                | "Байгууллагын мэдээлэл олдсонгүй."
-                | "Салбарын мэдээлэл олдсонгүй.";
+              404: "Байгууллагын мэдээлэл олдсонгүй." | "Салбарын мэдээлэл олдсонгүй.";
               402: "Системийн төлбөр хийгдээгүй байна. 88046194";
               422: {
                 type: "validation";
@@ -13801,9 +13353,7 @@ export declare const app: Elysia<
                 description: string | null;
               };
               401: "Токен олдсонгүй";
-              404:
-                | "Байгууллагын мэдээлэл олдсонгүй."
-                | "Салбарын мэдээлэл олдсонгүй.";
+              404: "Байгууллагын мэдээлэл олдсонгүй." | "Салбарын мэдээлэл олдсонгүй.";
               402: "Системийн төлбөр хийгдээгүй байна. 88046194";
               403: "Хандах эрхгүй байна.";
               422: {
@@ -13876,9 +13426,7 @@ export declare const app: Elysia<
               headers: {};
               response: {
                 401: "Токен олдсонгүй";
-                404:
-                  | "Байгууллагын мэдээлэл олдсонгүй."
-                  | "Салбарын мэдээлэл олдсонгүй.";
+                404: "Байгууллагын мэдээлэл олдсонгүй." | "Салбарын мэдээлэл олдсонгүй.";
                 402: "Системийн төлбөр хийгдээгүй байна. 88046194";
                 403: "Хандах эрхгүй байна.";
                 422: {
@@ -13944,9 +13492,7 @@ export declare const app: Elysia<
                 >[];
               };
               401: "Токен олдсонгүй";
-              404:
-                | "Байгууллагын мэдээлэл олдсонгүй."
-                | "Салбарын мэдээлэл олдсонгүй.";
+              404: "Байгууллагын мэдээлэл олдсонгүй." | "Салбарын мэдээлэл олдсонгүй.";
               402: "Системийн төлбөр хийгдээгүй байна. 88046194";
               422: {
                 type: "validation";
@@ -13986,9 +13532,7 @@ export declare const app: Elysia<
                 productCategoryId: string;
               };
               401: "Токен олдсонгүй";
-              404:
-                | "Байгууллагын мэдээлэл олдсонгүй."
-                | "Салбарын мэдээлэл олдсонгүй.";
+              404: "Байгууллагын мэдээлэл олдсонгүй." | "Салбарын мэдээлэл олдсонгүй.";
               402: "Системийн төлбөр хийгдээгүй байна. 88046194";
               403: "Хандах эрхгүй байна.";
               422: {
@@ -14063,9 +13607,7 @@ export declare const app: Elysia<
               headers: {};
               response: {
                 401: "Токен олдсонгүй";
-                404:
-                  | "Байгууллагын мэдээлэл олдсонгүй."
-                  | "Салбарын мэдээлэл олдсонгүй.";
+                404: "Байгууллагын мэдээлэл олдсонгүй." | "Салбарын мэдээлэл олдсонгүй.";
                 402: "Системийн төлбөр хийгдээгүй байна. 88046194";
                 403: "Хандах эрхгүй байна.";
                 422: {
@@ -14161,9 +13703,7 @@ export declare const app: Elysia<
                 >[];
               };
               401: "Токен олдсонгүй";
-              404:
-                | "Байгууллагын мэдээлэл олдсонгүй."
-                | "Салбарын мэдээлэл олдсонгүй.";
+              404: "Байгууллагын мэдээлэл олдсонгүй." | "Салбарын мэдээлэл олдсонгүй.";
               402: "Системийн төлбөр хийгдээгүй байна. 88046194";
               422: {
                 type: "validation";
@@ -14219,9 +13759,7 @@ export declare const app: Elysia<
                   | "DERIVED";
               };
               401: "Токен олдсонгүй";
-              404:
-                | "Байгууллагын мэдээлэл олдсонгүй."
-                | "Салбарын мэдээлэл олдсонгүй.";
+              404: "Байгууллагын мэдээлэл олдсонгүй." | "Салбарын мэдээлэл олдсонгүй.";
               402: "Системийн төлбөр хийгдээгүй байна. 88046194";
               403: "Хандах эрхгүй байна.";
               422: {
@@ -14313,9 +13851,7 @@ export declare const app: Elysia<
               headers: {};
               response: {
                 401: "Токен олдсонгүй";
-                404:
-                  | "Байгууллагын мэдээлэл олдсонгүй."
-                  | "Салбарын мэдээлэл олдсонгүй.";
+                404: "Байгууллагын мэдээлэл олдсонгүй." | "Салбарын мэдээлэл олдсонгүй.";
                 402: "Системийн төлбөр хийгдээгүй байна. 88046194";
                 403: "Хандах эрхгүй байна.";
                 422: {
@@ -14434,9 +13970,7 @@ export declare const app: Elysia<
                 >[];
               };
               401: "Токен олдсонгүй";
-              404:
-                | "Байгууллагын мэдээлэл олдсонгүй."
-                | "Салбарын мэдээлэл олдсонгүй.";
+              404: "Байгууллагын мэдээлэл олдсонгүй." | "Салбарын мэдээлэл олдсонгүй.";
               402: "Системийн төлбөр хийгдээгүй байна. 88046194";
               422: {
                 type: "validation";
@@ -14486,9 +14020,7 @@ export declare const app: Elysia<
                 uomQuantity: number;
               };
               401: "Токен олдсонгүй";
-              404:
-                | "Байгууллагын мэдээлэл олдсонгүй."
-                | "Салбарын мэдээлэл олдсонгүй.";
+              404: "Байгууллагын мэдээлэл олдсонгүй." | "Салбарын мэдээлэл олдсонгүй.";
               402: "Системийн төлбөр хийгдээгүй байна. 88046194";
               403: "Хандах эрхгүй байна.";
               422: {
@@ -14573,9 +14105,7 @@ export declare const app: Elysia<
               headers: {};
               response: {
                 401: "Токен олдсонгүй";
-                404:
-                  | "Байгууллагын мэдээлэл олдсонгүй."
-                  | "Салбарын мэдээлэл олдсонгүй.";
+                404: "Байгууллагын мэдээлэл олдсонгүй." | "Салбарын мэдээлэл олдсонгүй.";
                 402: "Системийн төлбөр хийгдээгүй байна. 88046194";
                 403: "Хандах эрхгүй байна.";
                 422: {
@@ -14617,9 +14147,7 @@ export declare const app: Elysia<
                 oldId: number | null;
               }[];
               401: "Токен олдсонгүй";
-              404:
-                | "Байгууллагын мэдээлэл олдсонгүй."
-                | "Салбарын мэдээлэл олдсонгүй.";
+              404: "Байгууллагын мэдээлэл олдсонгүй." | "Салбарын мэдээлэл олдсонгүй.";
               402: "Системийн төлбөр хийгдээгүй байна. 88046194";
               422: {
                 type: "validation";
@@ -14642,9 +14170,7 @@ export declare const app: Elysia<
             headers: {};
             response: {
               401: "Токен олдсонгүй";
-              404:
-                | "Байгууллагын мэдээлэл олдсонгүй."
-                | "Салбарын мэдээлэл олдсонгүй.";
+              404: "Байгууллагын мэдээлэл олдсонгүй." | "Салбарын мэдээлэл олдсонгүй.";
               402: "Системийн төлбөр хийгдээгүй байна. 88046194";
               403: "Хандах эрхгүй байна.";
             };
@@ -14662,9 +14188,7 @@ export declare const app: Elysia<
               headers: {};
               response: {
                 401: "Токен олдсонгүй";
-                404:
-                  | "Байгууллагын мэдээлэл олдсонгүй."
-                  | "Салбарын мэдээлэл олдсонгүй.";
+                404: "Байгууллагын мэдээлэл олдсонгүй." | "Салбарын мэдээлэл олдсонгүй.";
                 402: "Системийн төлбөр хийгдээгүй байна. 88046194";
                 403: "Хандах эрхгүй байна.";
                 422: {
@@ -14692,9 +14216,7 @@ export declare const app: Elysia<
               headers: {};
               response: {
                 401: "Токен олдсонгүй";
-                404:
-                  | "Байгууллагын мэдээлэл олдсонгүй."
-                  | "Салбарын мэдээлэл олдсонгүй.";
+                404: "Байгууллагын мэдээлэл олдсонгүй." | "Салбарын мэдээлэл олдсонгүй.";
                 402: "Системийн төлбөр хийгдээгүй байна. 88046194";
                 403: "Хандах эрхгүй байна.";
                 422: {
@@ -14750,9 +14272,7 @@ export declare const app: Elysia<
                 >[];
               };
               401: "Токен олдсонгүй";
-              404:
-                | "Байгууллагын мэдээлэл олдсонгүй."
-                | "Салбарын мэдээлэл олдсонгүй.";
+              404: "Байгууллагын мэдээлэл олдсонгүй." | "Салбарын мэдээлэл олдсонгүй.";
               402: "Системийн төлбөр хийгдээгүй байна. 88046194";
               422: {
                 type: "validation";
@@ -14793,9 +14313,7 @@ export declare const app: Elysia<
                 laborTime: number | null;
               };
               401: "Токен олдсонгүй";
-              404:
-                | "Байгууллагын мэдээлэл олдсонгүй."
-                | "Салбарын мэдээлэл олдсонгүй.";
+              404: "Байгууллагын мэдээлэл олдсонгүй." | "Салбарын мэдээлэл олдсонгүй.";
               402: "Системийн төлбөр хийгдээгүй байна. 88046194";
               403: "Хандах эрхгүй байна.";
               409: string;
@@ -14872,9 +14390,7 @@ export declare const app: Elysia<
               headers: {};
               response: {
                 401: "Токен олдсонгүй";
-                404:
-                  | "Байгууллагын мэдээлэл олдсонгүй."
-                  | "Салбарын мэдээлэл олдсонгүй.";
+                404: "Байгууллагын мэдээлэл олдсонгүй." | "Салбарын мэдээлэл олдсонгүй.";
                 402: "Системийн төлбөр хийгдээгүй байна. 88046194";
                 403: "Хандах эрхгүй байна.";
                 422: {
@@ -14928,9 +14444,7 @@ export declare const app: Elysia<
                   }[];
                 };
                 401: "Токен олдсонгүй";
-                404:
-                  | "Байгууллагын мэдээлэл олдсонгүй."
-                  | "Салбарын мэдээлэл олдсонгүй.";
+                404: "Байгууллагын мэдээлэл олдсонгүй." | "Салбарын мэдээлэл олдсонгүй.";
                 402: "Системийн төлбөр хийгдээгүй байна. 88046194";
                 403: "Хандах эрхгүй байна.";
                 422: {
@@ -14959,9 +14473,7 @@ export declare const app: Elysia<
               headers: {};
               response: {
                 401: "Токен олдсонгүй";
-                404:
-                  | "Байгууллагын мэдээлэл олдсонгүй."
-                  | "Салбарын мэдээлэл олдсонгүй.";
+                404: "Байгууллагын мэдээлэл олдсонгүй." | "Салбарын мэдээлэл олдсонгүй.";
                 402: "Системийн төлбөр хийгдээгүй байна. 88046194";
                 403: "Хандах эрхгүй байна.";
                 422: {
@@ -14993,9 +14505,7 @@ export declare const app: Elysia<
                 headers: {};
                 response: {
                   401: "Токен олдсонгүй";
-                  404:
-                    | "Байгууллагын мэдээлэл олдсонгүй."
-                    | "Салбарын мэдээлэл олдсонгүй.";
+                  404: "Байгууллагын мэдээлэл олдсонгүй." | "Салбарын мэдээлэл олдсонгүй.";
                   402: "Системийн төлбөр хийгдээгүй байна. 88046194";
                   403: "Хандах эрхгүй байна.";
                   422: {
@@ -15023,9 +14533,7 @@ export declare const app: Elysia<
                 headers: {};
                 response: {
                   401: "Токен олдсонгүй";
-                  404:
-                    | "Байгууллагын мэдээлэл олдсонгүй."
-                    | "Салбарын мэдээлэл олдсонгүй.";
+                  404: "Байгууллагын мэдээлэл олдсонгүй." | "Салбарын мэдээлэл олдсонгүй.";
                   402: "Системийн төлбөр хийгдээгүй байна. 88046194";
                   403: "Хандах эрхгүй байна.";
                   422: {
@@ -15070,9 +14578,7 @@ export declare const app: Elysia<
                       oldId: number | null;
                     }[];
                     401: "Токен олдсонгүй";
-                    404:
-                      | "Байгууллагын мэдээлэл олдсонгүй."
-                      | "Салбарын мэдээлэл олдсонгүй.";
+                    404: "Байгууллагын мэдээлэл олдсонгүй." | "Салбарын мэдээлэл олдсонгүй.";
                     402: "Системийн төлбөр хийгдээгүй байна. 88046194";
                     403: "Хандах эрхгүй байна.";
                     422: {
@@ -15113,9 +14619,7 @@ export declare const app: Elysia<
               headers: {};
               response: {
                 401: "Токен олдсонгүй";
-                404:
-                  | "Байгууллагын мэдээлэл олдсонгүй."
-                  | "Салбарын мэдээлэл олдсонгүй.";
+                404: "Байгууллагын мэдээлэл олдсонгүй." | "Салбарын мэдээлэл олдсонгүй.";
                 402: "Системийн төлбөр хийгдээгүй байна. 88046194";
                 403: "Хандах эрхгүй байна.";
                 422: {
@@ -15153,9 +14657,7 @@ export declare const app: Elysia<
                 headers: {};
                 response: {
                   401: "Токен олдсонгүй";
-                  404:
-                    | "Байгууллагын мэдээлэл олдсонгүй."
-                    | "Салбарын мэдээлэл олдсонгүй.";
+                  404: "Байгууллагын мэдээлэл олдсонгүй." | "Салбарын мэдээлэл олдсонгүй.";
                   402: "Системийн төлбөр хийгдээгүй байна. 88046194";
                   403: "Хандах эрхгүй байна.";
                   422: {
@@ -15183,9 +14685,7 @@ export declare const app: Elysia<
                 headers: {};
                 response: {
                   401: "Токен олдсонгүй";
-                  404:
-                    | "Байгууллагын мэдээлэл олдсонгүй."
-                    | "Салбарын мэдээлэл олдсонгүй.";
+                  404: "Байгууллагын мэдээлэл олдсонгүй." | "Салбарын мэдээлэл олдсонгүй.";
                   402: "Системийн төлбөр хийгдээгүй байна. 88046194";
                   403: "Хандах эрхгүй байна.";
                   422: {
@@ -15241,9 +14741,7 @@ export declare const app: Elysia<
                   >[];
                 };
                 401: "Токен олдсонгүй";
-                404:
-                  | "Байгууллагын мэдээлэл олдсонгүй."
-                  | "Салбарын мэдээлэл олдсонгүй.";
+                404: "Байгууллагын мэдээлэл олдсонгүй." | "Салбарын мэдээлэл олдсонгүй.";
                 402: "Системийн төлбөр хийгдээгүй байна. 88046194";
                 422: {
                   type: "validation";
@@ -15288,9 +14786,7 @@ export declare const app: Elysia<
                     oldId: number | null;
                   }[];
                   401: "Токен олдсонгүй";
-                  404:
-                    | "Байгууллагын мэдээлэл олдсонгүй."
-                    | "Салбарын мэдээлэл олдсонгүй.";
+                  404: "Байгууллагын мэдээлэл олдсонгүй." | "Салбарын мэдээлэл олдсонгүй.";
                   402: "Системийн төлбөр хийгдээгүй байна. 88046194";
                   400:
                     | "Хяналтын үр дүн оруулах мэдээлэл байхгүй байна."
@@ -15380,9 +14876,7 @@ export declare const app: Elysia<
                   >[];
                 };
                 401: "Токен олдсонгүй";
-                404:
-                  | "Байгууллагын мэдээлэл олдсонгүй."
-                  | "Салбарын мэдээлэл олдсонгүй.";
+                404: "Байгууллагын мэдээлэл олдсонгүй." | "Салбарын мэдээлэл олдсонгүй.";
                 402: "Системийн төлбөр хийгдээгүй байна. 88046194";
                 403: "Хандах эрхгүй байна.";
                 422: {
@@ -15414,9 +14908,7 @@ export declare const app: Elysia<
               response: {
                 200: string;
                 401: "Токен олдсонгүй";
-                404:
-                  | "Байгууллагын мэдээлэл олдсонгүй."
-                  | "Салбарын мэдээлэл олдсонгүй.";
+                404: "Байгууллагын мэдээлэл олдсонгүй." | "Салбарын мэдээлэл олдсонгүй.";
                 402: "Системийн төлбөр хийгдээгүй байна. 88046194";
                 403: "Хандах эрхгүй байна.";
                 422: {
@@ -15524,9 +15016,7 @@ export declare const app: Elysia<
                 headers: {};
                 response: {
                   401: "Токен олдсонгүй";
-                  404:
-                    | "Байгууллагын мэдээлэл олдсонгүй."
-                    | "Салбарын мэдээлэл олдсонгүй.";
+                  404: "Байгууллагын мэдээлэл олдсонгүй." | "Салбарын мэдээлэл олдсонгүй.";
                   402: "Системийн төлбөр хийгдээгүй байна. 88046194";
                   403: "Хандах эрхгүй байна.";
                   422: {
@@ -15561,13 +15051,7 @@ export declare const app: Elysia<
                       fieldId: string | null;
                       code: string | null;
                       description: string | null;
-                      fieldType:
-                        | "BOOLEAN"
-                        | "NUMERIC"
-                        | "TEXT"
-                        | "DATE"
-                        | "RATE"
-                        | "MULTI_CHOICE";
+                      fieldType: "BOOLEAN" | "NUMERIC" | "TEXT" | "DATE" | "RATE" | "MULTI_CHOICE";
                       required: boolean;
                       metadata: unknown;
                       sortIndex: number | null;
@@ -15578,9 +15062,7 @@ export declare const app: Elysia<
                       oldId: number | null;
                     }[];
                     401: "Токен олдсонгүй";
-                    404:
-                      | "Байгууллагын мэдээлэл олдсонгүй."
-                      | "Салбарын мэдээлэл олдсонгүй.";
+                    404: "Байгууллагын мэдээлэл олдсонгүй." | "Салбарын мэдээлэл олдсонгүй.";
                     402: "Системийн төлбөр хийгдээгүй байна. 88046194";
                     403: "Хандах эрхгүй байна.";
                     422: {
@@ -15629,9 +15111,7 @@ export declare const app: Elysia<
                   headers: {};
                   response: {
                     401: "Токен олдсонгүй";
-                    404:
-                      | "Байгууллагын мэдээлэл олдсонгүй."
-                      | "Салбарын мэдээлэл олдсонгүй.";
+                    404: "Байгууллагын мэдээлэл олдсонгүй." | "Салбарын мэдээлэл олдсонгүй.";
                     402: "Системийн төлбөр хийгдээгүй байна. 88046194";
                     403: "Хандах эрхгүй байна.";
                     422: {
@@ -15663,13 +15143,7 @@ export declare const app: Elysia<
                     sortIndex?: number | null | undefined;
                     fieldGroupId?: string | null | undefined;
                     fieldId?: string | null | undefined;
-                    fieldType:
-                      | "BOOLEAN"
-                      | "NUMERIC"
-                      | "TEXT"
-                      | "DATE"
-                      | "RATE"
-                      | "MULTI_CHOICE";
+                    fieldType: "BOOLEAN" | "NUMERIC" | "TEXT" | "DATE" | "RATE" | "MULTI_CHOICE";
                   };
                   params: {
                     id: string;
@@ -15678,9 +15152,7 @@ export declare const app: Elysia<
                   headers: {};
                   response: {
                     401: "Токен олдсонгүй";
-                    404:
-                      | "Байгууллагын мэдээлэл олдсонгүй."
-                      | "Салбарын мэдээлэл олдсонгүй.";
+                    404: "Байгууллагын мэдээлэл олдсонгүй." | "Салбарын мэдээлэл олдсонгүй.";
                     402: "Системийн төлбөр хийгдээгүй байна. 88046194";
                     403: "Хандах эрхгүй байна.";
                     422: {
@@ -15710,9 +15182,7 @@ export declare const app: Elysia<
                   headers: {};
                   response: {
                     401: "Токен олдсонгүй";
-                    404:
-                      | "Байгууллагын мэдээлэл олдсонгүй."
-                      | "Салбарын мэдээлэл олдсонгүй.";
+                    404: "Байгууллагын мэдээлэл олдсонгүй." | "Салбарын мэдээлэл олдсонгүй.";
                     402: "Системийн төлбөр хийгдээгүй байна. 88046194";
                     403: "Хандах эрхгүй байна.";
                     422: {
@@ -15798,9 +15268,7 @@ export declare const app: Elysia<
                   >[];
                 };
                 401: "Токен олдсонгүй";
-                404:
-                  | "Байгууллагын мэдээлэл олдсонгүй."
-                  | "Салбарын мэдээлэл олдсонгүй.";
+                404: "Байгууллагын мэдээлэл олдсонгүй." | "Салбарын мэдээлэл олдсонгүй.";
                 402: "Системийн төлбөр хийгдээгүй байна. 88046194";
                 422: {
                   type: "validation";
@@ -15830,9 +15298,7 @@ export declare const app: Elysia<
               headers: {};
               response: {
                 401: "Токен олдсонгүй";
-                404:
-                  | "Байгууллагын мэдээлэл олдсонгүй."
-                  | "Салбарын мэдээлэл олдсонгүй.";
+                404: "Байгууллагын мэдээлэл олдсонгүй." | "Салбарын мэдээлэл олдсонгүй.";
                 402: "Системийн төлбөр хийгдээгүй байна. 88046194";
                 422: {
                   type: "validation";
@@ -15866,9 +15332,7 @@ export declare const app: Elysia<
                 headers: {};
                 response: {
                   401: "Токен олдсонгүй";
-                  404:
-                    | "Байгууллагын мэдээлэл олдсонгүй."
-                    | "Салбарын мэдээлэл олдсонгүй.";
+                  404: "Байгууллагын мэдээлэл олдсонгүй." | "Салбарын мэдээлэл олдсонгүй.";
                   402: "Системийн төлбөр хийгдээгүй байна. 88046194";
                   422: {
                     type: "validation";
@@ -15895,9 +15359,7 @@ export declare const app: Elysia<
                 headers: {};
                 response: {
                   401: "Токен олдсонгүй";
-                  404:
-                    | "Байгууллагын мэдээлэл олдсонгүй."
-                    | "Салбарын мэдээлэл олдсонгүй.";
+                  404: "Байгууллагын мэдээлэл олдсонгүй." | "Салбарын мэдээлэл олдсонгүй.";
                   402: "Системийн төлбөр хийгдээгүй байна. 88046194";
                   422: {
                     type: "validation";
@@ -15921,12 +15383,7 @@ export declare const app: Elysia<
             body: {};
             params: {};
             query: {
-              state?:
-                | "COMPLETED"
-                | "CREATED"
-                | "SCHEDULED"
-                | "IN_PROGRESS"
-                | undefined;
+              state?: "COMPLETED" | "CREATED" | "SCHEDULED" | "IN_PROGRESS" | undefined;
               id?: string | undefined;
               endDate?: string | undefined;
               templateId?: string | undefined;
@@ -15958,11 +15415,7 @@ export declare const app: Elysia<
                       userInspectedId: string;
                       hours: number | null;
                       mileageKm: number | null;
-                      state:
-                        | "COMPLETED"
-                        | "CREATED"
-                        | "SCHEDULED"
-                        | "IN_PROGRESS";
+                      state: "COMPLETED" | "CREATED" | "SCHEDULED" | "IN_PROGRESS";
                       stateResult:
                         | "FAILED"
                         | "NOT_INSPECTED"
@@ -16016,9 +15469,7 @@ export declare const app: Elysia<
                 >[];
               };
               401: "Токен олдсонгүй";
-              404:
-                | "Байгууллагын мэдээлэл олдсонгүй."
-                | "Салбарын мэдээлэл олдсонгүй.";
+              404: "Байгууллагын мэдээлэл олдсонгүй." | "Салбарын мэдээлэл олдсонгүй.";
               402: "Системийн төлбөр хийгдээгүй байна. 88046194";
               422: {
                 type: "validation";
@@ -16036,12 +15487,7 @@ export declare const app: Elysia<
         inspection: {
           post: {
             body: {
-              state?:
-                | "COMPLETED"
-                | "CREATED"
-                | "SCHEDULED"
-                | "IN_PROGRESS"
-                | undefined;
+              state?: "COMPLETED" | "CREATED" | "SCHEDULED" | "IN_PROGRESS" | undefined;
               oldId?: number | null | undefined;
               note?: string | null | undefined;
               timeCompleted?: Date | null | undefined;
@@ -16064,9 +15510,7 @@ export declare const app: Elysia<
             headers: {};
             response: {
               401: "Токен олдсонгүй";
-              404:
-                | "Байгууллагын мэдээлэл олдсонгүй."
-                | "Салбарын мэдээлэл олдсонгүй.";
+              404: "Байгууллагын мэдээлэл олдсонгүй." | "Салбарын мэдээлэл олдсонгүй.";
               402: "Системийн төлбөр хийгдээгүй байна. 88046194";
               400: "Ажилтны мэдээлэл шаардлагатай.";
               422: {
@@ -16086,12 +15530,7 @@ export declare const app: Elysia<
           ":id": {
             put: {
               body: {
-                state?:
-                  | "COMPLETED"
-                  | "CREATED"
-                  | "SCHEDULED"
-                  | "IN_PROGRESS"
-                  | undefined;
+                state?: "COMPLETED" | "CREATED" | "SCHEDULED" | "IN_PROGRESS" | undefined;
                 oldId?: number | null | undefined;
                 note?: string | null | undefined;
                 timeCompleted?: Date | null | undefined;
@@ -16125,13 +15564,7 @@ export declare const app: Elysia<
                   hours: number | null;
                   mileageKm: number | null;
                   state: "COMPLETED" | "CREATED" | "SCHEDULED" | "IN_PROGRESS";
-                  stateResult:
-                    | "FAILED"
-                    | "NOT_INSPECTED"
-                    | "PASSED"
-                    | "RETURNED"
-                    | "WAIVED"
-                    | null;
+                  stateResult: "FAILED" | "NOT_INSPECTED" | "PASSED" | "RETURNED" | "WAIVED" | null;
                   timeScheduled: Date | null;
                   timeCompleted: Date | null;
                   note: string | null;
@@ -16229,9 +15662,7 @@ export declare const app: Elysia<
                     >[];
                   };
                   401: "Токен олдсонгүй";
-                  404:
-                    | "Байгууллагын мэдээлэл олдсонгүй."
-                    | "Салбарын мэдээлэл олдсонгүй.";
+                  404: "Байгууллагын мэдээлэл олдсонгүй." | "Салбарын мэдээлэл олдсонгүй.";
                   402: "Системийн төлбөр хийгдээгүй байна. 88046194";
                   403: "Хандах эрхгүй байна.";
                   422: {
@@ -16261,9 +15692,7 @@ export declare const app: Elysia<
                 headers: {};
                 response: {
                   401: "Токен олдсонгүй";
-                  404:
-                    | "Байгууллагын мэдээлэл олдсонгүй."
-                    | "Салбарын мэдээлэл олдсонгүй.";
+                  404: "Байгууллагын мэдээлэл олдсонгүй." | "Салбарын мэдээлэл олдсонгүй.";
                   402: "Системийн төлбөр хийгдээгүй байна. 88046194";
                   403: "Хандах эрхгүй байна.";
                   422: {
@@ -16296,9 +15725,7 @@ export declare const app: Elysia<
                   headers: {};
                   response: {
                     401: "Токен олдсонгүй";
-                    404:
-                      | "Байгууллагын мэдээлэл олдсонгүй."
-                      | "Салбарын мэдээлэл олдсонгүй.";
+                    404: "Байгууллагын мэдээлэл олдсонгүй." | "Салбарын мэдээлэл олдсонгүй.";
                     402: "Системийн төлбөр хийгдээгүй байна. 88046194";
                     403: "Хандах эрхгүй байна.";
                     422: {
@@ -16326,9 +15753,7 @@ export declare const app: Elysia<
                   headers: {};
                   response: {
                     401: "Токен олдсонгүй";
-                    404:
-                      | "Байгууллагын мэдээлэл олдсонгүй."
-                      | "Салбарын мэдээлэл олдсонгүй.";
+                    404: "Байгууллагын мэдээлэл олдсонгүй." | "Салбарын мэдээлэл олдсонгүй.";
                     402: "Системийн төлбөр хийгдээгүй байна. 88046194";
                     403: "Хандах эрхгүй байна.";
                     422: {
@@ -16425,9 +15850,7 @@ export declare const app: Elysia<
                   >[];
                 };
                 401: "Токен олдсонгүй";
-                404:
-                  | "Байгууллагын мэдээлэл олдсонгүй."
-                  | "Салбарын мэдээлэл олдсонгүй.";
+                404: "Байгууллагын мэдээлэл олдсонгүй." | "Салбарын мэдээлэл олдсонгүй.";
                 402: "Системийн төлбөр хийгдээгүй байна. 88046194";
                 403: "Хандах эрхгүй байна.";
                 422: {
@@ -16460,9 +15883,7 @@ export declare const app: Elysia<
               headers: {};
               response: {
                 401: "Токен олдсонгүй";
-                404:
-                  | "Байгууллагын мэдээлэл олдсонгүй."
-                  | "Салбарын мэдээлэл олдсонгүй.";
+                404: "Байгууллагын мэдээлэл олдсонгүй." | "Салбарын мэдээлэл олдсонгүй.";
                 402: "Системийн төлбөр хийгдээгүй байна. 88046194";
                 403: "Хандах эрхгүй байна.";
                 422: {
@@ -16498,9 +15919,7 @@ export declare const app: Elysia<
                 headers: {};
                 response: {
                   401: "Токен олдсонгүй";
-                  404:
-                    | "Байгууллагын мэдээлэл олдсонгүй."
-                    | "Салбарын мэдээлэл олдсонгүй.";
+                  404: "Байгууллагын мэдээлэл олдсонгүй." | "Салбарын мэдээлэл олдсонгүй.";
                   402: "Системийн төлбөр хийгдээгүй байна. 88046194";
                   403: "Хандах эрхгүй байна.";
                   422: {
@@ -16528,9 +15947,7 @@ export declare const app: Elysia<
                 headers: {};
                 response: {
                   401: "Токен олдсонгүй";
-                  404:
-                    | "Байгууллагын мэдээлэл олдсонгүй."
-                    | "Салбарын мэдээлэл олдсонгүй.";
+                  404: "Байгууллагын мэдээлэл олдсонгүй." | "Салбарын мэдээлэл олдсонгүй.";
                   402: "Системийн төлбөр хийгдээгүй байна. 88046194";
                   403: "Хандах эрхгүй байна.";
                   422: {
@@ -16589,9 +16006,7 @@ export declare const app: Elysia<
                     >[];
                   };
                   401: "Токен олдсонгүй";
-                  404:
-                    | "Байгууллагын мэдээлэл олдсонгүй."
-                    | "Салбарын мэдээлэл олдсонгүй.";
+                  404: "Байгууллагын мэдээлэл олдсонгүй." | "Салбарын мэдээлэл олдсонгүй.";
                   402: "Системийн төлбөр хийгдээгүй байна. 88046194";
                   422: {
                     type: "validation";
@@ -16620,9 +16035,7 @@ export declare const app: Elysia<
                 headers: {};
                 response: {
                   401: "Токен олдсонгүй";
-                  404:
-                    | "Байгууллагын мэдээлэл олдсонгүй."
-                    | "Салбарын мэдээлэл олдсонгүй.";
+                  404: "Байгууллагын мэдээлэл олдсонгүй." | "Салбарын мэдээлэл олдсонгүй.";
                   402: "Системийн төлбөр хийгдээгүй байна. 88046194";
                   400: "Ажилтны мэдээлэл шаардлагатай.";
                   422: {
@@ -16668,9 +16081,7 @@ export declare const app: Elysia<
                       userCreatedId: string;
                     }[];
                     401: "Токен олдсонгүй";
-                    404:
-                      | "Байгууллагын мэдээлэл олдсонгүй."
-                      | "Салбарын мэдээлэл олдсонгүй.";
+                    404: "Байгууллагын мэдээлэл олдсонгүй." | "Салбарын мэдээлэл олдсонгүй.";
                     402: "Системийн төлбөр хийгдээгүй байна. 88046194";
                     400: "Машины мэдээлэл оруулах мэдээлэл байхгүй байна.";
                     422: {
@@ -16706,9 +16117,7 @@ export declare const app: Elysia<
                   headers: {};
                   response: {
                     401: "Токен олдсонгүй";
-                    404:
-                      | "Байгууллагын мэдээлэл олдсонгүй."
-                      | "Салбарын мэдээлэл олдсонгүй.";
+                    404: "Байгууллагын мэдээлэл олдсонгүй." | "Салбарын мэдээлэл олдсонгүй.";
                     402: "Системийн төлбөр хийгдээгүй байна. 88046194";
                     422: {
                       type: "validation";
@@ -16735,9 +16144,7 @@ export declare const app: Elysia<
                   headers: {};
                   response: {
                     401: "Токен олдсонгүй";
-                    404:
-                      | "Байгууллагын мэдээлэл олдсонгүй."
-                      | "Салбарын мэдээлэл олдсонгүй.";
+                    404: "Байгууллагын мэдээлэл олдсонгүй." | "Салбарын мэдээлэл олдсонгүй.";
                     402: "Системийн төлбөр хийгдээгүй байна. 88046194";
                     422: {
                       type: "validation";
@@ -16818,9 +16225,7 @@ export declare const app: Elysia<
                     >[];
                   };
                   401: "Токен олдсонгүй";
-                  404:
-                    | "Байгууллагын мэдээлэл олдсонгүй."
-                    | "Салбарын мэдээлэл олдсонгүй.";
+                  404: "Байгууллагын мэдээлэл олдсонгүй." | "Салбарын мэдээлэл олдсонгүй.";
                   402: "Системийн төлбөр хийгдээгүй байна. 88046194";
                   422: {
                     type: "validation";
@@ -16850,9 +16255,7 @@ export declare const app: Elysia<
                 headers: {};
                 response: {
                   401: "Токен олдсонгүй";
-                  404:
-                    | "Байгууллагын мэдээлэл олдсонгүй."
-                    | "Салбарын мэдээлэл олдсонгүй.";
+                  404: "Байгууллагын мэдээлэл олдсонгүй." | "Салбарын мэдээлэл олдсонгүй.";
                   402: "Системийн төлбөр хийгдээгүй байна. 88046194";
                   422: {
                     type: "validation";
@@ -16895,9 +16298,7 @@ export declare const app: Elysia<
                       pmQuantity: string | null;
                     }[];
                     401: "Токен олдсонгүй";
-                    404:
-                      | "Байгууллагын мэдээлэл олдсонгүй."
-                      | "Салбарын мэдээлэл олдсонгүй.";
+                    404: "Байгууллагын мэдээлэл олдсонгүй." | "Салбарын мэдээлэл олдсонгүй.";
                     402: "Системийн төлбөр хийгдээгүй байна. 88046194";
                     400: "Бүтээгдэхүүний мэдээлэл оруулах мэдээлэл байхгүй байна.";
                     422: {
@@ -16932,9 +16333,7 @@ export declare const app: Elysia<
                   headers: {};
                   response: {
                     401: "Токен олдсонгүй";
-                    404:
-                      | "Байгууллагын мэдээлэл олдсонгүй."
-                      | "Салбарын мэдээлэл олдсонгүй.";
+                    404: "Байгууллагын мэдээлэл олдсонгүй." | "Салбарын мэдээлэл олдсонгүй.";
                     402: "Системийн төлбөр хийгдээгүй байна. 88046194";
                     422: {
                       type: "validation";
@@ -16961,9 +16360,7 @@ export declare const app: Elysia<
                   headers: {};
                   response: {
                     401: "Токен олдсонгүй";
-                    404:
-                      | "Байгууллагын мэдээлэл олдсонгүй."
-                      | "Салбарын мэдээлэл олдсонгүй.";
+                    404: "Байгууллагын мэдээлэл олдсонгүй." | "Салбарын мэдээлэл олдсонгүй.";
                     402: "Системийн төлбөр хийгдээгүй байна. 88046194";
                     422: {
                       type: "validation";
@@ -17014,9 +16411,7 @@ export declare const app: Elysia<
                   >[];
                 };
                 401: "Токен олдсонгүй";
-                404:
-                  | "Байгууллагын мэдээлэл олдсонгүй."
-                  | "Салбарын мэдээлэл олдсонгүй.";
+                404: "Байгууллагын мэдээлэл олдсонгүй." | "Салбарын мэдээлэл олдсонгүй.";
                 402: "Системийн төлбөр хийгдээгүй байна. 88046194";
                 403: "Хандах эрхгүй байна.";
                 422: {
@@ -17096,9 +16491,7 @@ export declare const app: Elysia<
                     oldId: number | null;
                   };
                   401: "Токен олдсонгүй";
-                  404:
-                    | "Байгууллагын мэдээлэл олдсонгүй."
-                    | "Салбарын мэдээлэл олдсонгүй.";
+                  404: "Байгууллагын мэдээлэл олдсонгүй." | "Салбарын мэдээлэл олдсонгүй.";
                   402: "Системийн төлбөр хийгдээгүй байна. 88046194";
                   403: "Хандах эрхгүй байна.";
                   422: {
@@ -17126,9 +16519,7 @@ export declare const app: Elysia<
                 headers: {};
                 response: {
                   401: "Токен олдсонгүй";
-                  404:
-                    | "Байгууллагын мэдээлэл олдсонгүй."
-                    | "Салбарын мэдээлэл олдсонгүй.";
+                  404: "Байгууллагын мэдээлэл олдсонгүй." | "Салбарын мэдээлэл олдсонгүй.";
                   402: "Системийн төлбөр хийгдээгүй байна. 88046194";
                   403: "Хандах эрхгүй байна.";
                   422: {
@@ -17200,9 +16591,7 @@ export declare const app: Elysia<
                 >[];
               };
               401: "Токен олдсонгүй";
-              404:
-                | "Байгууллагын мэдээлэл олдсонгүй."
-                | "Салбарын мэдээлэл олдсонгүй.";
+              404: "Байгууллагын мэдээлэл олдсонгүй." | "Салбарын мэдээлэл олдсонгүй.";
               402: "Системийн төлбөр хийгдээгүй байна. 88046194";
               422: {
                 type: "validation";
@@ -17248,9 +16637,7 @@ export declare const app: Elysia<
             headers: {};
             response: {
               401: "Токен олдсонгүй";
-              404:
-                | "Байгууллагын мэдээлэл олдсонгүй."
-                | "Салбарын мэдээлэл олдсонгүй.";
+              404: "Байгууллагын мэдээлэл олдсонгүй." | "Салбарын мэдээлэл олдсонгүй.";
               402: "Системийн төлбөр хийгдээгүй байна. 88046194";
               422: {
                 type: "validation";
@@ -17327,9 +16714,7 @@ export declare const app: Elysia<
                   oldId: number | null;
                 };
                 401: "Токен олдсонгүй";
-                404:
-                  | "Байгууллагын мэдээлэл олдсонгүй."
-                  | "Салбарын мэдээлэл олдсонгүй.";
+                404: "Байгууллагын мэдээлэл олдсонгүй." | "Салбарын мэдээлэл олдсонгүй.";
                 402: "Системийн төлбөр хийгдээгүй байна. 88046194";
                 422: {
                   type: "validation";
@@ -17356,9 +16741,7 @@ export declare const app: Elysia<
               headers: {};
               response: {
                 401: "Токен олдсонгүй";
-                404:
-                  | "Байгууллагын мэдээлэл олдсонгүй."
-                  | "Салбарын мэдээлэл олдсонгүй.";
+                404: "Байгууллагын мэдээлэл олдсонгүй." | "Салбарын мэдээлэл олдсонгүй.";
                 402: "Системийн төлбөр хийгдээгүй байна. 88046194";
                 422: {
                   type: "validation";
@@ -17401,9 +16784,7 @@ export declare const app: Elysia<
                     oldId: number | null;
                   }[];
                   401: "Токен олдсонгүй";
-                  404:
-                    | "Байгууллагын мэдээлэл олдсонгүй."
-                    | "Салбарын мэдээлэл олдсонгүй.";
+                  404: "Байгууллагын мэдээлэл олдсонгүй." | "Салбарын мэдээлэл олдсонгүй.";
                   402: "Системийн төлбөр хийгдээгүй байна. 88046194";
                   422: {
                     type: "validation";
@@ -17426,9 +16807,7 @@ export declare const app: Elysia<
                 headers: {};
                 response: {
                   401: "Токен олдсонгүй";
-                  404:
-                    | "Байгууллагын мэдээлэл олдсонгүй."
-                    | "Салбарын мэдээлэл олдсонгүй.";
+                  404: "Байгууллагын мэдээлэл олдсонгүй." | "Салбарын мэдээлэл олдсонгүй.";
                   402: "Системийн төлбөр хийгдээгүй байна. 88046194";
                 };
               };
@@ -17445,9 +16824,7 @@ export declare const app: Elysia<
                   headers: {};
                   response: {
                     401: "Токен олдсонгүй";
-                    404:
-                      | "Байгууллагын мэдээлэл олдсонгүй."
-                      | "Салбарын мэдээлэл олдсонгүй.";
+                    404: "Байгууллагын мэдээлэл олдсонгүй." | "Салбарын мэдээлэл олдсонгүй.";
                     402: "Системийн төлбөр хийгдээгүй байна. 88046194";
                     422: {
                       type: "validation";
@@ -17474,9 +16851,7 @@ export declare const app: Elysia<
                   headers: {};
                   response: {
                     401: "Токен олдсонгүй";
-                    404:
-                      | "Байгууллагын мэдээлэл олдсонгүй."
-                      | "Салбарын мэдээлэл олдсонгүй.";
+                    404: "Байгууллагын мэдээлэл олдсонгүй." | "Салбарын мэдээлэл олдсонгүй.";
                     402: "Системийн төлбөр хийгдээгүй байна. 88046194";
                     422: {
                       type: "validation";
@@ -17532,9 +16907,7 @@ export declare const app: Elysia<
                   >[];
                 };
                 401: "Токен олдсонгүй";
-                404:
-                  | "Байгууллагын мэдээлэл олдсонгүй."
-                  | "Салбарын мэдээлэл олдсонгүй.";
+                404: "Байгууллагын мэдээлэл олдсонгүй." | "Салбарын мэдээлэл олдсонгүй.";
                 402: "Системийн төлбөр хийгдээгүй байна. 88046194";
                 422: {
                   type: "validation";
@@ -17568,9 +16941,7 @@ export declare const app: Elysia<
               headers: {};
               response: {
                 401: "Токен олдсонгүй";
-                404:
-                  | "Байгууллагын мэдээлэл олдсонгүй."
-                  | "Салбарын мэдээлэл олдсонгүй.";
+                404: "Байгууллагын мэдээлэл олдсонгүй." | "Салбарын мэдээлэл олдсонгүй.";
                 402: "Системийн төлбөр хийгдээгүй байна. 88046194";
                 422: {
                   type: "validation";
@@ -17607,9 +16978,7 @@ export declare const app: Elysia<
                 headers: {};
                 response: {
                   401: "Токен олдсонгүй";
-                  404:
-                    | "Байгууллагын мэдээлэл олдсонгүй."
-                    | "Салбарын мэдээлэл олдсонгүй.";
+                  404: "Байгууллагын мэдээлэл олдсонгүй." | "Салбарын мэдээлэл олдсонгүй.";
                   402: "Системийн төлбөр хийгдээгүй байна. 88046194";
                   422: {
                     type: "validation";
@@ -17636,9 +17005,7 @@ export declare const app: Elysia<
                 headers: {};
                 response: {
                   401: "Токен олдсонгүй";
-                  404:
-                    | "Байгууллагын мэдээлэл олдсонгүй."
-                    | "Салбарын мэдээлэл олдсонгүй.";
+                  404: "Байгууллагын мэдээлэл олдсонгүй." | "Салбарын мэдээлэл олдсонгүй.";
                   402: "Системийн төлбөр хийгдээгүй байна. 88046194";
                   422: {
                     type: "validation";
@@ -17684,13 +17051,7 @@ export declare const app: Elysia<
                       task: {
                         machineId: string | null;
                         sourceType: string | null;
-                        priority:
-                          | "CRITICAL"
-                          | "HIGH"
-                          | "MEDIUM"
-                          | "LOW"
-                          | "PLANNED"
-                          | null;
+                        priority: "CRITICAL" | "HIGH" | "MEDIUM" | "LOW" | "PLANNED" | null;
                         workOrderId: string | null;
                         templateId: string | null;
                         serviceKindId: string | null;
@@ -17764,9 +17125,7 @@ export declare const app: Elysia<
                   >[];
                 };
                 401: "Токен олдсонгүй";
-                404:
-                  | "Байгууллагын мэдээлэл олдсонгүй."
-                  | "Салбарын мэдээлэл олдсонгүй.";
+                404: "Байгууллагын мэдээлэл олдсонгүй." | "Салбарын мэдээлэл олдсонгүй.";
                 402: "Системийн төлбөр хийгдээгүй байна. 88046194";
                 422: {
                   type: "validation";
@@ -17784,12 +17143,7 @@ export declare const app: Elysia<
           task: {
             post: {
               body: {
-                state?:
-                  | "COMPLETED"
-                  | "IN_PROGRESS"
-                  | "OPEN"
-                  | "CLOSED"
-                  | undefined;
+                state?: "COMPLETED" | "IN_PROGRESS" | "OPEN" | "CLOSED" | undefined;
                 oldId?: number | null | undefined;
                 description?: string | null | undefined;
                 serviceKindId?: string | null | undefined;
@@ -17797,14 +17151,7 @@ export declare const app: Elysia<
                 templateId?: string | null | undefined;
                 machineId?: string | null | undefined;
                 sourceType?: string | null | undefined;
-                priority?:
-                  | "CRITICAL"
-                  | "HIGH"
-                  | "MEDIUM"
-                  | "LOW"
-                  | "PLANNED"
-                  | null
-                  | undefined;
+                priority?: "CRITICAL" | "HIGH" | "MEDIUM" | "LOW" | "PLANNED" | null | undefined;
                 workOrderId?: string | null | undefined;
                 manHour?: number | null | undefined;
               };
@@ -17825,20 +17172,12 @@ export declare const app: Elysia<
                   templateId: string | null;
                   machineId: string | null;
                   sourceType: string | null;
-                  priority:
-                    | "CRITICAL"
-                    | "HIGH"
-                    | "MEDIUM"
-                    | "LOW"
-                    | "PLANNED"
-                    | null;
+                  priority: "CRITICAL" | "HIGH" | "MEDIUM" | "LOW" | "PLANNED" | null;
                   workOrderId: string | null;
                   manHour: number | null;
                 };
                 401: "Токен олдсонгүй";
-                404:
-                  | "Байгууллагын мэдээлэл олдсонгүй."
-                  | "Салбарын мэдээлэл олдсонгүй.";
+                404: "Байгууллагын мэдээлэл олдсонгүй." | "Салбарын мэдээлэл олдсонгүй.";
                 402: "Системийн төлбөр хийгдээгүй байна. 88046194";
                 422: {
                   type: "validation";
@@ -17857,12 +17196,7 @@ export declare const app: Elysia<
             ":id": {
               put: {
                 body: {
-                  state?:
-                    | "COMPLETED"
-                    | "IN_PROGRESS"
-                    | "OPEN"
-                    | "CLOSED"
-                    | undefined;
+                  state?: "COMPLETED" | "IN_PROGRESS" | "OPEN" | "CLOSED" | undefined;
                   oldId?: number | null | undefined;
                   description?: string | null | undefined;
                   serviceKindId?: string | null | undefined;
@@ -17870,14 +17204,7 @@ export declare const app: Elysia<
                   templateId?: string | null | undefined;
                   machineId?: string | null | undefined;
                   sourceType?: string | null | undefined;
-                  priority?:
-                    | "CRITICAL"
-                    | "HIGH"
-                    | "MEDIUM"
-                    | "LOW"
-                    | "PLANNED"
-                    | null
-                    | undefined;
+                  priority?: "CRITICAL" | "HIGH" | "MEDIUM" | "LOW" | "PLANNED" | null | undefined;
                   workOrderId?: string | null | undefined;
                   manHour?: number | null | undefined;
                 };
@@ -17888,9 +17215,7 @@ export declare const app: Elysia<
                 headers: {};
                 response: {
                   401: "Токен олдсонгүй";
-                  404:
-                    | "Байгууллагын мэдээлэл олдсонгүй."
-                    | "Салбарын мэдээлэл олдсонгүй.";
+                  404: "Байгууллагын мэдээлэл олдсонгүй." | "Салбарын мэдээлэл олдсонгүй.";
                   402: "Системийн төлбөр хийгдээгүй байна. 88046194";
                   422: {
                     type: "validation";
@@ -17917,9 +17242,7 @@ export declare const app: Elysia<
                 headers: {};
                 response: {
                   401: "Токен олдсонгүй";
-                  404:
-                    | "Байгууллагын мэдээлэл олдсонгүй."
-                    | "Салбарын мэдээлэл олдсонгүй.";
+                  404: "Байгууллагын мэдээлэл олдсонгүй." | "Салбарын мэдээлэл олдсонгүй.";
                   402: "Системийн төлбөр хийгдээгүй байна. 88046194";
                   422: {
                     type: "validation";
@@ -17957,12 +17280,7 @@ export declare const app: Elysia<
                       machineId: string;
                       sourceType: string | null;
                       type: "CORRECTIVE" | "PREVENTIVE";
-                      priority:
-                        | "CRITICAL"
-                        | "HIGH"
-                        | "MEDIUM"
-                        | "LOW"
-                        | "PLANNED";
+                      priority: "CRITICAL" | "HIGH" | "MEDIUM" | "LOW" | "PLANNED";
                       state: "COMPLETED" | "IN_PROGRESS" | "OPEN" | "CLOSED";
                       dateClosed: Date | null;
                       id: string;
@@ -18005,9 +17323,7 @@ export declare const app: Elysia<
                 >[];
               };
               401: "Токен олдсонгүй";
-              404:
-                | "Байгууллагын мэдээлэл олдсонгүй."
-                | "Салбарын мэдээлэл олдсонгүй.";
+              404: "Байгууллагын мэдээлэл олдсонгүй." | "Салбарын мэдээлэл олдсонгүй.";
               402: "Системийн төлбөр хийгдээгүй байна. 88046194";
               422: {
                 type: "validation";
@@ -18025,12 +17341,7 @@ export declare const app: Elysia<
         "work-order": {
           post: {
             body: {
-              state?:
-                | "COMPLETED"
-                | "IN_PROGRESS"
-                | "OPEN"
-                | "CLOSED"
-                | undefined;
+              state?: "COMPLETED" | "IN_PROGRESS" | "OPEN" | "CLOSED" | undefined;
               oldId?: number | null | undefined;
               sourceType?: string | null | undefined;
               dateClosed?: Date | null | undefined;
@@ -18056,9 +17367,7 @@ export declare const app: Elysia<
                 dateClosed: Date | null;
               };
               401: "Токен олдсонгүй";
-              404:
-                | "Байгууллагын мэдээлэл олдсонгүй."
-                | "Салбарын мэдээлэл олдсонгүй.";
+              404: "Байгууллагын мэдээлэл олдсонгүй." | "Салбарын мэдээлэл олдсонгүй.";
               402: "Системийн төлбөр хийгдээгүй байна. 88046194";
               422: {
                 type: "validation";
@@ -18077,23 +17386,12 @@ export declare const app: Elysia<
           ":id": {
             put: {
               body: {
-                state?:
-                  | "COMPLETED"
-                  | "IN_PROGRESS"
-                  | "OPEN"
-                  | "CLOSED"
-                  | undefined;
+                state?: "COMPLETED" | "IN_PROGRESS" | "OPEN" | "CLOSED" | undefined;
                 oldId?: number | null | undefined;
                 type?: "CORRECTIVE" | "PREVENTIVE" | undefined;
                 machineId?: string | undefined;
                 sourceType?: string | null | undefined;
-                priority?:
-                  | "CRITICAL"
-                  | "HIGH"
-                  | "MEDIUM"
-                  | "LOW"
-                  | "PLANNED"
-                  | undefined;
+                priority?: "CRITICAL" | "HIGH" | "MEDIUM" | "LOW" | "PLANNED" | undefined;
                 dateClosed?: Date | null | undefined;
               };
               params: {
@@ -18103,9 +17401,7 @@ export declare const app: Elysia<
               headers: {};
               response: {
                 401: "Токен олдсонгүй";
-                404:
-                  | "Байгууллагын мэдээлэл олдсонгүй."
-                  | "Салбарын мэдээлэл олдсонгүй.";
+                404: "Байгууллагын мэдээлэл олдсонгүй." | "Салбарын мэдээлэл олдсонгүй.";
                 402: "Системийн төлбөр хийгдээгүй байна. 88046194";
                 422: {
                   type: "validation";
@@ -18132,9 +17428,7 @@ export declare const app: Elysia<
               headers: {};
               response: {
                 401: "Токен олдсонгүй";
-                404:
-                  | "Байгууллагын мэдээлэл олдсонгүй."
-                  | "Салбарын мэдээлэл олдсонгүй.";
+                404: "Байгууллагын мэдээлэл олдсонгүй." | "Салбарын мэдээлэл олдсонгүй.";
                 402: "Системийн төлбөр хийгдээгүй байна. 88046194";
                 422: {
                   type: "validation";
@@ -18188,9 +17482,7 @@ export declare const app: Elysia<
                 >[];
               };
               401: "Токен олдсонгүй";
-              404:
-                | "Байгууллагын мэдээлэл олдсонгүй."
-                | "Салбарын мэдээлэл олдсонгүй.";
+              404: "Байгууллагын мэдээлэл олдсонгүй." | "Салбарын мэдээлэл олдсонгүй.";
               402: "Системийн төлбөр хийгдээгүй байна. 88046194";
               422: {
                 type: "validation";
@@ -18226,9 +17518,7 @@ export declare const app: Elysia<
                 description: string | null;
               };
               401: "Токен олдсонгүй";
-              404:
-                | "Байгууллагын мэдээлэл олдсонгүй."
-                | "Салбарын мэдээлэл олдсонгүй.";
+              404: "Байгууллагын мэдээлэл олдсонгүй." | "Салбарын мэдээлэл олдсонгүй.";
               402: "Системийн төлбөр хийгдээгүй байна. 88046194";
               422: {
                 type: "validation";
@@ -18267,9 +17557,7 @@ export declare const app: Elysia<
                   oldId: number | null;
                 };
                 401: "Токен олдсонгүй";
-                404:
-                  | "Байгууллагын мэдээлэл олдсонгүй."
-                  | "Салбарын мэдээлэл олдсонгүй.";
+                404: "Байгууллагын мэдээлэл олдсонгүй." | "Салбарын мэдээлэл олдсонгүй.";
                 402: "Системийн төлбөр хийгдээгүй байна. 88046194";
                 422: {
                   type: "validation";
@@ -18296,9 +17584,7 @@ export declare const app: Elysia<
               headers: {};
               response: {
                 401: "Токен олдсонгүй";
-                404:
-                  | "Байгууллагын мэдээлэл олдсонгүй."
-                  | "Салбарын мэдээлэл олдсонгүй.";
+                404: "Байгууллагын мэдээлэл олдсонгүй." | "Салбарын мэдээлэл олдсонгүй.";
                 402: "Системийн төлбөр хийгдээгүй байна. 88046194";
                 422: {
                   type: "validation";
@@ -18352,9 +17638,7 @@ export declare const app: Elysia<
                 >[];
               };
               401: "Токен олдсонгүй";
-              404:
-                | "Байгууллагын мэдээлэл олдсонгүй."
-                | "Салбарын мэдээлэл олдсонгүй.";
+              404: "Байгууллагын мэдээлэл олдсонгүй." | "Салбарын мэдээлэл олдсонгүй.";
               402: "Системийн төлбөр хийгдээгүй байна. 88046194";
               422: {
                 type: "validation";
@@ -18394,9 +17678,7 @@ export declare const app: Elysia<
                 isActive: boolean;
               };
               401: "Токен олдсонгүй";
-              404:
-                | "Байгууллагын мэдээлэл олдсонгүй."
-                | "Салбарын мэдээлэл олдсонгүй.";
+              404: "Байгууллагын мэдээлэл олдсонгүй." | "Салбарын мэдээлэл олдсонгүй.";
               402: "Системийн төлбөр хийгдээгүй байна. 88046194";
               422: {
                 type: "validation";
@@ -18439,9 +17721,7 @@ export declare const app: Elysia<
                   oldId: number | null;
                 };
                 401: "Токен олдсонгүй";
-                404:
-                  | "Байгууллагын мэдээлэл олдсонгүй."
-                  | "Салбарын мэдээлэл олдсонгүй.";
+                404: "Байгууллагын мэдээлэл олдсонгүй." | "Салбарын мэдээлэл олдсонгүй.";
                 402: "Системийн төлбөр хийгдээгүй байна. 88046194";
                 422: {
                   type: "validation";
@@ -18468,9 +17748,7 @@ export declare const app: Elysia<
               headers: {};
               response: {
                 401: "Токен олдсонгүй";
-                404:
-                  | "Байгууллагын мэдээлэл олдсонгүй."
-                  | "Салбарын мэдээлэл олдсонгүй.";
+                404: "Байгууллагын мэдээлэл олдсонгүй." | "Салбарын мэдээлэл олдсонгүй.";
                 402: "Системийн төлбөр хийгдээгүй байна. 88046194";
                 422: {
                   type: "validation";
@@ -18523,9 +17801,7 @@ export declare const app: Elysia<
               >[];
             };
             401: "Токен олдсонгүй";
-            404:
-              | "Байгууллагын мэдээлэл олдсонгүй."
-              | "Салбарын мэдээлэл олдсонгүй.";
+            404: "Байгууллагын мэдээлэл олдсонгүй." | "Салбарын мэдээлэл олдсонгүй.";
             402: "Системийн төлбөр хийгдээгүй байна. 88046194";
             403: "Хандах эрхгүй байна.";
             422: {
@@ -18572,9 +17848,7 @@ export declare const app: Elysia<
               baseFactor: number | null;
             };
             401: "Токен олдсонгүй";
-            404:
-              | "Байгууллагын мэдээлэл олдсонгүй."
-              | "Салбарын мэдээлэл олдсонгүй.";
+            404: "Байгууллагын мэдээлэл олдсонгүй." | "Салбарын мэдээлэл олдсонгүй.";
             402: "Системийн төлбөр хийгдээгүй байна. 88046194";
             403: "Хандах эрхгүй байна.";
             422: {
@@ -18624,9 +17898,7 @@ export declare const app: Elysia<
                 oldId: number | null;
               };
               401: "Токен олдсонгүй";
-              404:
-                | "Байгууллагын мэдээлэл олдсонгүй."
-                | "Салбарын мэдээлэл олдсонгүй.";
+              404: "Байгууллагын мэдээлэл олдсонгүй." | "Салбарын мэдээлэл олдсонгүй.";
               402: "Системийн төлбөр хийгдээгүй байна. 88046194";
               403: "Хандах эрхгүй байна.";
               422: {
@@ -18654,9 +17926,7 @@ export declare const app: Elysia<
             headers: {};
             response: {
               401: "Токен олдсонгүй";
-              404:
-                | "Байгууллагын мэдээлэл олдсонгүй."
-                | "Салбарын мэдээлэл олдсонгүй.";
+              404: "Байгууллагын мэдээлэл олдсонгүй." | "Салбарын мэдээлэл олдсонгүй.";
               402: "Системийн төлбөр хийгдээгүй байна. 88046194";
               403: "Хандах эрхгүй байна.";
               422: {
@@ -18716,9 +17986,7 @@ export declare const app: Elysia<
                 >[];
               };
               401: "Токен олдсонгүй";
-              404:
-                | "Байгууллагын мэдээлэл олдсонгүй."
-                | "Салбарын мэдээлэл олдсонгүй.";
+              404: "Байгууллагын мэдээлэл олдсонгүй." | "Салбарын мэдээлэл олдсонгүй.";
               402: "Системийн төлбөр хийгдээгүй байна. 88046194";
               422: {
                 type: "validation";
@@ -18760,9 +18028,7 @@ export declare const app: Elysia<
                 timeLastActive: string;
               };
               401: "Токен олдсонгүй";
-              404:
-                | "Байгууллагын мэдээлэл олдсонгүй."
-                | "Салбарын мэдээлэл олдсонгүй.";
+              404: "Байгууллагын мэдээлэл олдсонгүй." | "Салбарын мэдээлэл олдсонгүй.";
               402: "Системийн төлбөр хийгдээгүй байна. 88046194";
               422: {
                 type: "validation";
@@ -18907,9 +18173,7 @@ export declare const app: Elysia<
                 >[];
               };
               401: "Токен олдсонгүй";
-              404:
-                | "Байгууллагын мэдээлэл олдсонгүй."
-                | "Салбарын мэдээлэл олдсонгүй.";
+              404: "Байгууллагын мэдээлэл олдсонгүй." | "Салбарын мэдээлэл олдсонгүй.";
               402: "Системийн төлбөр хийгдээгүй байна. 88046194";
               422: {
                 type: "validation";
@@ -18947,9 +18211,7 @@ export declare const app: Elysia<
                 nmKey: string | null;
               };
               401: "Токен олдсонгүй";
-              404:
-                | "Байгууллагын мэдээлэл олдсонгүй."
-                | "Салбарын мэдээлэл олдсонгүй.";
+              404: "Байгууллагын мэдээлэл олдсонгүй." | "Салбарын мэдээлэл олдсонгүй.";
               402: "Системийн төлбөр хийгдээгүй байна. 88046194";
               409: string;
               422: {
@@ -18987,11 +18249,7 @@ export declare const app: Elysia<
                       updatedAt: Date;
                       companyId: string;
                       branchId: string;
-                      kind:
-                        | "ADMIN"
-                        | "COMPANY_ADMIN"
-                        | "CUSTOMER"
-                        | "INSPECTION";
+                      kind: "ADMIN" | "COMPANY_ADMIN" | "CUSTOMER" | "INSPECTION";
                       employeeId: string | null;
                       role: string | null;
                       banned: boolean | null;
@@ -19005,9 +18263,7 @@ export declare const app: Elysia<
                     };
                   }[];
                   401: "Токен олдсонгүй";
-                  404:
-                    | "Байгууллагын мэдээлэл олдсонгүй."
-                    | "Салбарын мэдээлэл олдсонгүй.";
+                  404: "Байгууллагын мэдээлэл олдсонгүй." | "Салбарын мэдээлэл олдсонгүй.";
                   402: "Системийн төлбөр хийгдээгүй байна. 88046194";
                   422: {
                     type: "validation";
@@ -19081,9 +18337,7 @@ export declare const app: Elysia<
               headers: {};
               response: {
                 401: "Токен олдсонгүй";
-                404:
-                  | "Байгууллагын мэдээлэл олдсонгүй."
-                  | "Салбарын мэдээлэл олдсонгүй.";
+                404: "Байгууллагын мэдээлэл олдсонгүй." | "Салбарын мэдээлэл олдсонгүй.";
                 402: "Системийн төлбөр хийгдээгүй байна. 88046194";
                 422: {
                   type: "validation";
@@ -19148,9 +18402,7 @@ export declare const app: Elysia<
                 >[];
               };
               401: "Токен олдсонгүй";
-              404:
-                | "Байгууллагын мэдээлэл олдсонгүй."
-                | "Салбарын мэдээлэл олдсонгүй.";
+              404: "Байгууллагын мэдээлэл олдсонгүй." | "Салбарын мэдээлэл олдсонгүй.";
               402: "Системийн төлбөр хийгдээгүй байна. 88046194";
               422: {
                 type: "validation";
@@ -19190,9 +18442,7 @@ export declare const app: Elysia<
                 title: string;
               };
               401: "Токен олдсонгүй";
-              404:
-                | "Байгууллагын мэдээлэл олдсонгүй."
-                | "Салбарын мэдээлэл олдсонгүй.";
+              404: "Байгууллагын мэдээлэл олдсонгүй." | "Салбарын мэдээлэл олдсонгүй.";
               402: "Системийн төлбөр хийгдээгүй байна. 88046194";
               422: {
                 type: "validation";
@@ -19333,9 +18583,7 @@ export declare const app: Elysia<
               headers: {};
               response: {
                 401: "Токен олдсонгүй";
-                404:
-                  | "Байгууллагын мэдээлэл олдсонгүй."
-                  | "Салбарын мэдээлэл олдсонгүй.";
+                404: "Байгууллагын мэдээлэл олдсонгүй." | "Салбарын мэдээлэл олдсонгүй.";
                 402: "Системийн төлбөр хийгдээгүй байна. 88046194";
                 422: {
                   type: "validation";
@@ -19360,13 +18608,7 @@ export declare const app: Elysia<
             body: {};
             params: {};
             query: {
-              state?:
-                | "DELIVERED"
-                | "PENDING"
-                | "FAILED"
-                | "SENT"
-                | "READ"
-                | undefined;
+              state?: "DELIVERED" | "PENDING" | "FAILED" | "SENT" | "READ" | undefined;
               nmNotificationId?: string | undefined;
               nmDeviceId?: string | undefined;
               pagination: {
@@ -19385,12 +18627,7 @@ export declare const app: Elysia<
                       nmNotificationId: string;
                       nmDeviceId: string;
                       providerMessageId: string;
-                      state:
-                        | "DELIVERED"
-                        | "PENDING"
-                        | "FAILED"
-                        | "SENT"
-                        | "READ";
+                      state: "DELIVERED" | "PENDING" | "FAILED" | "SENT" | "READ";
                       timeSent: string | null;
                       timeDelivered: string | null;
                       timeRead: string | null;
@@ -19429,9 +18666,7 @@ export declare const app: Elysia<
                 >[];
               };
               401: "Токен олдсонгүй";
-              404:
-                | "Байгууллагын мэдээлэл олдсонгүй."
-                | "Салбарын мэдээлэл олдсонгүй.";
+              404: "Байгууллагын мэдээлэл олдсонгүй." | "Салбарын мэдээлэл олдсонгүй.";
               402: "Системийн төлбөр хийгдээгүй байна. 88046194";
               422: {
                 type: "validation";
@@ -19636,9 +18871,7 @@ export declare const app: Elysia<
                   };
                 }[];
                 401: "Токен олдсонгүй";
-                404:
-                  | "Байгууллагын мэдээлэл олдсонгүй."
-                  | "Салбарын мэдээлэл олдсонгүй.";
+                404: "Байгууллагын мэдээлэл олдсонгүй." | "Салбарын мэдээлэл олдсонгүй.";
                 402: "Системийн төлбөр хийгдээгүй байна. 88046194";
               };
             };

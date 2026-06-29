@@ -24,13 +24,13 @@ export function ControlOrderList({
     <section className="mt-4 grid gap-3 lg:grid-cols-2">
       {loading && (
         <div className="rounded-[15px] border border-dashed border-slate-200 bg-white p-5 text-center text-sm text-slate-500">
-          Хяналтын ажлууд уншиж байна...
+          Засвар үйлчилгээний ажлууд уншиж байна...
         </div>
       )}
 
       {!loading && !error && orders.length === 0 && (
         <div className="rounded-[15px] border border-dashed border-slate-200 bg-white p-5 text-center text-sm text-slate-500">
-          Хяналтанд буй ажил олдсонгүй.
+          Засвар үйлчилгээний ажил олдсонгүй.
         </div>
       )}
 

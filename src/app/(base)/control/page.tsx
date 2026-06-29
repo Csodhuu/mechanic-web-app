@@ -106,7 +106,7 @@ export default function Control() {
       setOrders(activeRes.data?.result ?? []);
     } catch (fetchError) {
       console.error("Failed to fetch control orders:", fetchError);
-      setError("Хяналтын ажлуудыг уншихад алдаа гарлаа.");
+      setError("Засвар үйлчилгээний ажлуудыг уншихад алдаа гарлаа.");
     } finally {
       setLoading(false);
     }
@@ -136,14 +136,14 @@ export default function Control() {
 
       if (response.error || !response.data) throw response.error;
 
-      toast.success("Хяналтанд шилжлээ.");
+      toast.success("Засвар үйлчилгээ эхэллээ.");
       setRefreshKey((current) => current + 1);
       if (activeState === "CREATED") {
         handleTabChange("PROGRESSING");
       }
     } catch (mutateError) {
-      console.error("Failed to start control:", mutateError);
-      toast.error("Хяналт руу шилжүүлэхэд алдаа гарлаа.");
+      console.error("Failed to start repair service:", mutateError);
+      toast.error("Засвар үйлчилгээ эхлүүлэхэд алдаа гарлаа.");
     } finally {
       setMutatingId(null);
     }
@@ -168,14 +168,14 @@ export default function Control() {
 
       if (response.error || !response.data) throw response.error;
 
-      toast.success("Хяналт дууслаа.");
+      toast.success("Засвар үйлчилгээ дууслаа.");
       setRefreshKey((current) => current + 1);
       if (activeState === "PROGRESSING") {
         handleTabChange("COMPLETE");
       }
     } catch (mutateError) {
-      console.error("Failed to complete control:", mutateError);
-      toast.error("Хяналтыг дуусгахад алдаа гарлаа.");
+      console.error("Failed to complete repair service:", mutateError);
+      toast.error("Засвар үйлчилгээ дуусгахад алдаа гарлаа.");
     } finally {
       setMutatingId(null);
     }

@@ -72,8 +72,16 @@ export function ProfileContent({ user }: { user: MeQuery }) {
         <div className={cn("rounded-2xl border border-slate-200/80 bg-white px-4 shadow-sm")}>
           <ProfileDetailRow icon={Building2} label="Компанийн ID" value={user.companyId} />
           <ProfileDetailRow icon={IdCard} label="Салбарын ID" value={user.branchId} />
-          <ProfileDetailRow icon={CalendarDays} label="Үүссэн огноо" value={formatProfileDate(user.createdAt)} />
-          <ProfileDetailRow icon={BadgeCheck} label="Имэйл баталгаажсан" value={user.emailVerified} />
+          <ProfileDetailRow
+            icon={CalendarDays}
+            label="Үүссэн огноо"
+            value={formatProfileDate(user.createdAt)}
+          />
+          <ProfileDetailRow
+            icon={BadgeCheck}
+            label="Имэйл баталгаажсан"
+            value={user.emailVerified}
+          />
         </div>
       </section>
     </>

@@ -12,7 +12,7 @@ import { CpOrderQuery } from "../../_types/cp-order";
 const statusFilters = [
   { value: "ALL", label: "Бүгд" },
   { value: "CREATED", label: "Шинэ" },
-  { value: "PROGRESSING", label: "Явагдаж буй" },
+  { value: "PROGRESSING", label: "Засвар явагдаж буй" },
   { value: "COMPLETE", label: "Дууссан" },
 ] as const;
 
@@ -27,7 +27,8 @@ type StatusFilter = (typeof statusFilters)[number]["value"];
 type SearchField = (typeof searchFields)[number]["value"];
 type CpOrderQueryParams = Parameters<(typeof apiClient.api.crm)["cp-order"]["get"]>[0]["query"];
 
-const formatDate = (value?: string | null) => (value ? dayjs(value).format("YYYY-MM-DD HH.mm") : "-");
+const formatDate = (value?: string | null) =>
+  value ? dayjs(value).format("YYYY-MM-DD HH.mm") : "-";
 
 export default function ServiceList({ refreshKey }: { refreshKey: number }) {
   const router = useRouter();
@@ -87,7 +88,9 @@ export default function ServiceList({ refreshKey }: { refreshKey: number }) {
       <div className="flex items-center justify-between border-b border-slate-100 px-4 py-3 sm:px-5">
         <div>
           <h2 className="text-base font-semibold text-slate-950">Засвар үйлчилгээ</h2>
-          <p className="mt-0.5 text-xs text-slate-500">Нийт {data?.totalCount ?? orders.length} захиалга</p>
+          <p className="mt-0.5 text-xs text-slate-500">
+            Нийт {data?.totalCount ?? orders.length} захиалга
+          </p>
         </div>
         <span className="rounded-full bg-blue-50 px-2.5 py-1 text-xs font-medium text-blue-700">
           Идэвхтэй
@@ -185,7 +188,9 @@ export default function ServiceList({ refreshKey }: { refreshKey: number }) {
                   </span>
                 </div>
                 <div className="mt-1 flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-slate-500">
-                  <span className="font-medium text-slate-700">{item.vehicle?.licensePlate ?? "Дугааргүй"}</span>
+                  <span className="font-medium text-slate-700">
+                    {item.vehicle?.licensePlate ?? "Дугааргүй"}
+                  </span>
                   <span className="inline-flex items-center gap-1">
                     <Gauge className="size-3" />
                     {item.vehicle?.km ?? item.order.km ?? "-"} км
