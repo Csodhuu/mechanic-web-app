@@ -10,6 +10,7 @@ import { useEffect, useMemo, useState } from "react";
 import { toast } from "sonner";
 
 import { CompactDetailCard } from "./_components/molecules/compact-detail-card";
+import { OrderCustomerDialog, OrderMileageDialog } from "./_components/organisms/order-edit-dialogs";
 import { OrderDetailDialog } from "./_components/organisms/order-detail-dialog";
 import { OrderHeroCard } from "./_components/organisms/order-hero-card";
 import { OrderItemsSection } from "./_components/organisms/order-items-section";
@@ -25,6 +26,9 @@ export default function ServiceOrderDetail() {
   const [error, setError] = useState<string | null>(null);
   const [refreshKey, setRefreshKey] = useState(0);
   const [detailDialog, setDetailDialog] = useState<DetailDialogType | null>(null);
+  const [editDialog, setEditDialog] = useState<"customer" | "mileage" | null>(null);
+  const [isCancelling, setIsCancelling] = useState(false);
+  const [isCompleting, setIsCompleting] = useState(false);
   const [isStartingService, setIsStartingService] = useState(false);
 
   const vehicleName = useMemo(() => {
@@ -34,8 +38,10 @@ export default function ServiceOrderDetail() {
 
   const customerName = useMemo(() => {
     const name = [data?.customer?.lastname, data?.customer?.firstname].filter(Boolean).join(" ");
-    return name || "Харилцагчийн нэргүй";
+    return name || "Үйлчлүүлэгч оруулаагүй";
   }, [data?.customer?.firstname, data?.customer?.lastname]);
+
+  const refreshDetail = () => setRefreshKey((current) => current + 1);
 
   const startRepairService = async () => {
     if (!data) return;
@@ -73,6 +79,89 @@ export default function ServiceOrderDetail() {
     }
   };
 
+  const cancelOrder = async () => {
+    if (!data) return;
+    if (!window.confirm("Энэ ажлыг цуцлах уу?")) return;
+
+    try {
+      setIsCancelling(true);
+
+      const token = getCookie("token");
+      if (!token) {
+        toast.error("Нэвтрэх token олдсонгүй.");
+        return;
+      }
+
+      const res = await apiClient.api.crm["cp-order"]({ id: data.order.id }).delete({
+        query: {},
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      if (res.error) throw res.error;
+
+      toast.success("Ажил цуцлагдлаа.");
+      router.replace("/jobs");
+    } catch (cancelError) {
+      console.error("Failed to cancel service order:", cancelError);
+      toast.error("Ажил цуцлахад алдаа гарлаа. Бараа, үйлчилгээ нэмэгдсэн бол эхлээд устгана уу.");
+    } finally {
+      setIsCancelling(false);
+    }
+  };
+
+  const completeOrder = async () => {
+    if (!data) return;
+
+    const currentKm = data.vehicle?.km ?? data.order.km ?? 0;
+    const input = window.prompt("Ажил дуусгах үеийн нийт гүйлт /км/", String(currentKm));
+    if (input === null) return;
+
+    const km = Number(input);
+    if (!Number.isFinite(km) || km < 0) {
+      toast.error("Дуусгах үеийн нийт гүйлтийг зөв тоогоор оруулна уу.");
+      return;
+    }
+
+    try {
+      setIsCompleting(true);
+
+      const token = getCookie("token");
+      if (!token) {
+        toast.error("Нэвтрэх token олдсонгүй.");
+        return;
+      }
+
+      const headers = { Authorization: `Bearer ${token}` };
+      const nextKm = Math.round(km);
+      const completeResponse = await apiClient.api.crm["cp-order"].complete.post(
+        {
+          id: data.order.id,
+          km: nextKm,
+        },
+        { headers }
+      );
+
+      if (completeResponse.error) throw completeResponse.error;
+
+      if (data.vehicle?.id) {
+        const vehicleResponse = await apiClient.api.crm.vehicle.fleet({ id: data.vehicle.id }).put(
+          { km: nextKm },
+          { headers }
+        );
+        if (vehicleResponse.error) throw vehicleResponse.error;
+      }
+
+      toast.success("Ажил дууслаа.");
+      refreshDetail();
+    } catch (completeError) {
+      console.error("Failed to complete service order:", completeError);
+      toast.error("Ажил дуусгахад алдаа гарлаа.");
+    } finally {
+      setIsCompleting(false);
+    }
+  };
   useEffect(() => {
     const fetchData = async () => {
       if (!orderId) {
@@ -153,8 +242,14 @@ export default function ServiceOrderDetail() {
         <>
           <OrderHeroCard
             data={data}
+            isCancelling={isCancelling}
+            isCompleting={isCompleting}
             isStartingService={isStartingService}
             vehicleName={vehicleName}
+            onCancelOrder={() => void cancelOrder()}
+            onCompleteOrder={() => void completeOrder()}
+            onEditCustomer={() => setEditDialog("customer")}
+            onEditMileage={() => setEditDialog("mileage")}
             onStartService={() => void startRepairService()}
           />
 
@@ -175,17 +270,27 @@ export default function ServiceOrderDetail() {
             />
           </div>
 
-          <OrderItemsSection
-            orderId={data.order.id}
-            onItemsChanged={() => setRefreshKey((current) => current + 1)}
-          />
+          <OrderItemsSection orderId={data.order.id} onItemsChanged={refreshDetail} />
 
           <CompactDetailCard
             icon={IdCard}
-            title="Харилцагч"
+            title="Үйлчлүүлэгч"
             primary={customerName}
             secondary={data.customer?.phoneNumber ?? "Утасгүй"}
             onClick={() => setDetailDialog("customer")}
+          />
+
+          <OrderCustomerDialog
+            data={data}
+            open={editDialog === "customer"}
+            onOpenChange={(open) => setEditDialog(open ? "customer" : null)}
+            onSaved={refreshDetail}
+          />
+          <OrderMileageDialog
+            data={data}
+            open={editDialog === "mileage"}
+            onOpenChange={(open) => setEditDialog(open ? "mileage" : null)}
+            onSaved={refreshDetail}
           />
 
           <OrderDetailDialog

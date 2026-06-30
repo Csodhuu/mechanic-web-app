@@ -66,6 +66,7 @@ export function OrderDetailDialog({
             <DetailRow label="Марк, модель" value={vehicleName} />
             <DetailRow label="Улсын дугаар" value={data.vehicle?.licensePlate} />
             <DetailRow label="Арлын дугаар" value={data.vehicle?.vin} />
+            <DetailRow label="Нийт гүйлт" value={data.vehicle?.km ?? data.order.km} />
             <DetailRow label="Өнгө" value={data.vehicle?.color} />
             <DetailRow label="Үйлдвэрлэсэн он" value={data.vehicle?.yearManufacture} />
             <DetailRow label="Орж ирсэн он" value={data.vehicle?.yearImport} />

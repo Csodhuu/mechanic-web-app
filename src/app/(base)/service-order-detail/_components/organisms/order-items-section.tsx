@@ -20,7 +20,7 @@ type OrderItems = NonNullable<
   Awaited<ReturnType<(typeof apiClient.api.crm)["cp-order"]["item"]["get"]>>["data"]
 >;
 type CatalogProduct = NonNullable<
-  Awaited<ReturnType<typeof apiClient.api.warehouse.product.get>>["data"]
+  Awaited<ReturnType<typeof apiClient.api.warehouse.item.get>>["data"]
 >["result"][number];
 type CatalogService = NonNullable<
   Awaited<ReturnType<(typeof apiClient.api.company)["service-kind"]["get"]>>["data"]
@@ -31,6 +31,7 @@ type CatalogSelection = {
   kind: "product" | "service";
   name: string;
   price: number;
+  warehouseId?: string;
 };
 
 export function OrderItemsSection({
@@ -83,8 +84,8 @@ export function OrderItemsSection({
         setIsLoading(true);
         const headers = getHeaders();
         const [productResponse, serviceResponse] = await Promise.all([
-          apiClient.api.warehouse.product.get({
-            query: { pagination: { page: 1, size: 50 } },
+          apiClient.api.warehouse.item.get({
+            query: { isActive: true, pagination: { page: 1, size: 50 } },
             headers,
           }),
           apiClient.api.company["service-kind"].get({
@@ -118,11 +119,12 @@ export function OrderItemsSection({
             name: serviceKind.name,
             price: serviceKind.price,
           }))
-        : products.map(({ product }) => ({
+        : products.map(({ item, product }) => ({
             id: product.id,
             kind: "product" as const,
             name: product.name,
-            price: product.priceSell,
+            price: item.priceSell ?? product.priceSell,
+            warehouseId: item.warehouseId,
           }));
 
     return query ? source.filter((item) => item.name.toLowerCase().includes(query)) : source;
@@ -137,15 +139,21 @@ export function OrderItemsSection({
 
     try {
       setIsSaving(true);
-      const response = await apiClient.api.crm["cp-order"].item.post({
-        cpOrderId: orderId,
-        quantity: amount,
-        priceUnit: selected.price,
-        name: selected.name,
-        ...(selected.kind === "service"
-          ? { companyServiceKindId: selected.id }
-          : { companyProductId: selected.id }),
-      });
+      const response = await apiClient.api.crm["cp-order"].item.post(
+        {
+          cpOrderId: orderId,
+          quantity: amount,
+          priceUnit: selected.price,
+          name: selected.name,
+          ...(selected.kind === "service"
+            ? { companyServiceKindId: selected.id }
+            : {
+                companyProductId: selected.id,
+                ...(selected.warehouseId ? { warehouseId: selected.warehouseId } : {}),
+              }),
+        },
+        { headers: getHeaders() }
+      );
       if (response.error) throw response.error;
 
       toast.success("Захиалгад нэмлээ.");
@@ -265,6 +273,28 @@ export function OrderItemsSection({
               Захиалгад нэмэх {catalogType === "service" ? "үйлчилгээ" : "бараа"} сонгоно.
             </DialogDescription>
           </DialogHeader>
+          <div className="grid grid-cols-2 gap-2 rounded-xl bg-slate-100 p-1">
+            <CatalogTypeButton
+              active={catalogType === "service"}
+              icon={Wrench}
+              label="Үйлчилгээ"
+              onClick={() => {
+                setCatalogType("service");
+                setSelected(null);
+                setSearch("");
+              }}
+            />
+            <CatalogTypeButton
+              active={catalogType === "product"}
+              icon={Package}
+              label="Бараа"
+              onClick={() => {
+                setCatalogType("product");
+                setSelected(null);
+                setSearch("");
+              }}
+            />
+          </div>
 
           <div className="relative">
             <Search className="pointer-events-none absolute top-1/2 left-3 size-4 -translate-y-1/2 text-slate-400" />
@@ -285,17 +315,19 @@ export function OrderItemsSection({
             )}
             {catalog.map((item) => (
               <button
-                key={item.id}
+                key={`${item.id}:${item.warehouseId ?? "service"}`}
                 type="button"
                 onClick={() => setSelected(item)}
-                className={`flex min-w-0 w-full items-center gap-3 border-b border-slate-100 px-3 py-2.5 text-left last:border-0 ${selected?.id === item.id ? "bg-blue-50" : "hover:bg-slate-50"}`}
+                className={`flex min-w-0 w-full items-center gap-3 border-b border-slate-100 px-3 py-2.5 text-left last:border-0 ${selected?.id === item.id && selected?.warehouseId === item.warehouseId ? "bg-blue-50" : "hover:bg-slate-50"}`}
               >
                 <span className="min-w-0 flex-1 overflow-hidden">
                   <span className="line-clamp-2 block break-words text-sm font-medium text-slate-900">
                     {item.name}
                   </span>
                 </span>
-                {selected?.id === item.id && <Check className="size-4 text-blue-600" />}
+                {selected?.id === item.id && selected?.warehouseId === item.warehouseId && (
+                  <Check className="size-4 text-blue-600" />
+                )}
               </button>
             ))}
           </div>
@@ -352,6 +384,30 @@ function ActionButton({
   );
 }
 
+function CatalogTypeButton({
+  active,
+  icon: Icon,
+  label,
+  onClick,
+}: {
+  active: boolean;
+  icon: typeof Wrench;
+  label: string;
+  onClick: () => void;
+}) {
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      className={`flex h-9 items-center justify-center gap-1.5 rounded-lg text-xs font-semibold transition ${
+        active ? "bg-white text-slate-950 shadow-sm" : "text-slate-500 hover:text-slate-800"
+      }`}
+    >
+      <Icon className="size-3.5" />
+      {label}
+    </button>
+  );
+}
 function EmptyAction({
   icon: Icon,
   title,
