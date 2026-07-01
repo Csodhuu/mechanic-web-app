@@ -13,6 +13,7 @@ import { CompactDetailCard } from "./_components/molecules/compact-detail-card";
 import { OrderCustomerDialog, OrderMileageDialog } from "./_components/organisms/order-edit-dialogs";
 import { OrderDetailDialog } from "./_components/organisms/order-detail-dialog";
 import { OrderHeroCard } from "./_components/organisms/order-hero-card";
+import { OrderInspectionSummary } from "./_components/organisms/order-inspection-summary";
 import { OrderItemsSection } from "./_components/organisms/order-items-section";
 import { DetailDialogType, OrderDetail, stateLabel } from "./_types/service-order-detail";
 
@@ -269,6 +270,8 @@ export default function ServiceOrderDetail() {
               onClick={() => setDetailDialog("vehicle")}
             />
           </div>
+
+          <OrderInspectionSummary licensePlate={data.vehicle?.licensePlate} />
 
           <OrderItemsSection orderId={data.order.id} onItemsChanged={refreshDetail} />
 
