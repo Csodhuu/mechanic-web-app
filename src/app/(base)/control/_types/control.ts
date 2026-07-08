@@ -5,7 +5,7 @@ export type OrderItem = CpOrderQuery["result"][number];
 export type OrderState = OrderItem["order"]["state"];
 
 export const controlTabs: { value: OrderState; label: string; detail: string }[] = [
-  { value: "CREATED", label: "Эхлэхэд бэлэн", detail: "Засвар үйлчилгээ эхлүүлэхэд бэлэн" },
+  { value: "CREATED", label: "Үүссэн", detail: "Шинээр үүссэн засвар үйлчилгээ" },
   { value: "PROGRESSING", label: "Засвар явагдаж буй", detail: "Одоогоор засварлаж байна" },
   { value: "COMPLETE", label: "Дууссан", detail: "Засвар дууссан ажлууд" },
 ];
@@ -15,7 +15,7 @@ export const stateStyle: Record<
   { label: string; className: string; icon: typeof ShieldCheck }
 > = {
   CREATED: {
-    label: "Эхлэхэд бэлэн",
+    label: "Үүссэн",
     className: "border-amber-200 bg-amber-50 text-amber-700",
     icon: Clock3,
   },

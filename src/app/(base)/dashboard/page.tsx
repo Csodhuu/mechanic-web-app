@@ -1,13 +1,12 @@
 "use client";
 
-import { PageShell, EmptyState, MetricCard } from "@/components/page-shell";
+import { PageShell, EmptyState } from "@/components/page-shell";
 import { Button } from "@/components/ui/button";
 import { apiClient } from "@/lib/authClient";
 import { CpOrderQuery } from "../jobs/_types/cp-order";
 import { getCookie } from "cookies-next";
 import {
   ArrowRight,
-  CalendarClock,
   CarFront,
   ClipboardList,
   History as HistoryIcon,
@@ -15,51 +14,23 @@ import {
   Wrench,
 } from "lucide-react";
 import { useRouter } from "next/navigation";
-import { useEffect, useMemo, useState } from "react";
-
-export type MeQuery = NonNullable<
-  Awaited<ReturnType<typeof import("@/lib/authClient").apiClient.api.user.me.get>>["data"]
->;
+import { useEffect, useState } from "react";
 
 type OrderItem = CpOrderQuery["result"][number];
 
 const stateLabel: Record<OrderItem["order"]["state"], string> = {
-  CREATED: "Шинэ",
-  PROGRESSING: "Засвар явагдаж байна",
+  CREATED: "Үүссэн",
+  PROGRESSING: "Хийгдэж буй",
   COMPLETE: "Дууссан",
 };
-
-function getCustomerName(item: OrderItem) {
-  return (
-    [item.customer?.lastname, item.customer?.firstname].filter(Boolean).join(" ") ||
-    item.customer?.phoneNumber ||
-    "-"
-  );
-}
 
 function getVehicleName(item: OrderItem) {
   return [item.make?.name, item.model?.name].filter(Boolean).join(" ") || "Машины мэдээлэлгүй";
 }
 
-function formatDate(value?: string | null) {
-  if (!value) return "-";
-  return new Intl.DateTimeFormat("mn-MN", {
-    month: "2-digit",
-    day: "2-digit",
-    hour: "2-digit",
-    minute: "2-digit",
-  }).format(new Date(value));
-}
-
 export default function Dashboard() {
   const router = useRouter();
-  const [me, setMe] = useState<MeQuery | null>(null);
   const [orders, setOrders] = useState<OrderItem[]>([]);
-  const [totals, setTotals] = useState<Record<OrderItem["order"]["state"], number>>({
-    CREATED: 0,
-    PROGRESSING: 0,
-    COMPLETE: 0,
-  });
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -80,8 +51,7 @@ export default function Dashboard() {
         }
 
         const headers = { Authorization: `Bearer ${token}` };
-        const [meRes, createdRes, progressingRes, completeRes] = await Promise.all([
-          apiClient.api.user.me.get(),
+        const [createdRes, progressingRes, completeRes] = await Promise.all([
           apiClient.api.crm["cp-order"].get({
             query: { state: "CREATED", pagination: { page: 1, size: 5 } },
             headers,
@@ -97,13 +67,6 @@ export default function Dashboard() {
         ]);
 
         if (mounted) {
-          setMe(meRes.data ?? null);
-          setTotals({
-            CREATED: createdRes.data?.totalCount ?? 0,
-            PROGRESSING: progressingRes.data?.totalCount ?? 0,
-            COMPLETE: completeRes.data?.totalCount ?? 0,
-          });
-
           const recent = [
             ...(progressingRes.data?.result ?? []),
             ...(createdRes.data?.result ?? []),
@@ -132,145 +95,70 @@ export default function Dashboard() {
     };
   }, []);
 
-  const greeting = useMemo(() => {
-    if (!me?.name) return "Сайн байна уу";
-    return `Сайн байна уу, ${me.name}`;
-  }, [me?.name]);
-
   return (
     <PageShell
       eyebrow="Dashboard"
-      title={greeting}
-      description="Өнөөдрийн хяналт, checklist, засварын ажлуудаа нэг дор хяна."
+      title="Сайн байна уу"
       action={
-        <Button type="button" variant="outline" onClick={() => router.push("/jobs")}>
+        <Button
+          type="button"
+          variant="outline"
+          className="w-full sm:w-auto"
+          onClick={() => router.push("/jobs")}
+        >
           <ClipboardList className="size-4" />
           Ажил руу орох
         </Button>
       }
       contentClassName="space-y-5"
     >
-      <section className="grid gap-3 sm:grid-cols-3">
-        <MetricCard
-          label="Хүлээгдэж буй"
-          value={String(totals.CREATED)}
-          description="Шинээр орж ирсэн ажлууд"
-          tone="amber"
-          icon={<CarFront className="size-5" />}
-        />
-        <MetricCard
-          label="Засвар явагдаж буй"
-          value={String(totals.PROGRESSING)}
-          description="Одоогоор засварлаж буй"
-          tone="blue"
-          icon={<ShieldCheck className="size-5" />}
-        />
-        <MetricCard
-          label="Дууссан"
-          value={String(totals.COMPLETE)}
-          description="Архивлагдсан ажлууд"
-          tone="emerald"
-          icon={<HistoryIcon className="size-5" />}
-        />
-      </section>
-
-      <section className="grid gap-3 lg:grid-cols-[1fr_auto]">
-        <div className="rounded-2xl border border-slate-200/80 bg-white p-4 shadow-sm">
-          <div className="flex items-center justify-between gap-3">
-            <div>
-              <h2 className="text-base font-semibold text-slate-950">Түргэн үйлдэл</h2>
-              <p className="mt-0.5 text-sm text-slate-500">
-                Ихэнх workflow-ийг эндээс шууд эхлүүлнэ.
-              </p>
-            </div>
-          </div>
-
-          <div className="mt-4 grid gap-3 sm:grid-cols-3">
-            {[
-              {
-                title: "Ажил үүсгэх",
-                detail: "Улсын дугаараар машин сонгоод checklist бөглөх ажлыг эхлүүлнэ.",
-                icon: Wrench,
-                onClick: () => router.push("/jobs"),
-              },
-              {
-                title: "Засвар үйлчилгээ",
-                detail: "Эхлэхэд бэлэн болон явагдаж буй ажлуудыг хяна.",
-                icon: ShieldCheck,
-                onClick: () => router.push("/control"),
-              },
-              {
-                title: "Түүх",
-                detail: "Дууссан засварууд болон хугацааг харах.",
-                icon: HistoryIcon,
-                onClick: () => router.push("/history"),
-              },
-            ].map((item) => {
-              const Icon = item.icon;
-              return (
-                <button
-                  key={item.title}
-                  type="button"
-                  onClick={item.onClick}
-                  className="rounded-2xl border border-slate-200 bg-slate-50 p-4 text-left transition hover:border-blue-200 hover:bg-blue-50/60"
-                >
-                  <span className="flex h-11 w-11 items-center justify-center rounded-2xl bg-white text-blue-600 shadow-sm">
-                    <Icon className="size-5" />
-                  </span>
-                  <p className="mt-3 text-sm font-semibold text-slate-950">{item.title}</p>
-                  <p className="mt-1 text-sm leading-6 text-slate-500">{item.detail}</p>
-                </button>
-              );
-            })}
-          </div>
-        </div>
-
-        <div className="rounded-2xl border border-slate-200/80 bg-slate-950 p-4 text-white shadow-sm">
-          <p className="text-[11px] font-semibold uppercase tracking-[0.12em] text-slate-400">
-            Today
-          </p>
-          <h2 className="mt-2 text-base font-semibold sm:text-lg">Одоогийн ажлын тойм</h2>
-          <p className="mt-1 text-sm leading-6 text-slate-300">
-            Өнөөдрийн урсгал: ажил үүсгэх -&gt; checklist -&gt; засвар -&gt; дуусгах.
-          </p>
-
-          <div className="mt-4 space-y-3">
-            {[
-              { label: "Ажил үүсгэх", value: "Улсын дугаараар машин сонгож checklist эхлүүлнэ" },
-              { label: "Checklist", value: "Хяналт дээр үзлэг бөглөнө" },
-              { label: "Засвар руу", value: "Checklist-ийн дараа үйлчилгээ эхлүүлнэ" },
-              { label: "Түүх рүү", value: "Дууссан ажлыг архивлана" },
-            ].map((item) => (
-              <div key={item.label} className="rounded-2xl border border-white/10 bg-white/5 p-3">
-                <p className="text-xs font-semibold text-slate-300">{item.label}</p>
-                <p className="mt-1 text-sm text-slate-100">{item.value}</p>
-              </div>
-            ))}
-          </div>
-        </div>
+      <section className="grid gap-2 sm:grid-cols-3">
+        {[
+          {
+            title: "Оношлогоо",
+            icon: Wrench,
+            onClick: () => router.push("/jobs"),
+          },
+          {
+            title: "Засвар үйлчилгээ",
+            icon: ShieldCheck,
+            onClick: () => router.push("/control"),
+          },
+          {
+            title: "Түүх",
+            icon: HistoryIcon,
+            onClick: () => router.push("/history"),
+          },
+        ].map((item) => {
+          const Icon = item.icon;
+          return (
+            <button
+              key={item.title}
+              type="button"
+              onClick={item.onClick}
+              className="flex items-center gap-3 rounded-xl border border-slate-200 bg-white p-3 text-left shadow-sm transition hover:border-blue-200 hover:bg-blue-50/40"
+            >
+              <span className="flex size-9 shrink-0 items-center justify-center rounded-lg bg-slate-100 text-blue-600">
+                <Icon className="size-4" />
+              </span>
+              <span className="truncate text-sm font-semibold text-slate-950">{item.title}</span>
+            </button>
+          );
+        })}
       </section>
 
       <section className="rounded-2xl border border-slate-200/80 bg-white shadow-sm">
         <div className="flex items-center justify-between border-b border-slate-100 px-4 py-3">
           <div>
             <h2 className="text-base font-semibold text-slate-950">Сүүлийн ажлууд</h2>
-            <p className="mt-0.5 text-sm text-slate-500">Хамгийн сүүлд орсон order-ууд.</p>
           </div>
-          <Button
-            type="button"
-            variant="ghost"
-            onClick={() => router.push("/jobs")}
-          >
+          <Button type="button" variant="ghost" onClick={() => router.push("/jobs")}>
             Бүгд
             <ArrowRight className="size-4" />
           </Button>
         </div>
 
-        {loading && (
-          <div className="px-4 py-10 text-center text-sm text-slate-500">
-            Мэдээлэл уншиж байна...
-          </div>
-        )}
+        {loading && <RecentOrdersSkeleton />}
 
         {!loading && error && (
           <div className="px-4 py-10">
@@ -310,17 +198,9 @@ export default function Dashboard() {
                       {stateLabel[item.order.state]}
                     </span>
                   </div>
-                  <p className="mt-1 truncate text-sm text-slate-500">{getVehicleName(item)}</p>
-                  <div className="mt-2 flex flex-wrap gap-x-3 gap-y-1 text-xs text-slate-500">
-                    <span>{getCustomerName(item)}</span>
-                    <span className="inline-flex items-center gap-1">
-                      <CalendarClock className="size-3.5" />
-                      {formatDate(item.order.createdAt)}
-                    </span>
-                    <span className="font-medium text-slate-700">
-                      {item.vehicle?.licensePlate ?? "-"}
-                    </span>
-                  </div>
+                  <p className="mt-1 truncate text-sm text-slate-500">
+                    {item.vehicle?.licensePlate ?? getVehicleName(item)}
+                  </p>
                 </div>
                 <ArrowRight className="mt-2 size-4 shrink-0 text-slate-300" />
               </button>
@@ -329,5 +209,24 @@ export default function Dashboard() {
         )}
       </section>
     </PageShell>
+  );
+}
+function RecentOrdersSkeleton() {
+  return (
+    <div className="divide-y divide-slate-100">
+      {Array.from({ length: 4 }).map((_, index) => (
+        <div key={index} className="flex animate-pulse items-start gap-3 px-4 py-3">
+          <div className="h-11 w-11 shrink-0 rounded-2xl bg-slate-100" />
+          <div className="min-w-0 flex-1 space-y-2">
+            <div className="h-3.5 w-32 rounded-full bg-slate-100" />
+            <div className="h-3 w-44 max-w-full rounded-full bg-slate-100" />
+            <div className="flex flex-wrap gap-2">
+              <div className="h-3 w-24 rounded-full bg-slate-100" />
+              <div className="h-3 w-20 rounded-full bg-slate-100" />
+            </div>
+          </div>
+        </div>
+      ))}
+    </div>
   );
 }

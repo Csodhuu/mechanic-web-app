@@ -1,4 +1,4 @@
-import { Button } from "@/components/ui/button";
+﻿import { Button } from "@/components/ui/button";
 import {
   Dialog,
   DialogContent,
@@ -7,13 +7,16 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { apiClient } from "@/lib/authClient";
+import type { ChecklistStatus, ChecklistValue } from "@/lib/inspection-checklist";
 import { cn } from "@/lib/utils";
 import { getCookie } from "cookies-next";
-import { BriefcaseBusiness, CalendarDays, UserRound } from "lucide-react";
+import { BriefcaseBusiness, CalendarDays, Pencil, Save, UserRound, X } from "lucide-react";
 import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { toast } from "sonner";
 
+import { ChecklistGroup } from "@/app/(base)/jobs/initial-inspection/_components/organisms/checklist-group";
+import { InspectionNoteCard } from "@/app/(base)/jobs/initial-inspection/_components/organisms/inspection-note-card";
 import {
   employeeName,
   formatInspectionDate,
@@ -22,14 +25,49 @@ import {
 } from "../../_types/inspection";
 import { InspectionGroupSection } from "../molecules/inspection-group-section";
 
+type DraftInspectionGroup = {
+  type: string;
+  values: ChecklistValue[];
+};
+
 type InspectionDetailDialogProps = {
   item: InspectionItem | null;
   onOpenChange: (open: boolean) => void;
+  onUpdated: (inspection: InspectionItem["inspection"]) => void;
 };
 
-export function InspectionDetailDialog({ item, onOpenChange }: InspectionDetailDialogProps) {
+const toChecklistAnswer = (answer: string): ChecklistStatus | "" => {
+  if (answer === "Regular" || answer === "Warning" || answer === "Danger") return answer;
+  return "";
+};
+
+const toDraftInspection = (item: InspectionItem | null): DraftInspectionGroup[] =>
+  item?.inspection.inspection?.map((group) => ({
+    type: group.type,
+    values: group.values.map((value) => ({
+      question: value.question,
+      answer: toChecklistAnswer(value.answer),
+      description: value.description ?? "",
+    })),
+  })) ?? [];
+
+export function InspectionDetailDialog({
+  item,
+  onOpenChange,
+  onUpdated,
+}: InspectionDetailDialogProps) {
   const router = useRouter();
   const [isCreatingOrder, setIsCreatingOrder] = useState(false);
+  const [isEditing, setIsEditing] = useState(false);
+  const [isSavingInspection, setIsSavingInspection] = useState(false);
+  const [draftInspection, setDraftInspection] = useState<DraftInspectionGroup[]>([]);
+  const [draftDescription, setDraftDescription] = useState("");
+
+  useEffect(() => {
+    setIsEditing(false);
+    setDraftInspection(toDraftInspection(item));
+    setDraftDescription(item?.inspection.description ?? "");
+  }, [item]);
 
   const createServiceOrder = async () => {
     if (!item) return;
@@ -55,16 +93,85 @@ export function InspectionDetailDialog({ item, onOpenChange }: InspectionDetailD
 
       if (response.error || !response.data) throw response.error;
 
-      toast.success("Үзлэгээс ажил үүслээ.");
+      toast.success("Үзлэгээс оношлогоо үүслээ.");
       onOpenChange(false);
       router.push(`/service-order-detail?id=${encodeURIComponent(response.data.cpOrderId)}`);
     } catch (error) {
       console.error("Failed to create service order from inspection:", error);
-      toast.error("Үзлэгээс ажил үүсгэхэд алдаа гарлаа.");
+      toast.error("Үзлэгээс оношлогоо үүсгэхэд алдаа гарлаа.");
     } finally {
       setIsCreatingOrder(false);
     }
   };
+
+  const beginEdit = () => {
+    setDraftInspection(toDraftInspection(item));
+    setDraftDescription(item?.inspection.description ?? "");
+    setIsEditing(true);
+  };
+
+  const cancelEdit = () => {
+    setDraftInspection(toDraftInspection(item));
+    setDraftDescription(item?.inspection.description ?? "");
+    setIsEditing(false);
+  };
+
+  const updateDraftValue = (
+    groupIndex: number,
+    valueIndex: number,
+    patch: Partial<ChecklistValue>
+  ) => {
+    setDraftInspection((current) =>
+      current.map((group, index) =>
+        index !== groupIndex
+          ? group
+          : {
+              ...group,
+              values: group.values.map((value, itemIndex) =>
+                itemIndex === valueIndex ? { ...value, ...patch } : value
+              ),
+            }
+      )
+    );
+  };
+
+  const saveInspection = async () => {
+    if (!item) return;
+
+    const token = getCookie("token");
+    if (!token) {
+      toast.error("Нэвтрэх token олдсонгүй.");
+      return;
+    }
+
+    try {
+      setIsSavingInspection(true);
+      const response = await apiClient.api.crm.inspection({ id: item.inspection.id }).patch(
+        {
+          description: draftDescription.trim(),
+          inspection: draftInspection,
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
+      if (response.error || !response.data) throw response.error;
+
+      onUpdated(response.data);
+      setIsEditing(false);
+      toast.success("Үзлэгийн мэдээлэл хадгалагдлаа.");
+    } catch (error) {
+      console.error("Failed to update inspection:", error);
+      toast.error("Үзлэг хадгалахад алдаа гарлаа.");
+    } finally {
+      setIsSavingInspection(false);
+    }
+  };
+
+  const isBusy = isCreatingOrder || isSavingInspection;
 
   return (
     <Dialog open={Boolean(item)} onOpenChange={onOpenChange}>
@@ -79,18 +186,59 @@ export function InspectionDetailDialog({ item, onOpenChange }: InspectionDetailD
                     Анхан үзлэгийн тэмдэглэл, checklist-ийн бүлэг болон хариунууд.
                   </DialogDescription>
                 </div>
-                {item.inspection.status !== "CANCELLED" && (
-                  <Button
-                    type="button"
-                    size="sm"
-                    className="w-full sm:w-auto"
-                    disabled={isCreatingOrder}
-                    onClick={() => void createServiceOrder()}
-                  >
-                    <BriefcaseBusiness className="size-4" />
-                    {isCreatingOrder ? "Үүсгэж байна..." : "Ажил үүсгэх"}
-                  </Button>
-                )}
+                <div className="flex flex-col gap-2 sm:flex-row sm:items-center">
+                  {isEditing ? (
+                    <>
+                      <Button
+                        type="button"
+                        size="sm"
+                        variant="outline"
+                        className="w-full sm:w-auto"
+                        disabled={isBusy}
+                        onClick={cancelEdit}
+                      >
+                        <X className="size-4" />
+                        Болих
+                      </Button>
+                      <Button
+                        type="button"
+                        size="sm"
+                        className="w-full sm:w-auto"
+                        disabled={isBusy}
+                        onClick={() => void saveInspection()}
+                      >
+                        <Save className="size-4" />
+                        {isSavingInspection ? "Хадгалж байна..." : "Хадгалах"}
+                      </Button>
+                    </>
+                  ) : (
+                    <>
+                      <Button
+                        type="button"
+                        size="sm"
+                        variant="outline"
+                        className="w-full sm:w-auto"
+                        disabled={isBusy}
+                        onClick={beginEdit}
+                      >
+                        <Pencil className="size-4" />
+                        Засах
+                      </Button>
+                      {item.inspection.status !== "CANCELLED" && (
+                        <Button
+                          type="button"
+                          size="sm"
+                          className="w-full sm:w-auto"
+                          disabled={isBusy}
+                          onClick={() => void createServiceOrder()}
+                        >
+                          <BriefcaseBusiness className="size-4" />
+                          {isCreatingOrder ? "Үүсгэж байна..." : "Оношлогоо"}
+                        </Button>
+                      )}
+                    </>
+                  )}
+                </div>
               </div>
               <div className="mt-2 flex flex-wrap gap-x-4 gap-y-1 text-xs text-slate-500">
                 <span className="inline-flex items-center gap-1">
@@ -113,18 +261,40 @@ export function InspectionDetailDialog({ item, onOpenChange }: InspectionDetailD
             </div>
           </DialogHeader>
           <div className="space-y-3 p-4">
-            {item.inspection.description && (
-              <div className="rounded-2xl border border-slate-200 bg-slate-50 p-3">
-                <p className="text-xs font-semibold text-slate-400">Тэмдэглэл</p>
-                <p className="mt-1 text-sm leading-6 text-slate-700">
-                  {item.inspection.description}
-                </p>
-              </div>
-            )}
+            {isEditing ? (
+              <>
+                {draftInspection.length > 0 ? (
+                  draftInspection.map((group, groupIndex) => (
+                    <ChecklistGroup
+                      key={group.type}
+                      group={group}
+                      groupIndex={groupIndex}
+                      onValueChange={updateDraftValue}
+                    />
+                  ))
+                ) : (
+                  <div className="rounded-2xl border border-dashed border-slate-200 bg-slate-50 p-4 text-center text-sm text-slate-500">
+                    Checklist мэдээлэл олдсонгүй.
+                  </div>
+                )}
+                <InspectionNoteCard value={draftDescription} onChange={setDraftDescription} />
+              </>
+            ) : (
+              <>
+                {item.inspection.description && (
+                  <div className="rounded-2xl border border-slate-200 bg-slate-50 p-3">
+                    <p className="text-xs font-semibold text-slate-400">Тэмдэглэл</p>
+                    <p className="mt-1 text-sm leading-6 text-slate-700">
+                      {item.inspection.description}
+                    </p>
+                  </div>
+                )}
 
-            {item.inspection.inspection?.map((group) => (
-              <InspectionGroupSection key={group.type} group={group} />
-            ))}
+                {item.inspection.inspection?.map((group) => (
+                  <InspectionGroupSection key={group.type} group={group} />
+                ))}
+              </>
+            )}
           </div>
         </DialogContent>
       )}

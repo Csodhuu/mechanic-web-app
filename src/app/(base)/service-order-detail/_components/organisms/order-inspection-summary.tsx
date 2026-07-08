@@ -11,7 +11,13 @@ import {
 import { apiClient } from "@/lib/authClient";
 import { cn } from "@/lib/utils";
 import { getCookie } from "cookies-next";
-import { AlertTriangle, CheckCircle2, ChevronRight, CircleAlert, ClipboardCheck } from "lucide-react";
+import {
+  AlertTriangle,
+  CheckCircle2,
+  ChevronRight,
+  CircleAlert,
+  ClipboardCheck,
+} from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
 
 import {
@@ -33,6 +39,11 @@ const emptyCounts: InspectionCounts = {
   warning: 0,
 };
 
+type InspectionResult = {
+  licensePlate: string;
+  item: InspectionItem | null;
+};
+
 const countInspectionAnswers = (item: InspectionItem | null): InspectionCounts => {
   if (!item?.inspection.inspection) return emptyCounts;
 
@@ -50,18 +61,15 @@ const countInspectionAnswers = (item: InspectionItem | null): InspectionCounts =
 };
 
 export function OrderInspectionSummary({ licensePlate }: { licensePlate?: string | null }) {
-  const [inspection, setInspection] = useState<InspectionItem | null>(null);
+  const [inspectionResult, setInspectionResult] = useState<InspectionResult | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [open, setOpen] = useState(false);
+  const normalizedLicensePlate = licensePlate?.trim() ?? "";
 
   useEffect(() => {
     let isMounted = true;
-    const value = licensePlate?.trim();
 
-    if (!value) {
-      setInspection(null);
-      return;
-    }
+    if (!normalizedLicensePlate) return;
 
     const loadInspection = async () => {
       try {
@@ -71,17 +79,22 @@ export function OrderInspectionSummary({ licensePlate }: { licensePlate?: string
 
         const response = await apiClient.api.crm.inspection.get({
           query: {
-            licensePlate: value,
+            licensePlate: normalizedLicensePlate,
             pagination: { page: 1, size: 1 },
           },
           headers: { Authorization: `Bearer ${token}` },
         });
 
         if (!isMounted) return;
-        setInspection(response.data?.result?.[0] ?? null);
+        setInspectionResult({
+          licensePlate: normalizedLicensePlate,
+          item: response.data?.result?.[0] ?? null,
+        });
       } catch (error) {
         console.error("Failed to fetch order inspection summary:", error);
-        if (isMounted) setInspection(null);
+        if (isMounted) {
+          setInspectionResult({ licensePlate: normalizedLicensePlate, item: null });
+        }
       } finally {
         if (isMounted) setIsLoading(false);
       }
@@ -92,8 +105,11 @@ export function OrderInspectionSummary({ licensePlate }: { licensePlate?: string
     return () => {
       isMounted = false;
     };
-  }, [licensePlate]);
+  }, [normalizedLicensePlate]);
 
+  const inspection =
+    inspectionResult?.licensePlate === normalizedLicensePlate ? inspectionResult.item : null;
+  const isSummaryLoading = Boolean(normalizedLicensePlate) && isLoading;
   const counts = useMemo(() => countInspectionAnswers(inspection), [inspection]);
   const total = counts.danger + counts.regular + counts.warning;
 
@@ -124,7 +140,7 @@ export function OrderInspectionSummary({ licensePlate }: { licensePlate?: string
               <div className="min-w-0">
                 <h2 className="truncate text-sm font-bold text-slate-950">Анхан үзлэгийн дүн</h2>
                 <p className="truncate text-xs text-slate-500">
-                  {isLoading
+                  {isSummaryLoading
                     ? "Уншиж байна..."
                     : inspection
                       ? `${formatInspectionDate(inspection.inspection.createdAt)} · ${employeeName(inspection)}`

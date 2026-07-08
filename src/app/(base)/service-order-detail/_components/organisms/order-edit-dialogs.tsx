@@ -13,7 +13,7 @@ import { Label } from "@/components/ui/label";
 import { apiClient } from "@/lib/authClient";
 import { getCookie } from "cookies-next";
 import { Gauge, UserRoundPlus } from "lucide-react";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { toast } from "sonner";
 
 import { OrderDetail } from "../../_types/service-order-detail";
@@ -25,6 +25,7 @@ type EditableDialogProps = {
   onSaved: () => void;
 };
 
+type EditableDialogContentProps = Omit<EditableDialogProps, "open">;
 type AuthHeaders = { Authorization: string } | undefined;
 
 const getHeaders = (): AuthHeaders => {
@@ -37,23 +38,44 @@ const optionalValue = (value: string) => {
   return trimmed ? trimmed : null;
 };
 
+const customerDialogKey = (data: OrderDetail) =>
+  [
+    data.order.id,
+    data.customer?.id ?? "new",
+    data.customer?.firstname ?? "",
+    data.customer?.lastname ?? "",
+    data.customer?.phoneNumber ?? "",
+    data.customer?.email ?? "",
+    data.customer?.regNum ?? "",
+  ].join("|");
+
+const mileageDialogKey = (data: OrderDetail) =>
+  [data.order.id, data.vehicle?.id ?? "no-vehicle", data.vehicle?.km ?? data.order.km ?? ""].join(
+    "|"
+  );
+
 export function OrderCustomerDialog({ data, open, onOpenChange, onSaved }: EditableDialogProps) {
-  const [firstname, setFirstname] = useState("");
-  const [lastname, setLastname] = useState("");
-  const [phoneNumber, setPhoneNumber] = useState("");
-  const [email, setEmail] = useState("");
-  const [regNum, setRegNum] = useState("");
+  return (
+    <Dialog open={open} onOpenChange={onOpenChange}>
+      {open ? (
+        <OrderCustomerDialogContent
+          key={customerDialogKey(data)}
+          data={data}
+          onOpenChange={onOpenChange}
+          onSaved={onSaved}
+        />
+      ) : null}
+    </Dialog>
+  );
+}
+
+function OrderCustomerDialogContent({ data, onOpenChange, onSaved }: EditableDialogContentProps) {
+  const [firstname, setFirstname] = useState(() => data.customer?.firstname ?? "");
+  const [lastname, setLastname] = useState(() => data.customer?.lastname ?? "");
+  const [phoneNumber, setPhoneNumber] = useState(() => data.customer?.phoneNumber ?? "");
+  const [email, setEmail] = useState(() => data.customer?.email ?? "");
+  const [regNum, setRegNum] = useState(() => data.customer?.regNum ?? "");
   const [isSaving, setIsSaving] = useState(false);
-
-  useEffect(() => {
-    if (!open) return;
-
-    setFirstname(data.customer?.firstname ?? "");
-    setLastname(data.customer?.lastname ?? "");
-    setPhoneNumber(data.customer?.phoneNumber ?? "");
-    setEmail(data.customer?.email ?? "");
-    setRegNum(data.customer?.regNum ?? "");
-  }, [data.customer, open]);
 
   const saveCustomer = async () => {
     const phone = phoneNumber.trim();
@@ -96,10 +118,9 @@ export function OrderCustomerDialog({ data, open, onOpenChange, onSaved }: Edita
       }
 
       if (data.vehicle?.id && data.vehicle.customerId !== nextCustomerId) {
-        const vehicleResponse = await apiClient.api.crm.vehicle.fleet({ id: data.vehicle.id }).put(
-          { customerId: nextCustomerId },
-          { headers }
-        );
+        const vehicleResponse = await apiClient.api.crm.vehicle
+          .fleet({ id: data.vehicle.id })
+          .put({ customerId: nextCustomerId }, { headers });
         if (vehicleResponse.error) throw vehicleResponse.error;
       }
 
@@ -115,58 +136,73 @@ export function OrderCustomerDialog({ data, open, onOpenChange, onSaved }: Edita
   };
 
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-h-[85svh] overflow-y-auto p-4 sm:max-w-[480px] sm:p-5">
-        <DialogHeader>
-          <DialogTitle className="flex items-center gap-2 text-base">
-            <UserRoundPlus className="size-4 text-blue-600" />
-            Үйлчлүүлэгчийн мэдээлэл
-          </DialogTitle>
-          <DialogDescription>Захиалгад холбох үйлчлүүлэгчийн мэдээлэл нэмнэ эсвэл засна.</DialogDescription>
-        </DialogHeader>
+    <DialogContent className="max-h-[85svh] overflow-y-auto p-4 sm:max-w-[480px] sm:p-5">
+      <DialogHeader>
+        <DialogTitle className="flex items-center gap-2 text-base">
+          <UserRoundPlus className="size-4 text-blue-600" />
+          Үйлчлүүлэгчийн мэдээлэл
+        </DialogTitle>
+        <DialogDescription>
+          Захиалгад холбох үйлчлүүлэгчийн мэдээлэл нэмнэ эсвэл засна.
+        </DialogDescription>
+      </DialogHeader>
 
-        <div className="grid gap-3">
-          <Field label="Овог">
-            <Input value={lastname} onChange={(event) => setLastname(event.target.value)} />
-          </Field>
-          <Field label="Нэр">
-            <Input value={firstname} onChange={(event) => setFirstname(event.target.value)} />
-          </Field>
-          <Field label="Утас" required>
-            <Input
-              value={phoneNumber}
-              onChange={(event) => setPhoneNumber(event.target.value)}
-              inputMode="tel"
-            />
-          </Field>
-          <Field label="Имэйл">
-            <Input
-              value={email}
-              onChange={(event) => setEmail(event.target.value)}
-              inputMode="email"
-            />
-          </Field>
-          <Field label="Регистр">
-            <Input value={regNum} onChange={(event) => setRegNum(event.target.value)} />
-          </Field>
-        </div>
+      <div className="grid gap-3">
+        <Field label="Овог">
+          <Input value={lastname} onChange={(event) => setLastname(event.target.value)} />
+        </Field>
+        <Field label="Нэр">
+          <Input value={firstname} onChange={(event) => setFirstname(event.target.value)} />
+        </Field>
+        <Field label="Утас" required>
+          <Input
+            value={phoneNumber}
+            onChange={(event) => setPhoneNumber(event.target.value)}
+            inputMode="tel"
+          />
+        </Field>
+        <Field label="Имэйл">
+          <Input
+            value={email}
+            onChange={(event) => setEmail(event.target.value)}
+            inputMode="email"
+          />
+        </Field>
+        <Field label="Регистр">
+          <Input value={regNum} onChange={(event) => setRegNum(event.target.value)} />
+        </Field>
+      </div>
 
-        <Button type="button" className="mt-4 w-full" disabled={isSaving} onClick={() => void saveCustomer()}>
-          {isSaving ? "Хадгалж байна..." : "Үйлчлүүлэгч хадгалах"}
-        </Button>
-      </DialogContent>
-    </Dialog>
+      <Button
+        type="button"
+        className="mt-4 w-full"
+        disabled={isSaving}
+        onClick={() => void saveCustomer()}
+      >
+        {isSaving ? "Хадгалж байна..." : "Үйлчлүүлэгч хадгалах"}
+      </Button>
+    </DialogContent>
   );
 }
 
 export function OrderMileageDialog({ data, open, onOpenChange, onSaved }: EditableDialogProps) {
-  const [km, setKm] = useState("");
-  const [isSaving, setIsSaving] = useState(false);
+  return (
+    <Dialog open={open} onOpenChange={onOpenChange}>
+      {open ? (
+        <OrderMileageDialogContent
+          key={mileageDialogKey(data)}
+          data={data}
+          onOpenChange={onOpenChange}
+          onSaved={onSaved}
+        />
+      ) : null}
+    </Dialog>
+  );
+}
 
-  useEffect(() => {
-    if (!open) return;
-    setKm(String(data.vehicle?.km ?? data.order.km ?? ""));
-  }, [data.order.km, data.vehicle?.km, open]);
+function OrderMileageDialogContent({ data, onOpenChange, onSaved }: EditableDialogContentProps) {
+  const [km, setKm] = useState(() => String(data.vehicle?.km ?? data.order.km ?? ""));
+  const [isSaving, setIsSaving] = useState(false);
 
   const saveMileage = async () => {
     const value = Number(km);
@@ -192,10 +228,9 @@ export function OrderMileageDialog({ data, open, onOpenChange, onSaved }: Editab
       if (orderResponse.error) throw orderResponse.error;
 
       if (data.vehicle?.id) {
-        const vehicleResponse = await apiClient.api.crm.vehicle.fleet({ id: data.vehicle.id }).put(
-          { km: nextKm },
-          { headers }
-        );
+        const vehicleResponse = await apiClient.api.crm.vehicle
+          .fleet({ id: data.vehicle.id })
+          .put({ km: nextKm }, { headers });
         if (vehicleResponse.error) throw vehicleResponse.error;
       }
 
@@ -211,31 +246,36 @@ export function OrderMileageDialog({ data, open, onOpenChange, onSaved }: Editab
   };
 
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="p-4 sm:max-w-[420px] sm:p-5">
-        <DialogHeader>
-          <DialogTitle className="flex items-center gap-2 text-base">
-            <Gauge className="size-4 text-blue-600" />
-            Машины нийт гүйлт
-          </DialogTitle>
-          <DialogDescription>Одоогийн нийт километрийг захиалга болон машин дээр хадгална.</DialogDescription>
-        </DialogHeader>
+    <DialogContent className="p-4 sm:max-w-[420px] sm:p-5">
+      <DialogHeader>
+        <DialogTitle className="flex items-center gap-2 text-base">
+          <Gauge className="size-4 text-blue-600" />
+          Машины нийт гүйлт
+        </DialogTitle>
+        <DialogDescription>
+          Одоогийн нийт километрийг захиалга болон машин дээр хадгална.
+        </DialogDescription>
+      </DialogHeader>
 
-        <Field label="Нийт гүйлт" required>
-          <Input
-            type="number"
-            min="0"
-            value={km}
-            onChange={(event) => setKm(event.target.value)}
-            inputMode="numeric"
-          />
-        </Field>
+      <Field label="Нийт гүйлт" required>
+        <Input
+          type="number"
+          min="0"
+          value={km}
+          onChange={(event) => setKm(event.target.value)}
+          inputMode="numeric"
+        />
+      </Field>
 
-        <Button type="button" className="mt-4 w-full" disabled={isSaving} onClick={() => void saveMileage()}>
-          {isSaving ? "Хадгалж байна..." : "Гүйлт хадгалах"}
-        </Button>
-      </DialogContent>
-    </Dialog>
+      <Button
+        type="button"
+        className="mt-4 w-full"
+        disabled={isSaving}
+        onClick={() => void saveMileage()}
+      >
+        {isSaving ? "Хадгалж байна..." : "Гүйлт хадгалах"}
+      </Button>
+    </DialogContent>
   );
 }
 

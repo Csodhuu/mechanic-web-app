@@ -1,6 +1,6 @@
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import { Ban, CheckCircle2, Gauge, Phone, ReceiptText, UserRoundPlus } from "lucide-react";
+import { Ban, CheckCircle2, Gauge, UserRoundPlus } from "lucide-react";
 
 import { OrderDetail, stateLabel } from "../../_types/service-order-detail";
 
@@ -36,14 +36,14 @@ export function OrderHeroCard({
   return (
     <Card className="overflow-hidden rounded-[24px] border border-slate-200 bg-white p-0 shadow-sm">
       <div className="bg-slate-950 p-4 text-white">
-        <div className="flex items-start justify-between gap-3">
+        <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
           <div className="min-w-0">
-            <h2 className="truncate text-lg font-bold sm:text-2xl">{vehicleName}</h2>
-            <p className="mt-1 text-sm text-slate-300">
-              {data.vehicle?.licensePlate ?? "-"} · {data.vehicle?.vin ?? "-"}
-            </p>
+            <h2 className="truncate text-lg font-bold sm:text-2xl">
+              {data.vehicle?.licensePlate ?? vehicleName}
+            </h2>
+            <p className="mt-1 truncate text-sm text-slate-300">{vehicleName}</p>
           </div>
-          <span className="shrink-0 rounded-full bg-blue-500 px-3 py-1 text-xs font-semibold text-white">
+          <span className="w-fit shrink-0 rounded-full bg-blue-500 px-3 py-1 text-xs font-semibold leading-4 text-white">
             {stateLabel[data.order.state]}
           </span>
         </div>
@@ -100,28 +100,6 @@ export function OrderHeroCard({
               {isCancelling ? "Цуцалж байна..." : "Ажил цуцлах"}
             </Button>
           )}
-        </div>
-      </div>
-
-      <div className="grid grid-cols-2 gap-2 p-4">
-        <div className="rounded-xl bg-slate-50 p-3">
-          <Gauge className="mb-2 h-4 w-4 text-blue-600" />
-          <p className="text-xs text-slate-500">Километр</p>
-          <p className="mt-1 text-sm font-bold text-slate-900">
-            {data.vehicle?.km ?? data.order.km} Km
-          </p>
-        </div>
-        <div className="rounded-xl bg-slate-50 p-3">
-          <Phone className="mb-2 h-4 w-4 text-blue-600" />
-          <p className="text-xs text-slate-500">Утас</p>
-          <p className="mt-1 text-sm font-bold text-slate-900">
-            {data.customer?.phoneNumber ?? "-"}
-          </p>
-        </div>
-        <div className="rounded-xl bg-slate-50 p-3">
-          <ReceiptText className="mb-2 h-4 w-4 text-blue-600" />
-          <p className="text-xs text-slate-500">Мэдээлэл</p>
-          <p className="mt-1 text-sm font-bold text-slate-900">Нууцалсан</p>
         </div>
       </div>
     </Card>

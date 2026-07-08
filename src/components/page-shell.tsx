@@ -31,17 +31,17 @@ export function PageShell({
         className
       )}
     >
-      <header className="mb-3 rounded-2xl border border-slate-200/80 bg-white/90 p-3 shadow-[0_12px_36px_-28px_rgba(15,23,42,0.35)] backdrop-blur sm:mb-4 sm:rounded-[28px] sm:p-4">
+      <header className="mb-3 border-b border-slate-200/80 pb-3 sm:mb-4 sm:pb-4">
         <div className="flex flex-col items-start justify-between gap-3 sm:flex-row sm:gap-4">
           <div className="min-w-0">
             {eyebrow && (
-              <p className="text-[11px] font-semibold uppercase tracking-[0.12em] text-slate-400">
+              <p className="text-[11px] font-semibold uppercase tracking-[0.12em] text-slate-600">
                 {eyebrow}
               </p>
             )}
             <div className="mt-1 flex items-center gap-3">
               {icon && (
-                <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl bg-blue-50 text-blue-600 sm:h-11 sm:w-11">
+                <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-slate-100 text-slate-700 sm:h-10 sm:w-10">
                   {icon}
                 </span>
               )}
@@ -50,14 +50,14 @@ export function PageShell({
                   {title}
                 </h1>
                 {description && (
-                  <p className="mt-1 max-w-2xl text-[13px] leading-5 text-slate-500 sm:text-sm sm:leading-6">
+                  <p className="mt-1 hidden max-w-xl text-[13px] leading-5 text-slate-500 sm:block">
                     {description}
                   </p>
                 )}
               </div>
             </div>
           </div>
-          {action && <div className="shrink-0 self-start">{action}</div>}
+          {action && <div className="w-full shrink-0 self-start sm:w-auto">{action}</div>}
         </div>
       </header>
 
@@ -83,17 +83,15 @@ const toneClass: Record<NonNullable<MetricCardProps["tone"]>, string> = {
 
 export function MetricCard({ label, value, description, tone = "blue", icon }: MetricCardProps) {
   return (
-    <div className="rounded-2xl border border-slate-200/80 bg-white p-3 shadow-sm sm:p-4">
+    <div className="rounded-xl border border-slate-200/80 bg-white p-3 shadow-sm">
       <div className="flex items-start justify-between gap-3">
         <div className="min-w-0">
-          <p className="text-xs font-semibold uppercase tracking-[0.08em] text-slate-400">
+          <p className="text-xs font-semibold uppercase tracking-[0.08em] text-slate-600">
             {label}
           </p>
-          <p className="mt-1 break-words text-lg font-bold leading-6 text-slate-950 sm:text-[22px] sm:leading-7">
-            {value}
-          </p>
+          <p className="mt-1 break-words text-lg font-bold leading-6 text-slate-950">{value}</p>
           {description && (
-            <p className="mt-1 text-[13px] leading-5 text-slate-500 sm:text-sm sm:leading-6">
+            <p className="mt-1 hidden text-[13px] leading-5 text-slate-500 sm:block">
               {description}
             </p>
           )}
@@ -101,7 +99,7 @@ export function MetricCard({ label, value, description, tone = "blue", icon }: M
         {icon && (
           <span
             className={cn(
-              "flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl ring-1",
+              "flex h-9 w-9 shrink-0 items-center justify-center rounded-xl ring-1",
               toneClass[tone]
             )}
           >

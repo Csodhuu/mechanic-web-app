@@ -43,7 +43,7 @@ export function LoginBrandPanel() {
 
         <div className="mt-10 grid gap-2">
           {[
-            { icon: ShieldCheck, label: "01", value: "Ажил үүсгэх" },
+            { icon: ShieldCheck, label: "01", value: "Оношлогоо" },
             { icon: ClipboardCheck, label: "02", value: "Checklist бөглөх" },
             { icon: Wrench, label: "03", value: "Засвар үйлчилгээ эхлүүлэх" },
           ].map((item) => {

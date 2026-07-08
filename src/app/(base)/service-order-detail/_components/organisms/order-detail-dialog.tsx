@@ -1,4 +1,4 @@
-import {
+﻿import {
   Dialog,
   DialogContent,
   DialogDescription,
@@ -18,7 +18,6 @@ type OrderDetailDialogProps = {
   customerName: string;
   data: OrderDetail;
   detailDialog: DetailDialogType | null;
-  vehicleName: string;
   onOpenChange: (open: boolean) => void;
 };
 
@@ -26,7 +25,6 @@ export function OrderDetailDialog({
   customerName,
   data,
   detailDialog,
-  vehicleName,
   onOpenChange,
 }: OrderDetailDialogProps) {
   return (
@@ -63,17 +61,10 @@ export function OrderDetailDialog({
 
         {detailDialog === "vehicle" && (
           <div>
-            <DetailRow label="Марк, модель" value={vehicleName} />
+            <DetailRow label="VIN" value={data.vehicle?.vin} />
             <DetailRow label="Улсын дугаар" value={data.vehicle?.licensePlate} />
-            <DetailRow label="Арлын дугаар" value={data.vehicle?.vin} />
             <DetailRow label="Нийт гүйлт" value={data.vehicle?.km ?? data.order.km} />
-            <DetailRow label="Өнгө" value={data.vehicle?.color} />
-            <DetailRow label="Үйлдвэрлэсэн он" value={data.vehicle?.yearManufacture} />
-            <DetailRow label="Орж ирсэн он" value={data.vehicle?.yearImport} />
-            <DetailRow label="Хөдөлгүүр" value={data.vehicle?.engineCode} />
-            <DetailRow label="Багтаамж" value={data.vehicle?.engineCc} />
-            <DetailRow label="Түлш" value={data.vehicle?.gasType} />
-            <DetailRow label="Төрөл" value={data.vehicle?.vehicleType} />
+            <DetailRow label="Утас" value={data.customer?.phoneNumber} />
           </div>
         )}
 

@@ -11,13 +11,13 @@ export type InspectionValue = InspectionGroup["values"][number];
 
 export const inspectionFilters: { label: string; value: Status | "ALL" }[] = [
   { label: "Бүгд", value: "ALL" },
-  { label: "Хүлээгдэж буй", value: "CREATED" },
+  { label: "Үүссэн", value: "CREATED" },
   { label: "Баталгаажсан", value: "APPROVED" },
   { label: "Цуцлагдсан", value: "CANCELLED" },
 ];
 
 export const statusStyle: Record<Status, { label: string; className: string }> = {
-  CREATED: { label: "Хүлээгдэж буй", className: "bg-amber-50 text-amber-700 ring-amber-200" },
+  CREATED: { label: "Үүссэн", className: "bg-amber-50 text-amber-700 ring-amber-200" },
   APPROVED: { label: "Баталгаажсан", className: "bg-emerald-50 text-emerald-700 ring-emerald-200" },
   CANCELLED: { label: "Цуцлагдсан", className: "bg-slate-100 text-slate-600 ring-slate-200" },
 };

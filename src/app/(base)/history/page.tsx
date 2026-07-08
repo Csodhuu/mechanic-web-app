@@ -9,7 +9,6 @@ import { History as HistoryIcon } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useEffect, useMemo, useState } from "react";
 import { HistoryList } from "./_components/organisms/history-list";
-import { HistorySummary } from "./_components/organisms/history-summary";
 import { groupByCompletedDate } from "./_types/history";
 
 const PAGE_SIZE = 25;
@@ -77,7 +76,6 @@ export default function History() {
       description="Дууссан service order-ууд, харилцагч болон машины мэдээлэл."
       icon={<HistoryIcon className="size-5" />}
     >
-      <HistorySummary totalCount={data?.totalCount ?? orders.length} visibleCount={orders.length} />
 
       {isLoading && (
         <EmptyState title="Уншиж байна" description="Дууссан ажлуудыг татаж байна..." />

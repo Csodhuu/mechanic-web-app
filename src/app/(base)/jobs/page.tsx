@@ -9,7 +9,6 @@ export default function Jobs() {
     <PageShell
       eyebrow="Service orders"
       title="Ажлын жагсаалт"
-      description="Шинэ ажил үүсгэх, checklist бөглөх, засварын захиалга хайх хэсэг."
       icon={<ClipboardList className="size-5" />}
       contentClassName="space-y-4"
     >

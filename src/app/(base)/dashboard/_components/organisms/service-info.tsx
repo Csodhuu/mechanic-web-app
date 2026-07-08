@@ -9,7 +9,7 @@ const serviceInfo = [
     Key: "wrench",
     name: "Анхан үзлэг",
     value: 4,
-    description: "Үзлэг хүлээгдэж буй",
+    description: "Үзлэг үүссэн",
     icon: Wrench,
     color: "bg-blue-500",
     iconColor: "text-white",

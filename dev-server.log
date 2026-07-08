@@ -1,0 +1,11 @@
+
+> mechanic-web-app@0.1.0 dev
+> next dev -p 3000
+
+▲ Next.js 16.2.6 (Turbopack)
+- Local:         http://localhost:3000
+- Network:       http://192.168.0.234:3000
+✓ Ready in 604ms
+
+ GET /login 200 in 288ms (next.js: 132ms, application-code: 156ms)
+ GET /login 200 in 99ms (next.js: 30ms, application-code: 68ms)

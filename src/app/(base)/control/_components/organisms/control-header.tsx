@@ -24,7 +24,7 @@ export function ControlHeader({ loading, onBack, onRefresh }: ControlHeaderProps
             Засвар үйлчилгээ
           </h1>
           <p className="truncate text-[13px] font-medium text-slate-500">
-            Эхлэхэд бэлэн болон явагдаж буй ажлууд
+            Үүссэн болон явагдаж буй ажлууд
           </p>
         </div>
         <button

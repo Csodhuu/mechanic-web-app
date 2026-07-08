@@ -1,13 +1,13 @@
 "use client";
 
-import { EmptyState, MetricCard, PageShell } from "@/components/page-shell";
+import { EmptyState, PageShell } from "@/components/page-shell";
 import { Button } from "@/components/ui/button";
 import { PaginationControls } from "@/components/ui/pagination-controls";
 import { apiClient } from "@/lib/authClient";
 import { cn } from "@/lib/utils";
 import { getCookie } from "cookies-next";
-import { CarFront, ClipboardCheck, RefreshCw, ShieldCheck } from "lucide-react";
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { ClipboardCheck, RefreshCw } from "lucide-react";
+import { useCallback, useEffect, useState } from "react";
 
 import { InspectionDetailDialog } from "./_components/organisms/inspection-detail-dialog";
 import { InspectionFilters } from "./_components/molecules/inspection-filters";
@@ -26,23 +26,6 @@ export default function InspectionPage() {
   const [selected, setSelected] = useState<InspectionItem | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-
-  const counts = useMemo(
-    () => ({
-      total,
-      visible: items.length,
-      checked: items.reduce(
-        (sum, item) =>
-          sum +
-          (item.inspection.inspection?.reduce(
-            (groupSum, group) => groupSum + group.values.length,
-            0
-          ) ?? 0),
-        0
-      ),
-    }),
-    [items, total]
-  );
 
   const load = useCallback(async () => {
     try {
@@ -74,6 +57,16 @@ export default function InspectionPage() {
     }
   }, [filter, page, search]);
 
+  const handleInspectionUpdated = useCallback((inspection: InspectionItem["inspection"]) => {
+    setItems((current) =>
+      current.map((item) =>
+        item.inspection.id === inspection.id ? { ...item, inspection } : item
+      )
+    );
+    setSelected((current) =>
+      current?.inspection.id === inspection.id ? { ...current, inspection } : current
+    );
+  }, []);
   useEffect(() => {
     const timeoutId = window.setTimeout(() => void load(), search.trim() ? 300 : 0);
     return () => window.clearTimeout(timeoutId);
@@ -97,30 +90,6 @@ export default function InspectionPage() {
         </Button>
       }
     >
-      <section className="grid gap-3 sm:grid-cols-3">
-        <MetricCard
-          label="Нийт"
-          value={String(counts.total)}
-          description="Бүртгэгдсэн үзлэг"
-          tone="blue"
-          icon={<ClipboardCheck className="size-5" />}
-        />
-        <MetricCard
-          label="Харагдаж буй"
-          value={String(counts.visible)}
-          description="Одоогийн filter"
-          tone="emerald"
-          icon={<ShieldCheck className="size-5" />}
-        />
-        <MetricCard
-          label="Checklist"
-          value={String(counts.checked)}
-          description="Нийт шалгасан мөр"
-          tone="amber"
-          icon={<CarFront className="size-5" />}
-        />
-      </section>
-
       <InspectionFilters
         filter={filter}
         search={search}
@@ -160,7 +129,11 @@ export default function InspectionPage() {
         </>
       )}
 
-      <InspectionDetailDialog item={selected} onOpenChange={(open) => !open && setSelected(null)} />
+      <InspectionDetailDialog
+        item={selected}
+        onOpenChange={(open) => !open && setSelected(null)}
+        onUpdated={handleInspectionUpdated}
+      />
     </PageShell>
   );
 }

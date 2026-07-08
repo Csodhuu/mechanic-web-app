@@ -1,35 +1,42 @@
 "use client";
 
-import { apiClient } from "@/lib/authClient";
 import { Input } from "@/components/ui/input";
 import { PaginationControls } from "@/components/ui/pagination-controls";
+import { apiClient } from "@/lib/authClient";
+import { cn } from "@/lib/utils";
 import { getCookie } from "cookies-next";
-import dayjs from "dayjs";
-import { CalendarClock, CarFront, ChevronRight, Gauge, Phone, Search, X } from "lucide-react";
+import { CarFront, ChevronRight, Search, X } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { CpOrderQuery } from "../../_types/cp-order";
 
+type OrderState = CpOrderQuery["result"][number]["order"]["state"];
+
+const statusMeta: Record<OrderState, { label: string; className: string }> = {
+  CREATED: { label: "Үүссэн", className: "bg-amber-50 text-amber-700 ring-amber-100" },
+  PROGRESSING: {
+    label: "Засвар явагдаж буй",
+    className: "bg-blue-50 text-blue-700 ring-blue-100",
+  },
+  COMPLETE: { label: "Дууссан", className: "bg-emerald-50 text-emerald-700 ring-emerald-100" },
+};
+
 const statusFilters = [
   { value: "ALL", label: "Бүгд" },
-  { value: "CREATED", label: "Шинэ" },
-  { value: "PROGRESSING", label: "Засвар явагдаж буй" },
-  { value: "COMPLETE", label: "Дууссан" },
+  { value: "CREATED", label: statusMeta.CREATED.label },
+  { value: "PROGRESSING", label: statusMeta.PROGRESSING.label },
+  { value: "COMPLETE", label: statusMeta.COMPLETE.label },
 ] as const;
 
 const searchFields = [
   { value: "licensePlate", label: "Улсын дугаар", placeholder: "Жишээ: 1234 УБА" },
-  { value: "vin", label: "Арлын дугаар", placeholder: "Арлын дугаар оруулна уу" },
+  { value: "vin", label: "VIN", placeholder: "VIN дугаар оруулна уу" },
   { value: "phone", label: "Утас", placeholder: "Утасны дугаар оруулна уу" },
-  { value: "model", label: "Модель", placeholder: "Модель оруулна уу" },
 ] as const;
 
 type StatusFilter = (typeof statusFilters)[number]["value"];
 type SearchField = (typeof searchFields)[number]["value"];
 type CpOrderQueryParams = Parameters<(typeof apiClient.api.crm)["cp-order"]["get"]>[0]["query"];
-
-const formatDate = (value?: string | null) =>
-  value ? dayjs(value).format("YYYY-MM-DD HH.mm") : "-";
 
 const PAGE_SIZE = 10;
 
@@ -63,7 +70,6 @@ export default function ServiceList({ refreshKey }: { refreshKey: number }) {
           if (searchField === "licensePlate") query.licensePlate = searchValue;
           if (searchField === "vin") query.vin = searchValue;
           if (searchField === "phone") query.phone = searchValue;
-          if (searchField === "model") query.model = searchValue;
         }
 
         const res = await apiClient.api.crm["cp-order"].get({
@@ -90,15 +96,7 @@ export default function ServiceList({ refreshKey }: { refreshKey: number }) {
   return (
     <section className="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
       <div className="flex items-center justify-between border-b border-slate-100 px-4 py-3 sm:px-5">
-        <div>
-          <h2 className="text-base font-semibold text-slate-950">Засвар үйлчилгээ</h2>
-          <p className="mt-0.5 text-xs text-slate-500">
-            Нийт {data?.totalCount ?? orders.length} захиалга
-          </p>
-        </div>
-        <span className="rounded-full bg-blue-50 px-2.5 py-1 text-xs font-medium text-blue-700">
-          Идэвхтэй
-        </span>
+        <h2 className="text-base font-semibold text-slate-950">Захиалга</h2>
       </div>
 
       <div className="border-b border-slate-100 px-4 py-3 sm:px-5">
@@ -167,70 +165,68 @@ export default function ServiceList({ refreshKey }: { refreshKey: number }) {
       </div>
 
       <div className="divide-y divide-slate-100">
-        {isLoading && <ListMessage>Уншиж байна...</ListMessage>}
+        {isLoading ? (
+          <ListSkeleton />
+        ) : (
+          <>
+            {orders.length === 0 && <ListMessage>Засвар үйлчилгээний ажил олдсонгүй.</ListMessage>}
 
-        {!isLoading && orders.length === 0 && (
-          <ListMessage>Засвар үйлчилгээний ажил олдсонгүй.</ListMessage>
-        )}
+            {orders.map((item, index) => {
+              const state = statusMeta[item.order.state];
+              const licensePlate = item.vehicle?.licensePlate ?? "Дугааргүй";
+              const vehicleName =
+                [item.make?.name, item.model?.name].filter(Boolean).join(" ") ||
+                "Машины мэдээлэлгүй";
 
-        {orders.map((item, index) => {
-          const vehicleName = [item.make?.name, item.model?.name].filter(Boolean).join(" ");
+              return (
+                <article
+                  key={item.order.id ?? index}
+                  role="button"
+                  tabIndex={0}
+                  className="group grid cursor-pointer grid-cols-[36px_minmax(0,1fr)_auto] items-center gap-3 px-4 py-3 transition-colors hover:bg-slate-50 focus-visible:bg-slate-50 focus-visible:outline-none sm:grid-cols-[40px_minmax(0,1fr)_auto_auto] sm:px-5"
+                  onClick={() => openDetail(item.order.id)}
+                  onKeyDown={(event) => {
+                    if (event.key === "Enter" || event.key === " ") {
+                      event.preventDefault();
+                      openDetail(item.order.id);
+                    }
+                  }}
+                >
+                  <div className="flex size-9 items-center justify-center rounded-xl bg-slate-100 text-slate-600 sm:size-10">
+                    <CarFront className="size-4" />
+                  </div>
 
-          return (
-            <article
-              key={item.order.id ?? index}
-              role="button"
-              tabIndex={0}
-              className="group grid cursor-pointer grid-cols-[36px_minmax(0,1fr)_auto] items-center gap-3 px-4 py-3 transition-colors hover:bg-slate-50 focus-visible:bg-slate-50 focus-visible:outline-none sm:grid-cols-[40px_minmax(0,1fr)_auto_auto] sm:px-5"
-              onClick={() => openDetail(item.order.id)}
-              onKeyDown={(event) => {
-                if (event.key === "Enter" || event.key === " ") {
-                  event.preventDefault();
-                  openDetail(item.order.id);
-                }
-              }}
-            >
-              <div className="flex size-9 items-center justify-center rounded-xl bg-slate-100 text-slate-600 sm:size-10">
-                <CarFront className="size-4" />
-              </div>
-
-              <div className="min-w-0">
-                <div className="flex items-center gap-2">
-                  <h3 className="truncate text-sm font-semibold text-slate-900">
-                    {vehicleName || "Машины мэдээлэлгүй"}
-                  </h3>
-                  <span className="hidden shrink-0 rounded-full bg-blue-50 px-2 py-0.5 text-[10px] font-semibold text-blue-700 sm:inline-flex">
-                    {item.order.state}
-                  </span>
-                </div>
-                <div className="mt-1 flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-slate-500">
-                  <span className="font-medium text-slate-700">
-                    {item.vehicle?.licensePlate ?? "Дугааргүй"}
-                  </span>
-                  <span className="inline-flex items-center gap-1">
-                    <Gauge className="size-3" />
-                    {item.vehicle?.km ?? item.order.km ?? "-"} км
-                  </span>
-                  <span className="inline-flex items-center gap-1">
-                    <CalendarClock className="size-3" />
-                    {formatDate(item.order.createdAt)}
-                  </span>
-                  {item.customer?.phoneNumber && (
-                    <span className="inline-flex items-center gap-1">
-                      <Phone className="size-3" />
-                      {item.customer.phoneNumber}
+                  <div className="min-w-0">
+                    <div className="flex items-center gap-2">
+                      <h3 className="truncate text-sm font-semibold text-slate-900">
+                        {licensePlate}
+                      </h3>
+                      <span
+                        className={cn(
+                          "hidden shrink-0 rounded-full px-2 py-0.5 text-[10px] font-semibold ring-1 sm:inline-flex",
+                          state.className
+                        )}
+                      >
+                        {state.label}
+                      </span>
+                    </div>
+                    <p className="mt-0.5 truncate text-xs text-slate-500">{vehicleName}</p>
+                    <span
+                      className={cn(
+                        "mt-1 inline-flex rounded-full px-2 py-0.5 text-[10px] font-semibold ring-1 sm:hidden",
+                        state.className
+                      )}
+                    >
+                      {state.label}
                     </span>
-                  )}
-                </div>
-                <span className="mt-1 inline-flex rounded-full bg-blue-50 px-2 py-0.5 text-[10px] font-semibold text-blue-700 sm:hidden">
-                  {item.order.state}
-                </span>
-              </div>
+                  </div>
 
-              <ChevronRight className="hidden size-4 text-slate-300 transition group-hover:translate-x-0.5 group-hover:text-slate-500 sm:block" />
-            </article>
-          );
-        })}
+                  <ChevronRight className="hidden size-4 text-slate-300 transition group-hover:translate-x-0.5 group-hover:text-slate-500 sm:block" />
+                </article>
+              );
+            })}
+          </>
+        )}
       </div>
 
       <PaginationControls
@@ -244,6 +240,26 @@ export default function ServiceList({ refreshKey }: { refreshKey: number }) {
         onPageChange={setPage}
       />
     </section>
+  );
+}
+
+function ListSkeleton() {
+  return (
+    <>
+      {Array.from({ length: 5 }).map((_, index) => (
+        <div
+          key={index}
+          className="grid animate-pulse grid-cols-[36px_minmax(0,1fr)_auto] items-center gap-3 px-4 py-3 sm:grid-cols-[40px_minmax(0,1fr)_auto_auto] sm:px-5"
+        >
+          <div className="size-9 rounded-xl bg-slate-100 sm:size-10" />
+          <div className="min-w-0 space-y-2">
+            <div className="h-3.5 w-40 max-w-full rounded-full bg-slate-100" />
+            <div className="h-3 w-28 rounded-full bg-slate-100" />
+          </div>
+          <div className="hidden h-3 w-16 rounded-full bg-slate-100 sm:block" />
+        </div>
+      ))}
+    </>
   );
 }
 

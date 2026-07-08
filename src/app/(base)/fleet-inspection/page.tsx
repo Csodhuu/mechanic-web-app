@@ -1,6 +1,6 @@
 "use client";
 
-import { EmptyState, MetricCard, PageShell } from "@/components/page-shell";
+import { EmptyState, PageShell } from "@/components/page-shell";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -12,22 +12,26 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { PaginationControls } from "@/components/ui/pagination-controls";
-import { apiClient } from "@/lib/authClient";
+import { API_URL, apiClient } from "@/lib/authClient";
 import { cn } from "@/lib/utils";
 import { getCookie } from "cookies-next";
 import {
   CalendarClock,
-  ClipboardCheck,
+  Camera,
   FileText,
   Gauge,
+  Loader2,
   Plus,
   RefreshCw,
+  Save,
   Search,
   Truck,
+  Upload,
   Wrench,
   X,
 } from "lucide-react";
-import { FormEvent, ReactNode, useCallback, useEffect, useMemo, useState } from "react";
+import { ChangeEvent, FormEvent, ReactNode, useCallback, useEffect, useMemo, useState } from "react";
+import { toast } from "sonner";
 
 import {
   fleetInspectionResultFilters,
@@ -58,6 +62,110 @@ const createStateOptions: { label: string; value: CreateState }[] = [
 ];
 
 const PAGE_SIZE = 25;
+type MetadataItem = {
+  key: string;
+  value: string;
+};
+
+type ResultDraft = {
+  result: string;
+  numeric: string;
+  comment: string;
+  severityLevel: string;
+  file: File | null;
+  fileName: string;
+};
+
+const IMAGE_UPLOAD_FOLDER = "fleet-inspection";
+const imageFlagKeys = ["requiresImage", "captureImage", "imageRequired", "requiresPhoto", "photoRequired"];
+
+const emptyDraft: ResultDraft = {
+  result: "",
+  numeric: "",
+  comment: "",
+  severityLevel: "",
+  file: null,
+  fileName: "",
+};
+
+const metadataItems = (metadata: unknown): MetadataItem[] =>
+  Array.isArray(metadata)
+    ? metadata.filter(
+        (item): item is MetadataItem =>
+          typeof item === "object" &&
+          item !== null &&
+          typeof (item as MetadataItem).key === "string" &&
+          typeof (item as MetadataItem).value === "string"
+      )
+    : [];
+
+const metaValue = (field: FleetInspectionTemplateField, key: string) =>
+  metadataItems(field.metadata).find((item) => item.key === key)?.value ?? "";
+
+const truthyMeta = (value: string) => ["true", "1", "yes", "y"].includes(value.trim().toLowerCase());
+
+const getFieldLabel = (field: FleetInspectionTemplateField) =>
+  metaValue(field, "label") || field.description || field.code || field.fieldGroup || field.id;
+
+const getFieldOptions = (field: FleetInspectionTemplateField) => {
+  const optionsValue = metaValue(field, "options");
+  if (optionsValue) {
+    try {
+      const parsed = JSON.parse(optionsValue);
+      if (Array.isArray(parsed)) {
+        return parsed.filter((item): item is string => typeof item === "string");
+      }
+    } catch {
+      return [];
+    }
+  }
+
+  return [];
+};
+
+const isRwdField = (field: FleetInspectionTemplateField) =>
+  metaValue(field, "multiChoiceMode") === "RWD" || truthyMeta(metaValue(field, "isRwdLevel"));
+
+const isImageField = (field: FleetInspectionTemplateField) => {
+  if (imageFlagKeys.some((key) => truthyMeta(metaValue(field, key)))) return true;
+
+  const inputType = metaValue(field, "inputType");
+  const fileKind = metaValue(field, "fileKind");
+  if (inputType === "FILE" && fileKind === "IMAGE") return true;
+  if (inputType === "IMAGE") return true;
+
+  const inputMeta = metaValue(field, "input");
+  if (!inputMeta) return false;
+
+  try {
+    const parsed = JSON.parse(inputMeta) as { type?: unknown; accept?: unknown; fileKind?: unknown };
+    return parsed.type === "file" && (parsed.accept === "image/*" || parsed.fileKind === "IMAGE");
+  } catch {
+    return false;
+  }
+};
+
+const buildDrafts = (
+  fields: FleetInspectionTemplateField[],
+  results: FleetInspectionFieldResult[]
+): Record<string, ResultDraft> => {
+  const resultByFieldId = new Map(results.map((result) => [result.templateFieldId, result]));
+
+  return fields.reduce<Record<string, ResultDraft>>((acc, field) => {
+    const result = resultByFieldId.get(field.id);
+    acc[field.id] = {
+      result: result?.result ?? "",
+      numeric: typeof result?.numeric === "number" ? String(result.numeric) : "",
+      comment: result?.comment ?? "",
+      severityLevel: typeof result?.severityLevel === "number" ? String(result.severityLevel) : "",
+      file: null,
+      fileName: "",
+    };
+    return acc;
+  }, {});
+};
+
+const imageUrl = (path: string) => `${API_URL}/api/image?${path}`;
 
 export default function FleetInspectionPage() {
   const [items, setItems] = useState<FleetInspectionItem[]>([]);
@@ -161,15 +269,6 @@ export default function FleetInspectionPage() {
     [items, search]
   );
 
-  const counts = useMemo(
-    () => ({
-      total,
-      visible: visibleItems.length,
-      completed: items.filter((item) => item.inspection.state === "COMPLETED").length,
-      failed: items.filter((item) => item.inspection.stateResult === "FAILED").length,
-    }),
-    [items, total, visibleItems.length]
-  );
 
   const createInspection = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -226,37 +325,6 @@ export default function FleetInspectionPage() {
         </Button>
       }
     >
-      <section className="grid gap-3 sm:grid-cols-4">
-        <MetricCard
-          label="Нийт"
-          value={String(counts.total)}
-          description="Бүртгэл"
-          tone="blue"
-          icon={<ClipboardCheck className="size-5" />}
-        />
-        <MetricCard
-          label="Харагдаж буй"
-          value={String(counts.visible)}
-          description="Одоогийн шүүлтүүр"
-          tone="slate"
-          icon={<Search className="size-5" />}
-        />
-        <MetricCard
-          label="Дууссан"
-          value={String(counts.completed)}
-          description="Дууссан төлөв"
-          tone="emerald"
-          icon={<CalendarClock className="size-5" />}
-        />
-        <MetricCard
-          label="Failed"
-          value={String(counts.failed)}
-          description="Унасан үр дүн"
-          tone="amber"
-          icon={<Wrench className="size-5" />}
-        />
-      </section>
-
       <form
         onSubmit={(event) => void createInspection(event)}
         className="rounded-2xl border border-slate-200/80 bg-white p-4 shadow-sm"
@@ -536,7 +604,9 @@ function FleetInspectionDetailDialog({
 }) {
   const [results, setResults] = useState<FleetInspectionFieldResult[]>([]);
   const [fields, setFields] = useState<FleetInspectionTemplateField[]>([]);
+  const [drafts, setDrafts] = useState<Record<string, ResultDraft>>({});
   const [loading, setLoading] = useState(false);
+  const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
@@ -544,6 +614,8 @@ function FleetInspectionDetailDialog({
       if (!item) {
         setResults([]);
         setFields([]);
+        setDrafts({});
+        setSaving(false);
         setError(null);
       }
     }, 0);
@@ -578,8 +650,12 @@ function FleetInspectionDetailDialog({
         if (!active) return;
         if (resultResponse.error || !resultResponse.data) throw resultResponse.error;
 
-        setResults(resultResponse.data.result);
-        setFields(fieldResponse.data ? (fieldResponse.data as FleetInspectionTemplateField[]) : []);
+        const loadedResults = resultResponse.data.result;
+        const loadedFields = fieldResponse.data ? (fieldResponse.data as FleetInspectionTemplateField[]) : [];
+
+        setResults(loadedResults);
+        setFields(loadedFields);
+        setDrafts(buildDrafts(loadedFields, loadedResults));
       } catch (cause) {
         if (!active) return;
         console.error("Failed to fetch fleet inspection detail:", cause);
@@ -598,7 +674,120 @@ function FleetInspectionDetailDialog({
     };
   }, [item]);
 
-  const fieldById = useMemo(() => new Map(fields.map((field) => [field.id, field])), [fields]);
+  const orderedFields = useMemo(
+    () => [...fields].sort((a, b) => (a.sortIndex ?? 0) - (b.sortIndex ?? 0)),
+    [fields]
+  );
+  const resultByFieldId = useMemo(
+    () => new Map(results.map((result) => [result.templateFieldId, result])),
+    [results]
+  );
+
+  const updateDraft = (fieldId: string, patch: Partial<ResultDraft>) => {
+    setDrafts((prev) => ({
+      ...prev,
+      [fieldId]: {
+        ...emptyDraft,
+        ...(prev[fieldId] ?? {}),
+        ...patch,
+      },
+    }));
+  };
+
+  const handleFileChange = (field: FleetInspectionTemplateField, event: ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0] ?? null;
+    if (!file) return;
+
+    if (!file.type.startsWith("image/")) {
+      toast.error("Зөвхөн зураг файл сонгоно уу.");
+      event.target.value = "";
+      return;
+    }
+
+    updateDraft(field.id, { file, fileName: file.name });
+  };
+
+  const saveFieldResults = async () => {
+    if (!item) return;
+
+    const token = getCookie("token");
+    if (!token) {
+      toast.error("Нэвтрэх token олдсонгүй.");
+      return;
+    }
+
+    try {
+      setSaving(true);
+
+      const payload = [];
+      for (const field of orderedFields) {
+        const draft = drafts[field.id] ?? emptyDraft;
+        const imageField = isImageField(field);
+        let resultValue = draft.result.trim() || null;
+        let numericValue: number | null = null;
+        const commentValue = draft.comment.trim() || null;
+        const severityValue = draft.severityLevel ? Number(draft.severityLevel) : null;
+
+        if (field.fieldType === "NUMERIC" || field.fieldType === "RATE") {
+          numericValue = draft.numeric.trim() ? Number(draft.numeric) : null;
+          if (numericValue !== null && Number.isNaN(numericValue)) {
+            toast.error(`${getFieldLabel(field)} талбарт зөв тоон утга оруулна уу.`);
+            return;
+          }
+        }
+
+        if (imageField && draft.file) {
+          const uploadResponse = await apiClient.api.image.post(
+            { folder: IMAGE_UPLOAD_FOLDER, image: draft.file },
+            { headers: { Authorization: `Bearer ${token}` } }
+          );
+          const uploadedPath = uploadResponse.data?.path;
+          if (!uploadedPath) {
+            throw new Error("Image upload did not return a path.");
+          }
+          resultValue = uploadedPath;
+        }
+
+        const hasValue = Boolean(resultValue) || numericValue !== null;
+        if (field.required && !hasValue) {
+          toast.error(`${getFieldLabel(field)} талбарыг бөглөнө үү.`);
+          return;
+        }
+
+        if (hasValue || commentValue || severityValue !== null) {
+          payload.push({
+            inspectionId: item.inspection.id,
+            templateFieldId: field.id,
+            result: resultValue,
+            numeric: numericValue,
+            comment: commentValue,
+            severityLevel: severityValue,
+          });
+        }
+      }
+
+      if (payload.length === 0) {
+        toast.error("Хадгалах үр дүн оруулна уу.");
+        return;
+      }
+
+      const response = await apiClient.api.fleet.inspection["field-result"]["create-or-update"].post(
+        payload,
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+
+      if (response.error || !response.data) throw response.error;
+
+      setResults(response.data);
+      setDrafts(buildDrafts(fields, response.data));
+      toast.success("Үзлэгийн үр дүн хадгалагдлаа.");
+    } catch (cause) {
+      console.error("Failed to save fleet inspection results:", cause);
+      toast.error("Үзлэгийн үр дүн хадгалахад алдаа гарлаа.");
+    } finally {
+      setSaving(false);
+    }
+  };
 
   if (!item) return null;
 
@@ -649,47 +838,158 @@ function FleetInspectionDetailDialog({
         )}
 
         <section className="rounded-xl border border-slate-200">
-          <div className="flex items-center justify-between border-b border-slate-100 px-3 py-2">
+          <div className="flex items-center justify-between gap-3 border-b border-slate-100 px-3 py-2">
             <div className="flex items-center gap-2 text-sm font-semibold text-slate-950">
               <FileText className="size-4 text-blue-600" />
               Үзлэгийн үр дүн
             </div>
-            {loading && <RefreshCw className="size-4 animate-spin text-slate-400" />}
+            <div className="flex items-center gap-2">
+              {loading && <RefreshCw className="size-4 animate-spin text-slate-400" />}
+              <Button
+                type="button"
+                size="sm"
+                onClick={() => void saveFieldResults()}
+                disabled={loading || saving || orderedFields.length === 0}
+              >
+                {saving ? <Loader2 className="size-4 animate-spin" /> : <Save className="size-4" />}
+                {saving ? "Хадгалж байна" : "Хадгалах"}
+              </Button>
+            </div>
           </div>
 
           {error && <p className="p-3 text-sm text-rose-600">{error}</p>}
-          {!loading && !error && results.length === 0 && (
-            <p className="p-3 text-sm text-slate-500">Үр дүн бүртгэгдээгүй байна.</p>
+          {!loading && !error && orderedFields.length === 0 && (
+            <p className="p-3 text-sm text-slate-500">Template талбар бүртгэгдээгүй байна.</p>
           )}
 
           <div className="divide-y divide-slate-100">
-            {results.map((result) => {
-              const field = fieldById.get(result.templateFieldId);
-              const value = result.result ?? result.numeric?.toLocaleString("mn-MN") ?? "-";
+            {orderedFields.map((field) => {
+              const draft = drafts[field.id] ?? emptyDraft;
+              const existingResult = resultByFieldId.get(field.id);
+              const imageField = isImageField(field);
+              const rwdField = isRwdField(field);
+              const options = rwdField ? ["Regular", "Warning", "Danger"] : getFieldOptions(field);
+              const label = getFieldLabel(field);
+              const currentImagePath = imageField ? draft.result || existingResult?.result || "" : "";
 
               return (
-                <div key={result.id} className="px-3 py-2">
-                  <div className="flex items-start justify-between gap-3">
+                <div key={field.id} className="space-y-3 px-3 py-3">
+                  <div className="flex flex-wrap items-start justify-between gap-2">
                     <div className="min-w-0">
                       <p className="break-words text-sm font-medium text-slate-900">
-                        {field?.description ||
-                          field?.code ||
-                          field?.fieldGroup ||
-                          result.templateFieldId}
+                        {label}
+                        {field.required && <span className="ml-1 text-rose-600">*</span>}
                       </p>
                       <p className="mt-0.5 text-xs text-slate-500">
-                        {field?.fieldGroup ?? field?.fieldType ?? "Field"}
+                        {field.fieldGroup ?? field.fieldType ?? "Field"}
                       </p>
                     </div>
-                    <span className="shrink-0 rounded-full bg-slate-100 px-2 py-1 text-xs font-semibold text-slate-700">
-                      {value}
-                    </span>
+                    {imageField && (
+                      <span className="inline-flex items-center gap-1 rounded-full bg-blue-50 px-2 py-1 text-xs font-semibold text-blue-700 ring-1 ring-blue-100">
+                        <Camera className="size-3" />
+                        Зураг
+                      </span>
+                    )}
                   </div>
-                  {result.comment && (
-                    <p className="mt-2 whitespace-pre-wrap text-sm text-slate-600">
-                      {result.comment}
-                    </p>
+
+                  {imageField ? (
+                    <div className="space-y-2">
+                      <label className="flex min-h-24 cursor-pointer flex-col items-center justify-center rounded-xl border border-dashed border-slate-300 bg-slate-50 px-3 py-4 text-center transition hover:border-blue-300 hover:bg-blue-50">
+                        <Upload className="mb-2 size-5 text-slate-400" />
+                        <span className="text-sm font-medium text-slate-800">
+                          {draft.fileName || "Зураг сонгох"}
+                        </span>
+                        <span className="mt-1 text-xs text-slate-500">PNG, JPG, JPEG файл</span>
+                        <Input
+                          type="file"
+                          accept="image/*"
+                          className="hidden"
+                          disabled={saving}
+                          onChange={(event) => handleFileChange(field, event)}
+                        />
+                      </label>
+                      {currentImagePath && (
+                        <a
+                          href={imageUrl(currentImagePath)}
+                          target="_blank"
+                          rel="noreferrer"
+                          className="inline-flex items-center gap-2 rounded-full bg-slate-100 px-3 py-1 text-xs font-semibold text-slate-700 hover:bg-slate-200"
+                        >
+                          <Camera className="size-3" />
+                          Одоогийн зураг харах
+                        </a>
+                      )}
+                    </div>
+                  ) : field.fieldType === "NUMERIC" || field.fieldType === "RATE" ? (
+                    <Input
+                      type="number"
+                      value={draft.numeric}
+                      disabled={saving}
+                      onChange={(event) => updateDraft(field.id, { numeric: event.target.value })}
+                    />
+                  ) : field.fieldType === "DATE" ? (
+                    <Input
+                      type="date"
+                      value={draft.result}
+                      disabled={saving}
+                      onChange={(event) => updateDraft(field.id, { result: event.target.value })}
+                    />
+                  ) : field.fieldType === "BOOLEAN" ? (
+                    <select
+                      value={draft.result}
+                      disabled={saving}
+                      onChange={(event) => updateDraft(field.id, { result: event.target.value })}
+                      className="h-10 w-full rounded-xl border border-slate-200 bg-white px-3 text-sm text-slate-800 outline-none transition focus:border-blue-500 disabled:bg-slate-50 disabled:text-slate-400"
+                    >
+                      <option value="">Сонгох</option>
+                      <option value="true">Тийм</option>
+                      <option value="false">Үгүй</option>
+                    </select>
+                  ) : field.fieldType === "MULTI_CHOICE" && options.length > 0 ? (
+                    <select
+                      value={draft.result}
+                      disabled={saving}
+                      onChange={(event) => {
+                        const nextValue = event.target.value;
+                        const severityLevel = rwdField
+                          ? String(Math.max(0, options.indexOf(nextValue)))
+                          : draft.severityLevel;
+                        updateDraft(field.id, { result: nextValue, severityLevel });
+                      }}
+                      className="h-10 w-full rounded-xl border border-slate-200 bg-white px-3 text-sm text-slate-800 outline-none transition focus:border-blue-500 disabled:bg-slate-50 disabled:text-slate-400"
+                    >
+                      <option value="">Сонгох</option>
+                      {options.map((option) => (
+                        <option key={option} value={option}>
+                          {option}
+                        </option>
+                      ))}
+                    </select>
+                  ) : (
+                    <Input
+                      value={draft.result}
+                      disabled={saving}
+                      onChange={(event) => updateDraft(field.id, { result: event.target.value })}
+                    />
                   )}
+
+                  {!rwdField && (
+                    <Input
+                      type="number"
+                      value={draft.severityLevel}
+                      disabled={saving}
+                      placeholder="Severity level"
+                      onChange={(event) => updateDraft(field.id, { severityLevel: event.target.value })}
+                    />
+                  )}
+
+                  <textarea
+                    value={draft.comment}
+                    disabled={saving}
+                    placeholder="Тайлбар"
+                    onChange={(event) => updateDraft(field.id, { comment: event.target.value })}
+                    className="min-h-20 w-full resize-none rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm text-slate-800 outline-none transition placeholder:text-slate-400 focus:border-blue-500 disabled:bg-slate-50 disabled:text-slate-400"
+                  />
                 </div>
               );
             })}
